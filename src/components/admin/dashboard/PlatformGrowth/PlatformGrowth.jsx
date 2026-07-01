@@ -1,10 +1,10 @@
 import React from "react"
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
 import CommonCard from "@/components/shared/CommonCard/CommonCard"
 
 const PlatformGrowth = ({ data }) => {
   return (
-    <CommonCard 
+    <CommonCard
       title="Platform Growth"
       subtitle="Streams & users over 12 months (Millions)"
       tag={{ text: "Yearly" }}
@@ -13,18 +13,28 @@ const PlatformGrowth = ({ data }) => {
       {/* Chart */}
       <div className="flex-1 w-full z-10 relative min-h-0">
         <ResponsiveContainer width="100%" height="100%" debounce={1000}>
-          <LineChart data={data || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+          <AreaChart data={data || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+            <defs>
+              <linearGradient id="colorStream" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#3ADFFA" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#3ADFFA" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="colorFollowers" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#CC97FF" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#CC97FF" stopOpacity={0} />
+              </linearGradient>
+            </defs>
             <CartesianGrid stroke="rgba(255,255,255,0.05)" strokeDasharray="3 3" vertical={false} />
-            <XAxis 
-              dataKey="name" 
-              stroke="rgba(255,255,255,0.3)" 
+            <XAxis
+              dataKey="name"
+              stroke="rgba(255,255,255,0.3)"
               fontSize={12}
               tickLine={false}
               axisLine={false}
               dy={10}
             />
-            <YAxis 
-              stroke="rgba(255,255,255,0.3)" 
+            <YAxis
+              stroke="rgba(255,255,255,0.3)"
               fontSize={12}
               tickLine={false}
               axisLine={false}
@@ -49,25 +59,27 @@ const PlatformGrowth = ({ data }) => {
                 return null
               }}
             />
-            <Line 
-              type="monotone" 
-              dataKey="stream" 
-              name="Stream" 
-              stroke="#3ADFFA" 
-              strokeWidth={2} 
-              dot={false}
+            <Area
+              type="monotone"
+              dataKey="stream"
+              name="Stream"
+              stroke="#3ADFFA"
+              strokeWidth={2}
+              fillOpacity={1}
+              fill="url(#colorStream)"
               activeDot={{ r: 6, stroke: "#3ADFFA", strokeWidth: 2, fill: "#0E0E0E" }}
             />
-            <Line 
-              type="monotone" 
-              dataKey="followers" 
-              name="Followers" 
-              stroke="#CC97FF" 
-              strokeWidth={2} 
-              dot={false}
+            <Area
+              type="monotone"
+              dataKey="followers"
+              name="Followers"
+              stroke="#CC97FF"
+              strokeWidth={2}
+              fillOpacity={1}
+              fill="url(#colorFollowers)"
               activeDot={{ r: 6, stroke: "#CC97FF", strokeWidth: 2, fill: "#0E0E0E" }}
             />
-          </LineChart>
+          </AreaChart>
         </ResponsiveContainer>
       </div>
 
