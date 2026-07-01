@@ -1,2 +1,2 @@
-import DashboardLayout from "@/layouts/DashboardLayout";
-export default DashboardLayout;
+import AdminDashboardLayout from "@/layouts/AdminDashboardLayout";
+export default AdminDashboardLayout;
