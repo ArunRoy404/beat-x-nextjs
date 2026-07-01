@@ -135,3 +135,74 @@ export const statsCards = [
     iconBg: "rgba(204, 151, 255, 0.15)"
   }
 ]
+
+export const platformGrowthData = [
+  { name: "Jan", stream: 0, followers: 0 },
+  { name: "Feb", stream: 2.1, followers: 3.5 },
+  { name: "Mar", stream: 3.0, followers: 4.8 },
+  { name: "Apr", stream: 3.8, followers: 5.2 },
+  { name: "May", stream: 4.5, followers: 6.0 },
+  { name: "Jun", stream: 5.2, followers: 7.2 },
+  { name: "Jul", stream: 6.2, followers: 8.0 },
+  { name: "Aug", stream: 6.8, followers: 9.8 },
+  { name: "Sep", stream: 7.2, followers: 10.2 },
+  { name: "Oct", stream: 7.5, followers: 11.0 },
+  { name: "Nov", stream: 8.0, followers: 12.5 },
+  { name: "Dec", stream: 9.0, followers: 14.5 }
+]
+
+export const genreMixData = [
+  { name: "POP", value: 38, color: "#34C759" },
+  { name: "R&B", value: 24, color: "#FFAE00" },
+  { name: "Synthwave", value: 18, color: "#CC97FF" },
+  { name: "Folk", value: 12, color: "#3A8EFA" },
+  { name: "Electronic", value: 8, color: "#3ADFFA" },
+  { name: "Others", value: 2, color: "#6B6B6B" }
+]
+
+export const revenueStreamsData = [
+  { name: "Jul", subscription: 160, store: 50, events: 100 },
+  { name: "Aug", subscription: 160, store: 50, events: 100 },
+  { name: "Sep", subscription: 160, store: 50, events: 100 },
+  { name: "Oct", subscription: 160, store: 50, events: 100 },
+  { name: "Nov", subscription: 160, store: 50, events: 100 },
+  { name: "Dec", subscription: 160, store: 50, events: 100 }
+]
+
+export const recentUploadsData = [
+  {
+    id: "01",
+    title: "Tumi Onek Dami",
+    plays: "4.2M plays",
+    status: "Published",
+    cover: "/images/tumi_onek_dami.png"
+  },
+  {
+    id: "02",
+    title: "Bhalo Thako Mon",
+    plays: "3.1M plays",
+    status: "Published",
+    cover: "/images/bhalo_thako_mon.png"
+  },
+  {
+    id: "03",
+    title: "Neon Prophets",
+    plays: "Sarah J. Miller",
+    status: "Published",
+    cover: "/images/neon_prophets.png"
+  },
+  {
+    id: "04",
+    title: "Bhalo Thako Mon",
+    plays: "3.1M plays",
+    status: "Draft",
+    cover: "/images/bhalo_thako_mon.png"
+  },
+  {
+    id: "05",
+    title: "Bhalo Thako Mon",
+    plays: "3.1M plays",
+    status: "Scheduled",
+    cover: "/images/bhalo_thako_mon.png"
+  }
+]
