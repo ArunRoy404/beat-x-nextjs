@@ -21,7 +21,7 @@ const CommonDashboardNavbar = () => {
 
   return (
     <header
-      className="w-full flex items-center justify-between px-3 py-6 transition-all duration-300 border-b border-border bg-cover bg-center"
+      className="sticky top-0 z-50 w-full flex items-center justify-between px-3 py-6 transition-all duration-300 border-b border-border bg-cover bg-center"
       style={{
         backgroundImage: "url('/bg-images/navigation_bg.png')",
       }}
