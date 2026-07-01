@@ -1,10 +1,10 @@
 "use client"
 
 import CommonDashboardLayout from "./CommonDashboardLayout/CommonDashboardLayout";
-import { useNavigationStore } from "@/navigationData/navigationStore";
+import { useAdminDashboardNavigationStore } from "@/navigationStore/adminDashboardNavigationStore";
 
 const AdminDashboardLayout = ({ children }) => {
-  const navigationData = useNavigationStore((state) => state.navigationData);
+  const navigationData = useAdminDashboardNavigationStore((state) => state.navigationData);
 
   return (
     <CommonDashboardLayout 

@@ -5,24 +5,19 @@ import { usePathname } from "next/navigation"
 import { Bell } from "lucide-react"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import CommonAvatar from "@/components/shared/CommonAvatar"
-import { useNavigationStore } from "@/navigationData/navigationStore"
+import { useNavigationDetailsStore } from "@/navigationStore/navigationDetailsStore"
 
 const CommonDashboardNavbar = () => {
   const pathname = usePathname()
-  const navigationData = useNavigationStore((state) => state.navigationData)
+  const navigationDetails = useNavigationDetailsStore((state) => state.navigationDetails)
 
-  // Dynamically resolve current page headers based on URL route path
-  const activeItem = React.useMemo(() => {
-    if (!navigationData?.navMain) return null
-    for (const group of navigationData.navMain) {
-      const match = group.items.find((item) => item.url === pathname)
-      if (match) return match
-    }
-    return null
-  }, [navigationData, pathname])
+  const activeDetails = navigationDetails[pathname] || {
+    title: "Music Management",
+    subtitle: "Manage all platform music — upload, review, approve"
+  }
 
-  const pageTitle = activeItem?.navbarTitle || activeItem?.title || "Music Management"
-  const pageSubtitle = activeItem?.subtitle || "Manage all platform music — upload, review, approve"
+  const pageTitle = activeDetails.title
+  const pageSubtitle = activeDetails.subtitle
 
   return (
     <header
@@ -33,8 +28,8 @@ const CommonDashboardNavbar = () => {
     >
       {/* Title & Navigation controls */}
       <div className="flex items-center gap-3">
-        <SidebarTrigger 
-          className="w-10 h-10 rounded-[8px] flex items-center justify-center text-secondary hover:text-white hover:bg-opacity-80 active:scale-95 cursor-pointer transition-all shrink-0" 
+        <SidebarTrigger
+          className="w-10 h-10 rounded-[8px] flex items-center justify-center text-secondary hover:text-white hover:bg-opacity-80 active:scale-95 cursor-pointer transition-all shrink-0"
           style={{
             background: "rgba(30, 36, 87, 0.40)",
             backdropFilter: "blur(2.5px)",

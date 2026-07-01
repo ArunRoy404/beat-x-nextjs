@@ -1,6 +1,4 @@
-import { create } from "zustand"
-
-const defaultNavigationData = {
+export const adminDashboardNavigation = {
   sidebarTitle: "ADMIN CONTROL",
   navMain: [
     {
@@ -142,8 +140,3 @@ const defaultNavigationData = {
     },
   ],
 }
-
-export const useNavigationStore = create((set) => ({
-  navigationData: defaultNavigationData,
-  setNavigationData: (data) => set({ navigationData: data }),
-}))
