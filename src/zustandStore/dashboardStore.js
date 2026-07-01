@@ -7,7 +7,11 @@ import {
   revenueStreamsData, 
   recentUploadsData,
   recentActivityData,
-  upcomingEventsData
+  upcomingEventsData,
+  analyticsStatsCards,
+  growthOverviewData,
+  peakListeningHoursData,
+  genreDistributionData
 } from "@/dummydata/dashboardData"
 
 export const useDashboardStore = create((set) => ({
@@ -19,6 +23,10 @@ export const useDashboardStore = create((set) => ({
   recentUploadsData: recentUploadsData,
   recentActivityData: recentActivityData,
   upcomingEventsData: upcomingEventsData,
+  analyticsStatsCards: analyticsStatsCards,
+  growthOverviewData: growthOverviewData,
+  peakListeningHoursData: peakListeningHoursData,
+  genreDistributionData: genreDistributionData,
   
   setGreetingData: (data) => set({ greetingData: data }),
   setStatsCards: (cards) => set({ statsCards: cards }),
@@ -27,5 +35,9 @@ export const useDashboardStore = create((set) => ({
   setRevenueStreamsData: (data) => set({ revenueStreamsData: data }),
   setRecentUploadsData: (data) => set({ recentUploadsData: data }),
   setRecentActivityData: (data) => set({ recentActivityData: data }),
-  setUpcomingEventsData: (data) => set({ upcomingEventsData: data })
+  setUpcomingEventsData: (data) => set({ upcomingEventsData: data }),
+  setAnalyticsStatsCards: (cards) => set({ analyticsStatsCards: cards }),
+  setGrowthOverviewData: (data) => set({ growthOverviewData: data }),
+  setPeakListeningHoursData: (data) => set({ peakListeningHoursData: data }),
+  setGenreDistributionData: (data) => set({ genreDistributionData: data })
 }))
