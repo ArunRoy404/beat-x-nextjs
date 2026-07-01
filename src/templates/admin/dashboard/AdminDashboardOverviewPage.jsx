@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { useDashboardStore } from "@/zustandStore/dashboardStore"
+import { useAdminDashboardOverviewStore } from "@/zustandStore/admin/adminStore/adminDashboardOverviewStore"
 import AdminGreeting from "@/components/admin/dashboard/AdminGreeting/AdminGreeting"
 import DashboardStats from "@/components/shared/Dashboard/DashboardStats/DashboardStats"
 import PlatformGrowth from "@/components/admin/dashboard/PlatformGrowth/PlatformGrowth"
@@ -12,14 +12,14 @@ import RecentActivity from "@/components/admin/dashboard/RecentActivity/RecentAc
 import UpcomingEvents from "@/components/admin/dashboard/UpcomingEvents/UpcomingEvents"
 
 const AdminDashboardOverviewPage = () => {
-    const greetingData = useDashboardStore((state) => state.greetingData)
-    const statsCards = useDashboardStore((state) => state.statsCards)
-    const platformGrowthData = useDashboardStore((state) => state.platformGrowthData)
-    const genreMixData = useDashboardStore((state) => state.genreMixData)
-    const revenueStreamsData = useDashboardStore((state) => state.revenueStreamsData)
-    const recentUploadsData = useDashboardStore((state) => state.recentUploadsData)
-    const recentActivity = useDashboardStore((state) => state.recentActivityData)
-    const upcomingEvents = useDashboardStore((state) => state.upcomingEventsData)
+    const greetingData = useAdminDashboardOverviewStore((state) => state.greetingData)
+    const statsCards = useAdminDashboardOverviewStore((state) => state.statsCards)
+    const platformGrowthData = useAdminDashboardOverviewStore((state) => state.platformGrowthData)
+    const genreMixData = useAdminDashboardOverviewStore((state) => state.genreMixData)
+    const revenueStreamsData = useAdminDashboardOverviewStore((state) => state.revenueStreamsData)
+    const recentUploadsData = useAdminDashboardOverviewStore((state) => state.recentUploadsData)
+    const recentActivity = useAdminDashboardOverviewStore((state) => state.recentActivityData)
+    const upcomingEvents = useAdminDashboardOverviewStore((state) => state.upcomingEventsData)
 
     return (
         <div className="flex flex-col gap-6 w-full pb-8">

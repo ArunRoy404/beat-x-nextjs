@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { useDashboardStore } from "@/zustandStore/dashboardStore"
+import { useAdminDashboardAnalyticsStore } from "@/zustandStore/admin/adminStore/adminDashboardAnalyticsStore"
 import DashboardStats from "@/components/shared/Dashboard/DashboardStats/DashboardStats"
 import TimeFilters from "@/components/admin/dashboard/Analytics/TimeFilters"
 import GrowthOverview from "@/components/admin/dashboard/Analytics/GrowthOverview"
@@ -9,10 +9,10 @@ import PeakListeningHours from "@/components/admin/dashboard/Analytics/PeakListe
 import GenreDistribution from "@/components/admin/dashboard/Analytics/GenreDistribution"
 
 const AdminDashboardAnalyticsPage = () => {
-    const statsCards = useDashboardStore((state) => state.analyticsStatsCards)
-    const growthOverviewData = useDashboardStore((state) => state.growthOverviewData)
-    const peakListeningHoursData = useDashboardStore((state) => state.peakListeningHoursData)
-    const genreDistributionData = useDashboardStore((state) => state.genreDistributionData)
+    const statsCards = useAdminDashboardAnalyticsStore((state) => state.analyticsStatsCards)
+    const growthOverviewData = useAdminDashboardAnalyticsStore((state) => state.growthOverviewData)
+    const peakListeningHoursData = useAdminDashboardAnalyticsStore((state) => state.peakListeningHoursData)
+    const genreDistributionData = useAdminDashboardAnalyticsStore((state) => state.genreDistributionData)
 
     return (
         <div className="flex flex-col gap-6 w-full pb-8">
