@@ -1,2 +1,6 @@
 import AdminDashboardOverviewPage from "@/templates/admin/dashboard/AdminDashboardOverviewPage";
-export default AdminDashboardOverviewPage;
+const page = () => {
+    return <AdminDashboardOverviewPage />
+}
+
+export default page;
