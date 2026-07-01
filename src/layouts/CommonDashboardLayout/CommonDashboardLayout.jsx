@@ -3,10 +3,10 @@ import CommonDashboardNavbar from "./CommonDashboardNavbar"
 import CommonDashboardOutlet from "./CommonDashboardOutlet"
 import CommonDashboardSidebar from "./CommonDashboardSidebar"
 
-export default function CommonDashboardLayout({ children, sidebarData }) {
+export default function CommonDashboardLayout({ children, sidebarData, sidebarTitle }) {
     return (
         <SidebarProvider>
-            <CommonDashboardSidebar data={sidebarData} />
+            <CommonDashboardSidebar data={sidebarData} title={sidebarTitle} />
             <SidebarInset>
                 <CommonDashboardNavbar />
                 <CommonDashboardOutlet>{children}</CommonDashboardOutlet>

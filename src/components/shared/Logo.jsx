@@ -12,8 +12,7 @@ const Logo = ({ variant = "default", className, ...props }) => {
             alt="BeatX Logo"
             width={width}
             height={width}
-            style={{ width: `${width}px`, height: "auto" }}
-            className={cn("object-contain", className)}
+            className={cn("object-contain max-w-full h-auto", className)}
             priority
             {...props}
         />
