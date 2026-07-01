@@ -41,6 +41,9 @@
   --color-dark-accent: var(--dark-accent);
   --color-whitetext: var(--whitetext);
   --color-nav-icon-bg: var(--nav-icon-bg);
+  --color-green-success: var(--green-success);
+  --color-red-error: var(--red-error);
+  --color-yellow-warning: var(--yellow-warning);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
