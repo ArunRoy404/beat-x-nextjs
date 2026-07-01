@@ -9,18 +9,18 @@ const GenreDistribution = ({ data }) => {
       subtitle="Stream share by genre"
       className="flex flex-col gap-4 h-[380px] w-full"
     >
-      {/* Content - Donut at top, Legend below */}
-      <div className="flex-1 flex flex-col items-center justify-between z-10 relative overflow-hidden min-h-0">
-        {/* Donut Chart Container */}
-        <div className="w-[150px] h-[150px] shrink-0 relative flex items-center justify-center">
+      {/* Content - Donut & List Side-by-side */}
+      <div className="flex flex-1 items-center justify-between gap-4 z-10 relative overflow-hidden min-h-0">
+        {/* Left Side: Donut Chart */}
+        <div className="w-[180px] h-[180px] shrink-0 relative flex items-center justify-center">
           <ResponsiveContainer width="100%" height="100%" debounce={1000}>
             <PieChart>
               <Pie
                 data={data || []}
                 cx="50%"
                 cy="50%"
-                innerRadius={45}
-                outerRadius={65}
+                innerRadius={55}
+                outerRadius={75}
                 paddingAngle={3}
                 dataKey="value"
               >
@@ -46,15 +46,15 @@ const GenreDistribution = ({ data }) => {
           </ResponsiveContainer>
         </div>
 
-        {/* Legend List Below */}
-        <div className="w-full flex flex-col gap-1.5 overflow-y-auto max-h-[140px] pr-1 mt-2">
+        {/* Right Side: List of Genres with Percentages */}
+        <div className="flex-1 flex flex-col gap-2 max-h-[220px] overflow-y-auto pr-1">
           {(data || []).map((genre, idx) => (
             <div key={idx} className="flex items-center justify-between text-xs py-1 border-b border-white/[0.02] last:border-0">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: genre.color }} />
                 <span className="text-light-gray uppercase font-medium">{genre.name}</span>
               </div>
-              <span className="font-semibold text-[14px]" style={{ color: genre.color }}>
+              <span className="font-semibold" style={{ color: genre.color }}>
                 {genre.value}%
               </span>
             </div>
