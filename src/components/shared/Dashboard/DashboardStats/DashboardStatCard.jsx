@@ -1,5 +1,6 @@
 import React from "react"
 import * as LucideIcons from "lucide-react"
+import CommonCard from "@/components/shared/CommonCard/CommonCard"
 
 const DashboardStatCard = ({ card }) => {
   if (!card) return null;
@@ -7,13 +8,7 @@ const DashboardStatCard = ({ card }) => {
   const IconComponent = card?.icon ? (LucideIcons[card.icon] || LucideIcons.HelpCircle) : null
 
   return (
-    <div className="relative overflow-hidden rounded-[8px] border border-border p-4 bg-[#0E0E0E] flex flex-col justify-between">
-      {/* Background image layer with 10% opacity */}
-      <div
-        className="absolute inset-0 bg-cover bg-center opacity-10 pointer-events-none"
-        style={{ backgroundImage: "url('/bg-images/card_bg.png')" }}
-      />
-
+    <CommonCard className="flex flex-col justify-between">
       {/* Upper row: Number & Icon */}
       <div className="relative z-10 flex items-center justify-between">
         <span className="text-whitetext text-[24px] not-italic font-medium">
@@ -58,7 +53,7 @@ const DashboardStatCard = ({ card }) => {
           </div>
         )}
       </div>
-    </div>
+    </CommonCard>
   )
 }
 
