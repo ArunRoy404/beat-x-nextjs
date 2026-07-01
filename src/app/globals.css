@@ -1,26 +1,111 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-space-grotesk), var(--font-sans);
+  --font-space-grotesk: var(--font-space-grotesk);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  /* Theme Custom Colors */
+  --primary: #CC97FF;
+  --secondary: #3ADFFA;
+  --light-gray: #ADAAAA;
+  --dark-gray: #6B6B6B;
+  --border: #6B6B6B;
+  --dark-accent: #20201F;
+  --whitetext: #FFF;
+  --light-whitetext: #FFFFFF66;
+  --search-bg: rgba(14, 14, 14, 0.20);
+  --green-success: #34C759;
+  --red-error: #ED1010;
+  --yellow-warning: #FFAE00;
+  --modal-header-bg: linear-gradient(135deg, rgba(58, 223, 250, 0.08) 0%, rgba(204, 151, 255, 0.06) 100%);
+  --modal-footer-bg: #1A1A19;
+  --border-radius: 32px;
+  --button-bg: var(--Button-Background, linear-gradient(270deg, #3ADFFA 0%, #B1FE4D 100%));
+
+  /* Standard Theme Mapping (Mapped to custom) */
+  --background: #0E0E0E;
+  --foreground: var(--whitetext);
+  --card: var(--modal-footer-bg);
+  --card-foreground: var(--whitetext);
+  --popover: var(--modal-footer-bg);
+  --popover-foreground: var(--whitetext);
+  --primary-foreground: #0E0E0E;
+  --secondary-foreground: #0E0E0E;
+  --muted: var(--dark-accent);
+  --muted-foreground: var(--light-gray);
+  --accent: var(--dark-accent);
+  --accent-foreground: var(--whitetext);
+  --destructive: var(--red-error);
+  --input: var(--border);
+  --ring: var(--primary);
+  --radius: var(--border-radius);
+  --sidebar: var(--dark-accent);
+  --sidebar-foreground: var(--whitetext);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: #0E0E0E;
+  --sidebar-accent: var(--secondary);
+  --sidebar-accent-foreground: #0E0E0E;
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--primary);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-space-grotesk);
+  }
+
+  html {
+    @apply font-sans;
+  }
 }
