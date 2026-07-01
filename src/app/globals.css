@@ -40,6 +40,7 @@
   --color-dark-gray: var(--dark-gray);
   --color-dark-accent: var(--dark-accent);
   --color-whitetext: var(--whitetext);
+  --color-nav-icon-bg: var(--nav-icon-bg);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -71,6 +72,7 @@
   --modal-footer-bg: #1A1A19;
   --border-radius: 32px;
   --button-bg: var(--Button-Background, linear-gradient(270deg, #3ADFFA 0%, #B1FE4D 100%));
+  --nav-icon-bg: rgba(30, 36, 87, 0.40);
 
   /* Standard Theme Mapping (Mapped to custom) */
   --background: #0E0E0E;
