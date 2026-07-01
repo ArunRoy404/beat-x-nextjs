@@ -206,3 +206,70 @@ export const recentUploadsData = [
     cover: "/images/bhalo_thako_mon.png"
   }
 ]
+
+export const recentActivityData = [
+  {
+    id: 1,
+    text: "Skyline Residency building added to portfolio",
+    time: "May 23, 8:33 AM",
+    color: "#3ADFFA"
+  },
+  {
+    id: 2,
+    text: "Rent payment of ₹45,000 received from Meera Iyer (Flat 301)",
+    time: "May 23, 8:33 AM",
+    color: "#FFAE00"
+  },
+  {
+    id: 3,
+    text: "Critical: CCTV camera malfunction at Skyline Residency",
+    time: "May 23, 8:33 AM",
+    color: "#34C759"
+  },
+  {
+    id: 4,
+    text: "Ankit Verma moved into Sunrise Tower, Flat 101",
+    time: "May 23, 8:33 AM",
+    color: "#FFAE00"
+  },
+  {
+    id: 5,
+    text: "Flat 302 at Skyline Residency marked for maintenance",
+    time: "May 23, 8:33 AM",
+    color: "#3ADFFA"
+  },
+  {
+    id: 6,
+    text: "₹75,000 paid for lift motor replacement at Skyline Residency",
+    time: "May 23, 8:33 AM",
+    color: "#6B6B6B"
+  },
+  {
+    id: 7,
+    text: "Flat 302 at Skyline Residency marked for maintenance",
+    time: "May 23, 8:33 AM",
+    color: "#CC97FF"
+  }
+]
+
+export const upcomingEventsData = [
+  {
+    id: 1,
+    month: "NOV",
+    day: "24",
+    title: "Neon City Arena",
+    location: "Tokyo, Japan",
+    status: "Upcoming",
+    ticketsSold: "320/500 tickets sold"
+  },
+  {
+    id: 2,
+    month: "NOV",
+    day: "24",
+    title: "The Grid Pavilion",
+    location: "Berlin, Germany",
+    status: "Upcoming",
+    ticketsSold: "320/500 tickets sold"
+  }
+]
+

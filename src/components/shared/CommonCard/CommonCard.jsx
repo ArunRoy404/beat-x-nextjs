@@ -33,15 +33,19 @@ const CommonCard = ({ children, className, title, subtitle, tag, link, ...props 
                     </div>
                     {/* Render action tag */}
                     {tag && (
-                        <CardAction onClick={tag?.onClick}>
-                            {typeof tag === "object" ? tag.text : tag}
-                        </CardAction>
+                        React.isValidElement(tag) ? tag : (
+                            <CardAction onClick={tag?.onClick}>
+                                {typeof tag === "object" ? tag.text : tag}
+                            </CardAction>
+                        )
                     )}
                     {/* Render navigation link */}
                     {link && (
-                        <CardAction href={typeof link === "object" ? link.href : undefined} onClick={link?.onClick}>
-                            {typeof link === "object" ? link.text : link}
-                        </CardAction>
+                        React.isValidElement(link) ? link : (
+                            <CardAction href={typeof link === "object" ? link.href : undefined} onClick={link?.onClick}>
+                                {typeof link === "object" ? link.text : link}
+                            </CardAction>
+                        )
                     )}
                 </div>
             )}

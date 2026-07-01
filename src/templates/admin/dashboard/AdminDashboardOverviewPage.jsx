@@ -8,6 +8,8 @@ import PlatformGrowth from "@/components/admin/dashboard/PlatformGrowth/Platform
 import GenreMix from "@/components/admin/dashboard/GenreMix/GenreMix"
 import RevenueStreams from "@/components/admin/dashboard/RevenueStreams/RevenueStreams"
 import RecentUploads from "@/components/admin/dashboard/RecentUploads/RecentUploads"
+import RecentActivity from "@/components/admin/dashboard/RecentActivity/RecentActivity"
+import UpcomingEvents from "@/components/admin/dashboard/UpcomingEvents/UpcomingEvents"
 
 const AdminDashboardOverviewPage = () => {
     const greetingData = useDashboardStore((state) => state.greetingData)
@@ -16,6 +18,8 @@ const AdminDashboardOverviewPage = () => {
     const genreMixData = useDashboardStore((state) => state.genreMixData)
     const revenueStreamsData = useDashboardStore((state) => state.revenueStreamsData)
     const recentUploadsData = useDashboardStore((state) => state.recentUploadsData)
+    const recentActivity = useDashboardStore((state) => state.recentActivityData)
+    const upcomingEvents = useDashboardStore((state) => state.upcomingEventsData)
 
     return (
         <div className="flex flex-col gap-6 w-full pb-8">
@@ -28,9 +32,11 @@ const AdminDashboardOverviewPage = () => {
                 <GenreMix data={genreMixData} />
                 <RevenueStreams data={revenueStreamsData} />
                 <RecentUploads uploads={recentUploadsData} />
+                <RecentActivity data={recentActivity} />
+                <UpcomingEvents data={upcomingEvents} />
             </div>
         </div>
     )
 }
 
-export default AdminDashboardOverviewPage 
+export default AdminDashboardOverviewPage
