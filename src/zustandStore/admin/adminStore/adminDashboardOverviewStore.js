@@ -1,16 +1,16 @@
 import { create } from "zustand"
-import { 
-  greetingData, 
-  statsCards, 
-  platformGrowthData, 
-  genreMixData, 
-  revenueStreamsData, 
+import {
+  greetingData,
+  statsCards,
+  platformGrowthData,
+  genreMixData,
+  revenueStreamsData,
   recentUploadsData,
   recentActivityData,
   upcomingEventsData
-} from "@/dummydata/dashboardData"
+} from "@/dummyData/admin/adminData/adminDashboardOverviewData"
 
-export const useDashboardStore = create((set) => ({
+export const useAdminDashboardOverviewStore = create((set) => ({
   greetingData: greetingData,
   statsCards: statsCards,
   platformGrowthData: platformGrowthData,
@@ -19,7 +19,7 @@ export const useDashboardStore = create((set) => ({
   recentUploadsData: recentUploadsData,
   recentActivityData: recentActivityData,
   upcomingEventsData: upcomingEventsData,
-  
+
   setGreetingData: (data) => set({ greetingData: data }),
   setStatsCards: (cards) => set({ statsCards: cards }),
   setPlatformGrowthData: (data) => set({ platformGrowthData: data }),

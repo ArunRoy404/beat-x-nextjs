@@ -16,7 +16,7 @@ const EventCard = ({ event }) => {
           <span className="text-[20px] font-bold text-whitetext leading-none">
             {event?.day || "00"}
           </span>
-        </div>
+        </div> 
 
         {/* Text details */}
         <div className="flex flex-col min-w-0">

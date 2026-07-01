@@ -272,4 +272,3 @@ export const upcomingEventsData = [
     ticketsSold: "320/500 tickets sold"
   }
 ]
-
