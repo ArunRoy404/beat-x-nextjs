@@ -36,6 +36,14 @@
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
+  --color-light-gray: var(--light-gray);
+  --color-dark-gray: var(--dark-gray);
+  --color-dark-accent: var(--dark-accent);
+  --color-whitetext: var(--whitetext);
+  --color-nav-icon-bg: var(--nav-icon-bg);
+  --color-green-success: var(--green-success);
+  --color-red-error: var(--red-error);
+  --color-yellow-warning: var(--yellow-warning);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -67,6 +75,7 @@
   --modal-footer-bg: #1A1A19;
   --border-radius: 32px;
   --button-bg: var(--Button-Background, linear-gradient(270deg, #3ADFFA 0%, #B1FE4D 100%));
+  --nav-icon-bg: rgba(30, 36, 87, 0.40);
 
   /* Standard Theme Mapping (Mapped to custom) */
   --background: #0E0E0E;
@@ -108,4 +117,53 @@
   html {
     @apply font-sans;
   }
+}
+
+.custom-dashboard-sidebar [data-sidebar="sidebar"] {
+  background-color: transparent !important;
+}
+
+
+/* PREMIUM SCROLLBAR STYLES */
+/* Webkit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) var(--background);
+}
+
+/* Specific hover effect for Firefox isn't supported via standard CSS properties, 
+   but we can apply it to specific containers if needed. 
+   However, this global reset makes everything look consistent. */
+
+/* Optional: Make scrollbar more prominent in specific areas like panels */
+.panel::-webkit-scrollbar-thumb,
+.tx-panel-body::-webkit-scrollbar-thumb,
+.modal::-webkit-scrollbar-thumb {
+  background: var(--border);
+}
+
+.panel:hover::-webkit-scrollbar-thumb,
+.tx-panel-body:hover::-webkit-scrollbar-thumb,
+.modal:hover::-webkit-scrollbar-thumb {
+  background: var(--primary);
 }
