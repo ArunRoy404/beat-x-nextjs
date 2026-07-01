@@ -122,3 +122,48 @@
 .custom-dashboard-sidebar [data-sidebar="sidebar"] {
   background-color: transparent !important;
 }
+
+
+/* PREMIUM SCROLLBAR STYLES */
+/* Webkit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) var(--background);
+}
+
+/* Specific hover effect for Firefox isn't supported via standard CSS properties, 
+   but we can apply it to specific containers if needed. 
+   However, this global reset makes everything look consistent. */
+
+/* Optional: Make scrollbar more prominent in specific areas like panels */
+.panel::-webkit-scrollbar-thumb,
+.tx-panel-body::-webkit-scrollbar-thumb,
+.modal::-webkit-scrollbar-thumb {
+  background: var(--border);
+}
+
+.panel:hover::-webkit-scrollbar-thumb,
+.tx-panel-body:hover::-webkit-scrollbar-thumb,
+.modal:hover::-webkit-scrollbar-thumb {
+  background: var(--primary);
+}
