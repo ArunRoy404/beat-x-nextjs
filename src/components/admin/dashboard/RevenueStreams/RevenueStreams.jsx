@@ -11,7 +11,7 @@ const RevenueStreams = ({ data }) => {
     >
       {/* Chart */}
       <div className="flex-1 w-full z-10 relative min-h-0">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" debounce={1000}>
           <BarChart data={data || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} barGap={3}>
             <CartesianGrid stroke="rgba(255,255,255,0.05)" strokeDasharray="3 3" vertical={false} />
             <XAxis 

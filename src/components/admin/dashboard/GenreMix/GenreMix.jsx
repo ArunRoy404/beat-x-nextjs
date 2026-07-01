@@ -13,7 +13,7 @@ const GenreMix = ({ data }) => {
       <div className="flex flex-1 items-center justify-between gap-4 z-10 relative overflow-hidden min-h-0">
         {/* Left Side: Donut Chart */}
         <div className="w-[180px] h-[180px] shrink-0 relative flex items-center justify-center">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" debounce={1000}>
             <PieChart>
               <Pie
                 data={data || []}
