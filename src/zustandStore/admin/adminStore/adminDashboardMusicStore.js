@@ -7,9 +7,4 @@ import {
 export const useAdminDashboardMusicStore = create((set) => ({
   musicStatsCards: musicStatsCards,
   songsList: songsList,
-  
-  setMusicStatsCards: (cards) => set({ musicStatsCards: cards }),
-  setSongsList: (songs) => set({ songsList: songs }),
-  addSong: (song) => set((state) => ({ songsList: [...state.songsList, song] })),
-  deleteSong: (id) => set((state) => ({ songsList: state.songsList.filter(s => s.id !== id) }))
 }))

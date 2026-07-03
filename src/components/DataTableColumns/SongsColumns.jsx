@@ -1,65 +1,59 @@
 import React from "react"
-import { Eye, Edit, Trash2, TrendingUp } from "lucide-react"
-import CommonAvatar from "@/components/shared/CommonAvatar"
+import { Eye, Check, X, Trash2, TrendingUp } from "lucide-react"
+import CommonSongCell from "@/components/shared/CommonTable/CommonSongCell"
+import CommonTableCell from "@/components/shared/CommonTable/CommonTableCell"
+import CommonTableHeader from "@/components/shared/CommonTable/CommonTableHeader"
 
-export const getSongsColumns = ({ onViewDetails, onEdit, onDelete } = {}) => [
+export const getSongsColumns = () => [
   {
     accessorKey: "title",
-    header: "Songs",
+    header: () => <CommonTableHeader>Songs</CommonTableHeader>,
     cell: ({ row }) => {
       const song = row.original
       return (
-        <div className="flex items-center gap-3">
-          <CommonAvatar
-            src={song?.cover}
-            className="w-10 h-10 rounded-[8px]"
-            alt={song?.title}
-          />
-          <div className="flex flex-col min-w-0">
-            <span className="text-whitetext text-[14px] font-normal truncate">
-              {song?.title}
-            </span>
-            <span className="text-dark-gray text-[12px] font-normal">
-              {song?.duration}
-            </span>
-          </div>
-        </div>
+        <CommonSongCell
+          title={song?.title}
+          duration={song?.duration}
+          cover={song?.cover}
+        />
       )
     }
   },
   {
     accessorKey: "album",
-    header: "Album",
+    header: () => <CommonTableHeader>Album</CommonTableHeader>,
     cell: ({ getValue }) => (
-      <span className="text-light-gray text-[14px] font-normal truncate max-w-[120px] block">
-        {getValue()}
-      </span>
+      <CommonTableCell>
+        {getValue() || "-"}
+      </CommonTableCell>
     )
   },
   {
     accessorKey: "genre",
-    header: "Genre",
+    header: () => <CommonTableHeader>Genre</CommonTableHeader>,
     cell: ({ getValue }) => (
-      <span className="inline-block px-2.5 py-0.5 rounded-full border border-white/10 text-light-gray text-[12px] uppercase font-normal">
-        {getValue()}
-      </span>
+      <div className="flex">
+        <span className="inline-block px-2.5 py-0.5 rounded-full border border-white/10 text-light-gray text-[12px] uppercase font-normal select-none">
+          {getValue()}
+        </span>
+      </div>
     )
   },
   {
     accessorKey: "streams",
-    header: "Streams",
+    header: () => <CommonTableHeader>Streams</CommonTableHeader>,
     cell: ({ getValue }) => {
       const streams = getValue()
-      const hasStreams = parseFloat(streams) > 0
+      const hasStreams = streams && streams !== "0" && streams !== "-"
       return (
         <div className="flex items-center gap-1">
           {hasStreams ? (
             <>
               <TrendingUp className="w-3.5 h-3.5 text-green-success shrink-0" />
-              <span className="text-green-success text-[14px] font-normal">{streams}</span>
+              <span className="text-green-success text-[14px] font-normal">~ {streams}</span>
             </>
           ) : (
-            <span className="text-[14px] font-normal text-dark-gray">~ 0</span>
+            <span className="text-[14px] font-normal text-dark-gray select-none">~ 0</span>
           )}
         </div>
       )
@@ -67,80 +61,113 @@ export const getSongsColumns = ({ onViewDetails, onEdit, onDelete } = {}) => [
   },
   {
     accessorKey: "released",
-    header: "Released",
+    header: () => <CommonTableHeader>Released</CommonTableHeader>,
     cell: ({ getValue }) => (
-      <span className="text-light-gray text-[14px] font-normal">
-        {getValue()}
-      </span>
+      <CommonTableCell>
+        {getValue() || "-"}
+      </CommonTableCell>
     )
   },
   {
     accessorKey: "status",
-    header: "Status",
+    header: () => <CommonTableHeader>Status</CommonTableHeader>,
     cell: ({ getValue }) => {
       const status = getValue()
       return (
-        <>
+        <div className="flex">
           {status === "Published" && (
-            <span className="border border-green-success/20 bg-green-success/10 text-green-success text-[12px] font-normal px-2.5 py-0.5 rounded-full">
+            <span className="border border-green-success/20 bg-green-success/10 text-green-success text-[12px] font-normal px-2.5 py-0.5 rounded-full select-none">
               Published
             </span>
           )}
           {status === "Under Review" && (
-            <span className="border border-yellow-warning/20 bg-yellow-warning/10 text-yellow-warning text-[12px] font-normal px-2.5 py-0.5 rounded-full">
+            <span className="border border-yellow-warning/20 bg-yellow-warning/10 text-yellow-warning text-[12px] font-normal px-2.5 py-0.5 rounded-full flex items-center gap-1.5 select-none">
+              <span className="w-1.5 h-1.5 rounded-full bg-yellow-warning animate-pulse" />
               Under Review
             </span>
           )}
           {status === "Scheduled" && (
-            <span className="border border-yellow-warning/40 bg-yellow-warning/10 text-yellow-warning text-[12px] font-normal px-2.5 py-0.5 rounded-full">
+            <span className="border border-yellow-warning/30 bg-yellow-warning/10 text-yellow-warning text-[12px] font-normal px-2.5 py-0.5 rounded-full select-none">
               Scheduled
             </span>
           )}
           {status === "Draft" && (
-            <span className="border border-white/10 bg-white/[0.05] text-light-gray text-[12px] font-normal px-2.5 py-0.5 rounded-full">
+            <span className="border border-white/10 bg-white/[0.05] text-light-gray text-[12px] font-normal px-2.5 py-0.5 rounded-full select-none">
               Draft
             </span>
           )}
           {status === "Rejected" && (
-            <span className="border border-red-error/20 bg-red-error/10 text-red-error text-[12px] font-normal px-2.5 py-0.5 rounded-full">
+            <span className="border border-red-error/20 bg-red-error/10 text-red-error text-[12px] font-normal px-2.5 py-0.5 rounded-full select-none">
               Rejected
             </span>
           )}
-        </>
+          {status === "Take Down" && (
+            <span className="border border-secondary/20 bg-secondary/10 text-secondary text-[12px] font-normal px-2.5 py-0.5 rounded-full select-none">
+              Take Down
+            </span>
+          )}
+        </div>
       )
     }
   },
   {
     id: "actions",
-    header: () => <div className="text-right pr-6">Action</div>,
+    header: () => <CommonTableHeader className="text-right block pr-6">Action</CommonTableHeader>,
     cell: ({ row }) => {
       const song = row.original
+      const status = song?.status
+
       return (
-        <div className="flex items-center justify-end gap-3.5 pr-2">
-          {/* Details button */}
-          <span
-            onClick={() => onViewDetails?.(song)}
-            className="border border-secondary bg-secondary/15 text-secondary text-[11px] font-semibold py-1 px-3 rounded-full flex items-center gap-1 select-none cursor-pointer"
+        <div className="flex items-center justify-end gap-3 pr-2">
+          {/* Details circle button */}
+          <button
+            className="w-7 h-7 rounded-full bg-secondary/10 border border-secondary/20 text-secondary flex items-center justify-center cursor-pointer select-none"
+            title="View Details"
           >
             <Eye className="w-3.5 h-3.5 shrink-0" />
-            <span>Details</span>
-          </span>
+          </button>
 
-          {/* Edit icon */}
-          <span
-            onClick={() => onEdit?.(song)}
-            className="text-secondary cursor-pointer"
-          >
-            <Edit className="w-4 h-4 shrink-0" />
-          </span>
+          {/* Conditional status-based actions */}
+          {status === "Published" && (
+            <button
+              className="border border-yellow-warning/20 bg-yellow-warning/10 text-yellow-warning text-[12px] font-semibold py-1 px-3 rounded-full cursor-pointer select-none whitespace-nowrap"
+            >
+              Take Down
+            </button>
+          )}
+
+          {status === "Take Down" && (
+            <button
+              className="border border-green-success/20 bg-green-success/10 text-green-success text-[12px] font-semibold py-1 px-3 rounded-full cursor-pointer select-none whitespace-nowrap"
+            >
+              Restore
+            </button>
+          )}
+
+          {status === "Under Review" && (
+            <>
+              <button
+                className="w-7 h-7 rounded-full bg-green-success/10 border border-green-success/20 text-green-success flex items-center justify-center cursor-pointer select-none"
+                title="Approve"
+              >
+                <Check className="w-3.5 h-3.5 shrink-0" />
+              </button>
+              <button
+                className="w-7 h-7 rounded-full bg-red-error/10 border border-red-error/20 text-red-error flex items-center justify-center cursor-pointer select-none"
+                title="Reject"
+              >
+                <X className="w-3.5 h-3.5 shrink-0" />
+              </button>
+            </>
+          )}
 
           {/* Delete icon */}
-          <span
-            onClick={() => onDelete?.(song)}
-            className="text-red-error cursor-pointer"
+          <button
+            className="text-red-error bg-transparent border-0 p-1 flex items-center justify-center select-none"
+            title="Delete Song"
           >
             <Trash2 className="w-4 h-4 shrink-0" />
-          </span>
+          </button>
         </div>
       )
     }

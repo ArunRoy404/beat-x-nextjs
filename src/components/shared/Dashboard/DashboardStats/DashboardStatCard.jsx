@@ -32,17 +32,16 @@ const DashboardStatCard = ({ card }) => {
       </div>
 
       {/* Bottom row: Comparison & Change Percentage */}
-      <div className="relative z-10 flex items-center justify-between mt-4">
-        <span className="text-dark-gray text-[14px] not-italic font-normal">
-          VS Last Month
-        </span>
-        {card?.change && (
+      {card?.change && (
+        <div className="relative z-10 flex items-center justify-between mt-4">
+          <span className="text-dark-gray text-[14px] not-italic font-normal">
+            VS Last Month
+          </span>
           <div
-            className={`text-[14px] not-italic font-normal rounded px-2 py-1 flex items-center gap-0.5 ${
-              card?.isPositive
-                ? "text-green-success bg-green-success/10"
-                : "text-red-error bg-red-error/10"
-            }`}
+            className={`text-[14px] not-italic font-normal rounded px-2 py-1 flex items-center gap-0.5 ${card?.isPositive
+              ? "text-green-success bg-green-success/10"
+              : "text-red-error bg-red-error/10"
+              }`}
           >
             {card?.isPositive ? (
               <LucideIcons.TrendingUp className="w-3.5 h-3.5" />
@@ -51,8 +50,8 @@ const DashboardStatCard = ({ card }) => {
             )}
             <span>{card.change}</span>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </CommonCard>
   )
 }
