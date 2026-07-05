@@ -1,6 +1,6 @@
 import React from "react"
 import DataTable from "@/components/ui/DataTable"
-import { getSongsColumns } from "@/components/DataTableColumns/SongsColumns"
+import { getSongsColumns } from "@/components/DataTableColumns/admin/SongsColumns"
 import CommonFilter from "@/components/shared/commonFilter/commonFilter"
 import CommonSearch from "@/components/shared/CommonSearch/CommonSearch"
 import CommonPagination from "@/components/shared/CommonPagination/CommonPagination"
