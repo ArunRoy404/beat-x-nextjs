@@ -40,6 +40,7 @@
   --color-dark-gray: var(--dark-gray);
   --color-dark-accent: var(--dark-accent);
   --color-whitetext: var(--whitetext);
+  --color-light-whitetext: var(--light-whitetext);
   --color-nav-icon-bg: var(--nav-icon-bg);
   --color-green-success: var(--green-success);
   --color-red-error: var(--red-error);

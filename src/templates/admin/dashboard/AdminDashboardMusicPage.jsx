@@ -4,7 +4,7 @@ import React from "react"
 import { useAdminDashboardMusicStore } from "@/zustandStore/admin/adminStore/adminDashboardMusicStore"
 import DashboardStats from "@/components/shared/Dashboard/DashboardStats/DashboardStats"
 import UploadNewSong from "@/components/admin/music/UploadNewSong"
-import SongsTable from "@/components/admin/music/SongsTable"
+import SongsContainer from "@/components/admin/music/SongsContainer/SongsContainer"
 
 const AdminDashboardMusicPage = () => {
   const statsCards = useAdminDashboardMusicStore((state) => state.musicStatsCards)
@@ -18,8 +18,8 @@ const AdminDashboardMusicPage = () => {
       {/* Upload song selector container */}
       <UploadNewSong />
 
-      {/* Songs collection list table */}
-      <SongsTable songs={songs} />
+      {/* Songs collection container */}
+      <SongsContainer songs={songs} />
     </div>
   )
 }
