@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Cancel01Icon } from "@hugeicons/core-free-icons"
+import { X } from "lucide-react"
 
 function Dialog({
   ...props
@@ -60,6 +61,7 @@ function DialogContent({
         data-slot="dialog-content"
         className={cn(
           "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-xs/relaxed text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          "bg-dark-accent/50 backdrop-blur-md border border-whitetext/10 rounded-[24px] p-0 max-h-[95vh] overflow-hidden sm:max-w-[672px] text-whitetext outline-none select-none flex flex-col",
           className
         )}
         {...props}>
@@ -67,11 +69,11 @@ function DialogContent({
         {showCloseButton && (
           <DialogPrimitive.Close
             data-slot="dialog-close"
+            className="text-light-whitetext hover:text-whitetext cursor-pointer transition-colors p-1.5 rounded-full hover:bg-white/5 border border-white/20 bg-transparent flex items-center justify-center"
             render={
-              <Button variant="ghost" className="absolute top-2 right-2" size="icon-sm" />
+              <Button variant="ghost" className="absolute top-4 right-6" size="icon" />
             }>
-            <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} />
-            <span className="sr-only">Close</span>
+            <X />
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Popup>

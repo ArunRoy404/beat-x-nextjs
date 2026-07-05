@@ -131,23 +131,17 @@ const UploadNewSongDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="rounded-full bg-gradient-to-r from-secondary to-[#B1FE4D] text-button-text font-semibold hover:opacity-90 transition-opacity border-0 h-10 px-6 gap-2 cursor-pointer shadow-md">
-          <PlusCircle className="w-5 h-5" /> Upload Song
+        <Button variant="gradient">
+          <PlusCircle /> Upload Song
         </Button>
       </DialogTrigger>
 
-      <DialogContent
-        showCloseButton={false}
-        className="bg-dark-accent/50 backdrop-blur-md border border-whitetext/10 rounded-[24px] p-0 max-h-[95vh] overflow-hidden sm:max-w-[672px] text-whitetext outline-none select-none flex flex-col"
-      >
+      <DialogContent >
         {/* Custom Header */}
         <DialogHeader className="bg-dark-accent p-6 flex flex-row items-center justify-between border-b border-whitetext/5 shrink-0">
           <DialogTitle className="text-[24px] not-italic font-medium text-whitetext font-sans leading-none">
             Upload New Song
           </DialogTitle>
-          <DialogClose className="text-light-whitetext hover:text-whitetext cursor-pointer transition-colors p-1.5 rounded-full hover:bg-white/5 border border-white/20 bg-transparent flex items-center justify-center">
-            <X className="w-4 h-4" />
-          </DialogClose>
         </DialogHeader>
 
         {/* Scrollable Form Container with 24px padding */}
@@ -419,19 +413,23 @@ const UploadNewSongDialog = () => {
           {/* Footer Actions */}
           <div className="flex items-center gap-4 mt-2 shrink-0">
             <DialogClose asChild className="flex-1 w-full">
-              <button
+              <Button
                 type="button"
-                className="w-full h-[52px] flex items-center justify-center rounded-full border border-white/40 text-white hover:bg-white/5 font-semibold text-[16px] cursor-pointer transition-colors bg-transparent"
+                variant="outline"
+                className='w-full rounded-full'
+                size="lg"
               >
                 Cancel
-              </button>
+              </Button>
             </DialogClose>
-            <button
+            <Button
               type="submit"
-              className="flex-1 h-[52px] flex items-center justify-center rounded-full bg-gradient-to-r from-secondary to-[#B1FE4D] text-button-text hover:opacity-90 font-semibold text-[16px] cursor-pointer transition-opacity border-0"
+              variant="gradient"
+              className='flex-1'
+              size="lg"
             >
               Upload Now
-            </button>
+            </Button>
           </div>
         </form>
       </DialogContent>
