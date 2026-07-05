@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils"
 import React from "react"
 
 export const GridViewIcon = ({ className, width = 20, height = 20, ...props }) => (
@@ -17,7 +18,7 @@ export const GridViewIcon = ({ className, width = 20, height = 20, ...props }) =
 )
 
 export const Analytics01Icon = ({ className, width = 20, height = 20, ...props }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} viewBox="0 0 24 24" fill="none" className={className} {...props} stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-chart-column-icon lucide-file-chart-column"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" /><path d="M14 2v5a1 1 0 0 0 1 1h5" /><path d="M8 18v-1" /><path d="M12 18v-6" /><path d="M16 18v-3" /></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} viewBox="0 0 24 24" fill="none" className={cn("lucide lucide-file-chart-column-icon lucide-file-chart-column", className)} {...props} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" ><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" /><path d="M14 2v5a1 1 0 0 0 1 1h5" /><path d="M8 18v-1" /><path d="M12 18v-6" /><path d="M16 18v-3" /></svg>
 )
 
 export const MusicNote01Icon = ({ className, width = 20, height = 20, ...props }) => (
@@ -51,7 +52,7 @@ export const Video01Icon = ({ className, width = 20, height = 20, ...props }) =>
 )
 
 export const Mic01Icon = ({ className, width = 20, height = 20, ...props }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} className={className} {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mic-vocal-icon lucide-mic-vocal"><path d="m11 7.601-5.994 8.19a1 1 0 0 0 .1 1.298l.817.818a1 1 0 0 0 1.314.087L15.09 12" /><path d="M16.5 21.174C15.5 20.5 14.372 20 13 20c-2.058 0-3.928 2.356-6 2-2.072-.356-2.775-3.369-1.5-4.5" /><circle cx="16" cy="7" r="5" /></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} className={cn("lucide lucide-mic-vocal-icon lucide-mic-vocal", className)} {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m11 7.601-5.994 8.19a1 1 0 0 0 .1 1.298l.817.818a1 1 0 0 0 1.314.087L15.09 12" /><path d="M16.5 21.174C15.5 20.5 14.372 20 13 20c-2.058 0-3.928 2.356-6 2-2.072-.356-2.775-3.369-1.5-4.5" /><circle cx="16" cy="7" r="5" /></svg>
 )
 
 export const UserGroupIcon = ({ className, width = 20, height = 20, ...props }) => (
@@ -102,7 +103,7 @@ export const Package01Icon = ({ className, width = 20, height = 20, ...props }) 
 )
 
 export const MoneyBag01Icon = ({ className, width = 20, height = 20, ...props }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} className={className} {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-dollar-sign-icon lucide-circle-dollar-sign"><circle cx="12" cy="12" r="10" /><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" /><path d="M12 18V6" /></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} className={cn("lucide lucide-circle-dollar-sign-icon lucide-circle-dollar-sign", className)} {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" /><path d="M12 18V6" /></svg>
 )
 
 export const Shield01Icon = ({ className, width = 20, height = 20, ...props }) => (
