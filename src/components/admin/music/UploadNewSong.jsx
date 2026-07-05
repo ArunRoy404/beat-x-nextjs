@@ -1,7 +1,6 @@
 import React from "react"
-import { Upload, Plus, PlusCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { toast } from "sonner"
+import { Upload } from "lucide-react"
+import UploadNewSongDialog from "./UploadNewSongDialog"
 
 const UploadNewSong = () => {
   return (
@@ -23,10 +22,8 @@ const UploadNewSong = () => {
         </div>
       </div>
 
-      {/* Button */}
-      <Button notImplemented>
-        <PlusCircle /> Upload Song
-      </Button>
+      {/* Upload Dialog */}
+      <UploadNewSongDialog />
     </div>
   )
 }
