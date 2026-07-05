@@ -18,6 +18,7 @@ const CommonTableActions = ({
             {/* Conditional status-based actions */}
             {status === "Published" && (
                 <Button
+                    notImplemented
                     onClick={onTakeDown}
                     variant="outline"
                     className="text-yellow-warning border border-yellow-warning/20 bg-yellow-warning/10 rounded-full"
@@ -28,6 +29,7 @@ const CommonTableActions = ({
 
             {status === "Take Down" && (
                 <Button
+                    notImplemented
                     onClick={onRestore}
                     variant="outline"
                     className="text-green-success border border-green-success/20 bg-green-success/10 rounded-full"
@@ -39,6 +41,7 @@ const CommonTableActions = ({
             {status === "Under Review" && (
                 <>
                     <Button
+                        notImplemented
                         onClick={onApprove}
                         title="Approve"
                         size="icon"
@@ -48,6 +51,7 @@ const CommonTableActions = ({
                         <Check className="w-3.5 h-3.5 shrink-0" />
                     </Button>
                     <Button
+                        notImplemented
                         onClick={onReject}
                         title="Reject"
                         size="icon"
@@ -61,6 +65,7 @@ const CommonTableActions = ({
 
             {/* Details circle button */}
             <Button
+                notImplemented
                 onClick={onViewDetails}
                 title="View Details"
                 size="icon"
@@ -72,6 +77,7 @@ const CommonTableActions = ({
 
             {/* Delete icon */}
             <Button
+                notImplemented
                 onClick={onDelete}
                 title="Delete Song"
                 size="icon"

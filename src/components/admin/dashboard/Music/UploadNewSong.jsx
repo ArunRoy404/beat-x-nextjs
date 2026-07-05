@@ -24,7 +24,7 @@ const UploadNewSong = () => {
       </div>
 
       {/* Button */}
-      <Button>
+      <Button notImplemented>
         <PlusCircle /> Upload Song
       </Button>
     </div>

@@ -75,6 +75,7 @@ const CommonPagination = ({
 
             return (
                 <Button
+                    notImplemented
                     key={page}
                     onClick={() => onPageChange?.(page)}
                     variant="outline"
@@ -98,6 +99,7 @@ const CommonPagination = ({
             <div className="flex items-center gap-1.5">
                 {/* Previous Page Button */}
                 <Button
+                    notImplemented
                     onClick={handlePrev}
                     disabled={currentPage === 1}
                     variant="outline"
@@ -110,6 +112,7 @@ const CommonPagination = ({
 
                 {/* Next Page Button */}
                 <Button
+                    notImplemented
                     onClick={handleNext}
                     disabled={currentPage === calculatedTotalPages}
                     variant="outline"
