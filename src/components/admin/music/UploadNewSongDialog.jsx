@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Calendar } from "@/components/ui/calendar"
+import { Switch } from "@/components/ui/switch"
 import {
   Select,
   SelectContent,
@@ -25,7 +26,7 @@ import {
 } from "@/components/ui/select"
 import { format } from "date-fns"
 import {
-  Music, 
+  Music,
   Image as ImageIcon,
   Calendar as CalendarIcon,
   CheckCircle2,
@@ -36,6 +37,7 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
+import { useAdminDashboardMusicStore } from "@/zustandStore/admin/adminStore/adminDashboardMusicStore"
 
 // Schema definition using Zod
 const uploadSongSchema = z.object({
@@ -63,12 +65,13 @@ const UploadNewSongDialog = () => {
   const audioInputRef = useRef(null)
   const coverInputRef = useRef(null)
 
+  const addSong = useAdminDashboardMusicStore((state) => state.addSong)
+
   const {
     register,
     handleSubmit,
     control,
     setValue,
-    watch,
     reset,
     formState: { errors },
   } = useForm({
@@ -87,7 +90,7 @@ const UploadNewSongDialog = () => {
     },
   })
 
-  // Watch fields for display
+  // Watch fields for display using useWatch hook
   const audioFile = useWatch({ control, name: "audioFile" })
   const coverImage = useWatch({ control, name: "coverImage" })
   const releaseDate = useWatch({ control, name: "releaseDate" })
@@ -110,6 +113,7 @@ const UploadNewSongDialog = () => {
 
   const onSubmit = (data) => {
     console.log("Submitted Song Data:", data)
+    addSong(data)
     toast.success("Song uploaded successfully!")
 
     // Reset state & close
@@ -118,7 +122,6 @@ const UploadNewSongDialog = () => {
   }
 
   const onInvalid = (validationErrors) => {
-    // Toast the first validation error message
     const errorKeys = Object.keys(validationErrors)
     if (errorKeys.length > 0) {
       toast.error(validationErrors[errorKeys[0]].message)
@@ -135,27 +138,27 @@ const UploadNewSongDialog = () => {
 
       <DialogContent
         showCloseButton={false}
-        className="bg-background border border-whitetext/10 rounded-[24px] p-6 max-h-[90vh] overflow-hidden sm:max-w-[672px] text-whitetext outline-none select-none flex flex-col"
+        className="bg-dark-accent/50 backdrop-blur-md border border-whitetext/10 rounded-[24px] p-0 max-h-[95vh] overflow-hidden sm:max-w-[672px] text-whitetext outline-none select-none flex flex-col"
       >
         {/* Custom Header */}
-        <DialogHeader className="flex flex-row items-center justify-between border-b border-whitetext/5 pb-4 mb-4 shrink-0">
-          <DialogTitle className="text-xl font-semibold text-whitetext font-sans">
+        <DialogHeader className="bg-dark-accent p-6 flex flex-row items-center justify-between border-b border-whitetext/5 shrink-0">
+          <DialogTitle className="text-[24px] not-italic font-medium text-whitetext font-sans leading-none">
             Upload New Song
           </DialogTitle>
-          <DialogClose className="text-light-whitetext hover:text-whitetext cursor-pointer transition-colors p-1 rounded-full hover:bg-white/5 border-0 bg-transparent flex items-center justify-center">
-            <X className="w-5 h-5" />
+          <DialogClose className="text-light-whitetext hover:text-whitetext cursor-pointer transition-colors p-1.5 rounded-full hover:bg-white/5 border border-white/20 bg-transparent flex items-center justify-center">
+            <X className="w-4 h-4" />
           </DialogClose>
         </DialogHeader>
 
-        {/* Scrollable Form Container */}
+        {/* Scrollable Form Container with 24px padding */}
         <form
           onSubmit={handleSubmit(onSubmit, onInvalid)}
-          className="flex-1 overflow-y-auto pr-1 flex flex-col gap-4 text-left [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          className="flex-1 overflow-y-auto p-6 flex flex-col gap-[16px] text-left [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
           {/* Audio Dropzone */}
           <div
             onClick={() => audioInputRef.current?.click()}
-            className="group flex flex-col items-center justify-center p-6 h-32 rounded-[16px] border border-dashed border-secondary/30 bg-secondary/[0.02] hover:bg-secondary/[0.05] cursor-pointer transition-all gap-2 shrink-0"
+            className="group flex flex-col items-center justify-center p-6 h-32 rounded-[16px] border border-dashed border-secondary/15 bg-secondary/15 hover:bg-secondary/20 cursor-pointer transition-all gap-2 shrink-0"
           >
             <input
               type="file"
@@ -178,7 +181,7 @@ const UploadNewSongDialog = () => {
               </div>
             ) : (
               <div className="text-center">
-                <p className="text-whitetext text-[14px] font-medium">Drop your audio file here</p>
+                <p className="text-whitetext text-[14px] font-medium font-sans">Drop your audio file here</p>
                 <p className="text-light-whitetext text-[11px] mt-0.5">MP3, WAV, FLAC · Max 200MB</p>
               </div>
             )}
@@ -187,7 +190,7 @@ const UploadNewSongDialog = () => {
           {/* Cover Art Dropzone */}
           <div
             onClick={() => coverInputRef.current?.click()}
-            className="group flex flex-col items-center justify-center p-4 h-24 rounded-[16px] border border-dashed border-primary/30 bg-primary/[0.02] hover:bg-primary/[0.05] cursor-pointer transition-all gap-2 shrink-0"
+            className="group flex flex-col items-center justify-center p-4 h-24 rounded-[16px] border border-dashed border-primary/15 bg-primary/15 hover:bg-primary/20 cursor-pointer transition-all gap-2 shrink-0"
           >
             <input
               type="file"
@@ -207,7 +210,7 @@ const UploadNewSongDialog = () => {
               </div>
             ) : (
               <div className="text-center">
-                <p className="text-light-whitetext text-[13px]">
+                <p className="text-light-whitetext text-[13px] font-sans">
                   Upload cover art · min 1000×1000px
                 </p>
               </div>
@@ -216,48 +219,48 @@ const UploadNewSongDialog = () => {
 
           {/* Song Title Input */}
           <div className="flex flex-col gap-1.5 shrink-0">
-            <label className="text-[12px] font-normal uppercase text-primary/80 tracking-wider">
+            <label className="text-primary text-[16px] not-italic font-normal font-sans">
               Song Title
             </label>
             <Input
               type="text"
               placeholder="Enter song title..."
               {...register("songTitle")}
-              className="h-10 rounded-full border border-whitetext/10 bg-[#0E0E0E] px-4 py-2 text-sm text-whitetext placeholder:text-light-whitetext focus-visible:border-primary/50 focus-visible:ring-primary/20"
+              className="w-full h-[52px] rounded-full border border-light-gray/20 bg-light-gray/10 px-5 text-[14px] text-whitetext placeholder:text-light-gray placeholder:text-[14px] placeholder:font-normal placeholder:not-italic focus-visible:border-primary/50 focus-visible:ring-primary/20 outline-none"
             />
           </div>
 
           {/* Artist & Album inputs */}
-          <div className="grid grid-cols-2 gap-4 shrink-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-[16px] shrink-0">
             <div className="flex flex-col gap-1.5">
-              <label className="text-[12px] font-normal uppercase text-primary/80 tracking-wider">
+              <label className="text-primary text-[16px] not-italic font-normal font-sans">
                 Artist
               </label>
               <Input
                 type="text"
                 placeholder="Artist name"
                 {...register("artist")}
-                className="h-10 rounded-full border border-whitetext/10 bg-[#0E0E0E] px-4 py-2 text-sm text-whitetext placeholder:text-light-whitetext focus-visible:border-primary/50 focus-visible:ring-primary/20"
+                className="w-full h-[52px] rounded-full border border-light-gray/20 bg-light-gray/10 px-5 text-[14px] text-whitetext placeholder:text-light-gray placeholder:text-[14px] placeholder:font-normal placeholder:not-italic focus-visible:border-primary/50 focus-visible:ring-primary/20 outline-none"
               />
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-[12px] font-normal uppercase text-primary/80 tracking-wider">
+              <label className="text-primary text-[16px] not-italic font-normal font-sans">
                 Album
               </label>
               <Input
                 type="text"
                 placeholder="Album name (optional)"
                 {...register("album")}
-                className="h-10 rounded-full border border-whitetext/10 bg-[#0E0E0E] px-4 py-2 text-sm text-whitetext placeholder:text-light-whitetext focus-visible:border-primary/50 focus-visible:ring-primary/20"
+                className="w-full h-[52px] rounded-full border border-light-gray/20 bg-light-gray/10 px-5 text-[14px] text-whitetext placeholder:text-light-gray placeholder:text-[14px] placeholder:font-normal placeholder:not-italic focus-visible:border-primary/50 focus-visible:ring-primary/20 outline-none"
               />
             </div>
           </div>
 
           {/* Genre & Release Date picker */}
-          <div className="grid grid-cols-2 gap-4 shrink-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-[16px] shrink-0">
             <div className="flex flex-col gap-1.5">
-              <label className="text-[12px] font-normal uppercase text-primary/80 tracking-wider">
+              <label className="text-primary text-[16px] not-italic font-normal font-sans">
                 Genre
               </label>
               <Controller
@@ -265,8 +268,8 @@ const UploadNewSongDialog = () => {
                 control={control}
                 render={({ field }) => (
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="h-10 w-full rounded-full border border-whitetext/10 bg-[#0E0E0E] px-4 py-2 text-sm text-whitetext flex items-center justify-between cursor-pointer">
-                      <SelectValue placeholder="Select genre" />
+                    <SelectTrigger size="custom" className="w-full h-[52px] rounded-full border border-light-gray/20 bg-light-gray/10 px-5 text-[14px] text-whitetext flex items-center justify-between cursor-pointer outline-none">
+                      <SelectValue placeholder="Select genre" className="placeholder:text-light-gray" />
                     </SelectTrigger>
                     <SelectContent className="bg-background border border-whitetext/10 rounded-[12px] text-whitetext max-h-[200px] overflow-y-auto">
                       <SelectItem value="Pop">Pop</SelectItem>
@@ -283,7 +286,7 @@ const UploadNewSongDialog = () => {
             </div>
 
             <div className="flex flex-col gap-1.5 relative">
-              <label className="text-[12px] font-normal uppercase text-primary/80 tracking-wider">
+              <label className="text-primary text-[16px] not-italic font-normal font-sans">
                 Release Date
               </label>
               <Controller
@@ -294,12 +297,12 @@ const UploadNewSongDialog = () => {
                     <button
                       type="button"
                       onClick={() => setShowCalendar(!showCalendar)}
-                      className="h-10 w-full flex items-center justify-between rounded-full border border-whitetext/10 bg-[#0E0E0E] px-4 py-2 text-sm text-left text-whitetext outline-none cursor-pointer"
+                      className="w-full h-[52px] flex items-center justify-between rounded-full border border-light-gray/20 bg-light-gray/10 px-5 text-[14px] text-left text-whitetext outline-none cursor-pointer"
                     >
-                      <span className={field.value ? "text-whitetext" : "text-light-whitetext"}>
+                      <span className={field.value ? "text-whitetext" : "text-light-gray"}>
                         {field.value ? format(field.value, "PPP") : "Choose Date"}
                       </span>
-                      <CalendarIcon className="w-4 h-4 text-light-whitetext" />
+                      <CalendarIcon className="w-5 h-5 text-light-gray" />
                     </button>
 
                     {showCalendar && (
@@ -316,7 +319,7 @@ const UploadNewSongDialog = () => {
                               field.onChange(date)
                               setShowCalendar(false)
                             }}
-                            className="rounded-[12px] bg-background"
+                            className="rounded-[12px] bg-background text-whitetext"
                           />
                         </div>
                       </>
@@ -329,37 +332,37 @@ const UploadNewSongDialog = () => {
 
           {/* Song Description */}
           <div className="flex flex-col gap-1.5 shrink-0">
-            <label className="text-[12px] font-normal uppercase text-primary/80 tracking-wider">
+            <label className="text-primary text-[16px] not-italic font-normal font-sans">
               Song Description
             </label>
             <Textarea
               placeholder="Type a short description..."
               {...register("description")}
-              className="min-h-[70px] rounded-[20px] border border-whitetext/10 bg-[#0E0E0E] px-4 py-3 text-sm text-whitetext placeholder:text-light-whitetext resize-none"
+              className="min-h-[100px] w-full rounded-[20px] border border-light-gray/20 bg-light-gray/10 p-5 text-[14px] text-whitetext placeholder:text-light-gray placeholder:text-[14px] placeholder:font-normal placeholder:not-italic resize-none outline-none focus-visible:border-primary/50 focus-visible:ring-primary/20"
             />
           </div>
 
           {/* Visibility Section */}
           <div className="flex flex-col gap-2 shrink-0">
-            <label className="text-[12px] font-normal uppercase text-primary/80 tracking-wider">
+            <label className="text-primary text-[16px] not-italic font-normal font-sans">
               Visibility
             </label>
             <Controller
               name="visibility"
               control={control}
               render={({ field }) => (
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <button
                     type="button"
                     onClick={() => field.onChange("publish")}
                     className={cn(
-                      "flex flex-col sm:flex-row items-center justify-center gap-1.5 p-3 rounded-[12px] border text-[11px] font-medium cursor-pointer transition-all",
+                      "flex flex-col items-center justify-center gap-1.5 py-4 px-3 rounded-[16px] border text-[12px] font-medium not-italic cursor-pointer transition-all text-center",
                       field.value === "publish"
-                        ? "bg-secondary/10 border-secondary/40 text-whitetext"
-                        : "bg-white/[0.02] border-whitetext/5 text-light-whitetext hover:bg-white/[0.04]"
+                        ? "bg-secondary/15 border-secondary/15 text-secondary"
+                        : "bg-light-gray/10 border-light-gray/20 text-light-gray hover:bg-light-gray/20"
                     )}
                   >
-                    <CheckCircle2 className={cn("w-3.5 h-3.5", field.value === "publish" ? "text-secondary" : "text-light-whitetext")} />
+                    <CheckCircle2 className={cn("w-5 h-5 mb-0.5", field.value === "publish" ? "text-secondary" : "text-light-gray")} />
                     <span>Publish Now</span>
                   </button>
 
@@ -367,13 +370,13 @@ const UploadNewSongDialog = () => {
                     type="button"
                     onClick={() => field.onChange("schedule")}
                     className={cn(
-                      "flex flex-col sm:flex-row items-center justify-center gap-1.5 p-3 rounded-[12px] border text-[11px] font-medium cursor-pointer transition-all",
+                      "flex flex-col items-center justify-center gap-1.5 py-4 px-3 rounded-[16px] border text-[12px] font-medium not-italic cursor-pointer transition-all text-center",
                       field.value === "schedule"
-                        ? "bg-secondary/10 border-secondary/40 text-whitetext"
-                        : "bg-white/[0.02] border-whitetext/5 text-light-whitetext hover:bg-white/[0.04]"
+                        ? "bg-secondary/15 border-secondary/15 text-secondary"
+                        : "bg-light-gray/10 border-light-gray/20 text-light-gray hover:bg-light-gray/20"
                     )}
                   >
-                    <Clock className={cn("w-3.5 h-3.5", field.value === "schedule" ? "text-secondary" : "text-light-whitetext")} />
+                    <Clock className={cn("w-5 h-5 mb-0.5", field.value === "schedule" ? "text-secondary" : "text-light-gray")} />
                     <span>Schedule</span>
                   </button>
 
@@ -381,13 +384,13 @@ const UploadNewSongDialog = () => {
                     type="button"
                     onClick={() => field.onChange("draft")}
                     className={cn(
-                      "flex flex-col sm:flex-row items-center justify-center gap-1.5 p-3 rounded-[12px] border text-[11px] font-medium cursor-pointer transition-all",
+                      "flex flex-col items-center justify-center gap-1.5 py-4 px-3 rounded-[16px] border text-[12px] font-medium not-italic cursor-pointer transition-all text-center",
                       field.value === "draft"
-                        ? "bg-secondary/10 border-secondary/40 text-whitetext"
-                        : "bg-white/[0.02] border-whitetext/5 text-light-whitetext hover:bg-white/[0.04]"
+                        ? "bg-secondary/15 border-secondary/15 text-secondary"
+                        : "bg-light-gray/10 border-light-gray/20 text-light-gray hover:bg-light-gray/20"
                     )}
                   >
-                    <FileText className={cn("w-3.5 h-3.5", field.value === "draft" ? "text-secondary" : "text-light-whitetext")} />
+                    <FileText className={cn("w-5 h-5 mb-0.5", field.value === "draft" ? "text-secondary" : "text-light-gray")} />
                     <span>Save as Draft</span>
                   </button>
                 </div>
@@ -395,28 +398,20 @@ const UploadNewSongDialog = () => {
             />
           </div>
 
-          {/* Explicit Content Toggle */}
+          {/* Explicit Content Toggle using Shadcn Switch */}
           <Controller
             name="isExplicit"
             control={control}
             render={({ field }) => (
-              <div className="flex items-center justify-between py-1 border-t border-b border-whitetext/5 shrink-0">
-                <span className="text-[14px] text-whitetext font-medium">Explicit Content</span>
-                <button
-                  type="button"
-                  onClick={() => field.onChange(!field.value)}
-                  className={cn(
-                    "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out outline-none",
-                    field.value ? "bg-secondary" : "bg-white/10"
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-whitetext shadow ring-0 transition duration-200 ease-in-out",
-                      field.value ? "translate-x-5" : "translate-x-0"
-                    )}
-                  />
-                </button>
+              <div className="flex items-center justify-between py-2 border-t border-b border-whitetext/5 shrink-0">
+                <span className="text-light-gray text-[16px] not-italic font-medium font-sans">
+                  Explicit Content
+                </span>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  className="data-checked:bg-secondary data-unchecked:bg-light-gray/20"
+                />
               </div>
             )}
           />
@@ -426,14 +421,14 @@ const UploadNewSongDialog = () => {
             <DialogClose asChild>
               <button
                 type="button"
-                className="flex-1 py-3 rounded-full border border-whitetext/10 text-whitetext hover:bg-white/5 font-semibold text-sm cursor-pointer transition-colors text-center bg-transparent"
+                className="flex-1 h-[52px] flex items-center justify-center rounded-full border border-white/40 text-white hover:bg-white/5 font-semibold text-[16px] cursor-pointer transition-colors bg-transparent"
               >
                 Cancel
               </button>
             </DialogClose>
             <button
               type="submit"
-              className="flex-1 py-3 rounded-full bg-gradient-to-r from-secondary to-[#B1FE4D] text-button-text hover:opacity-90 font-semibold text-sm cursor-pointer transition-opacity text-center border-0"
+              className="flex-1 h-[52px] flex items-center justify-center rounded-full bg-gradient-to-r from-secondary to-[#B1FE4D] text-button-text hover:opacity-90 font-semibold text-[16px] cursor-pointer transition-opacity border-0"
             >
               Upload Now
             </button>
