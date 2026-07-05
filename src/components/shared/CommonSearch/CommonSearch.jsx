@@ -1,27 +1,35 @@
 import React from "react"
 import { Search } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
 
 const CommonSearch = ({
-    value,
-    onChange,
-    placeholder = "Search .....",
-    className,
-    ...props
+  value,
+  onChange,
+  placeholder = "Search .....",
+  className,
+  ...props
 }) => {
-    return (
-        <div className={cn("relative w-full md:w-72", className)}>
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-light-gray" />
-            <input
-                type="text"
-                value={value}
-                onChange={onChange}
-                placeholder={placeholder}
-                className="w-full pl-10 pr-4 py-2 text-sm bg-transparent border border-border rounded-full text-whitetext placeholder-dark-gray focus:outline-none transition-all"
-                {...props}
-            />
-        </div>
-    )
+  return (
+    <InputGroup
+      className={cn(
+        "w-full md:w-72 h-auto bg-transparent border border-border rounded-full text-whitetext placeholder-dark-gray focus-within:border-border",
+        className
+      )}
+    >
+      <InputGroupAddon align="inline-start" className="pl-3.5 pr-0 py-2">
+        <Search className="w-4 h-4 text-light-gray" />
+      </InputGroupAddon>
+      <InputGroupInput
+        type="text"
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        className="w-full pl-2 pr-4 py-2 text-sm bg-transparent text-whitetext placeholder-dark-gray focus:outline-none transition-all"
+        {...props}
+      />
+    </InputGroup>
+  )
 }
 
 export default CommonSearch
