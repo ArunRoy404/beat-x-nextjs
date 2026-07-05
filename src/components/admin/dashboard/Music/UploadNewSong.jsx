@@ -1,6 +1,7 @@
 import React from "react"
 import { Upload, Plus, PlusCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 
 const UploadNewSong = () => {
   return (
@@ -23,7 +24,7 @@ const UploadNewSong = () => {
       </div>
 
       {/* Button */}
-      <Button>
+      <Button onClick={() => toast.success('hello')}>
         <PlusCircle /> Upload Song
       </Button>
     </div>
