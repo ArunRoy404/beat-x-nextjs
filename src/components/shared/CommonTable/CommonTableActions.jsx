@@ -4,6 +4,8 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import EditSongDialog from "@/components/dialogs/admin/EditSongDialog"
 
+import DeleteSongDialog from "@/components/dialogs/admin/DeleteSongDialog"
+
 const CommonTableActions = ({
     status,
     song,
@@ -90,16 +92,16 @@ const CommonTableActions = ({
 
 
             {/* Delete icon */}
-            <Button
-                notImplemented
-                onClick={onDelete}
-                title="Delete Song"
-                size="icon"
-                variant="outline"
-                className="text-red-error border border-red-error/20 bg-red-error/10 rounded-full"
-            >
-                <Trash2 className="w-4 h-4 shrink-0" />
-            </Button>
+            <DeleteSongDialog song={song}>
+                <Button
+                    title="Delete Song"
+                    size="icon"
+                    variant="outline"
+                    className="text-red-error border border-red-error/20 bg-red-error/10 rounded-full cursor-pointer"
+                >
+                    <Trash2 className="w-4 h-4 shrink-0" />
+                </Button>
+            </DeleteSongDialog>
         </div>
     )
 }

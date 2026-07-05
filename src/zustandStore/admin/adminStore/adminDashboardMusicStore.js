@@ -1,7 +1,7 @@
 import { create } from "zustand"
-import { 
-  musicStatsCards, 
-  songsList 
+import {
+  musicStatsCards,
+  songsList
 } from "@/dummyData/admin/adminData/adminDashboardMusicData"
 
 export const useAdminDashboardMusicStore = create((set) => ({
@@ -17,10 +17,10 @@ export const useAdminDashboardMusicStore = create((set) => ({
         genre: newSong.genre,
         streams: "0",
         released: newSong.releaseDate ? newSong.releaseDate.toISOString().split('T')[0] : "-",
-        status: newSong.visibility === "publish" 
-          ? "Published" 
-          : newSong.visibility === "schedule" 
-            ? "Scheduled" 
+        status: newSong.visibility === "publish"
+          ? "Published"
+          : newSong.visibility === "schedule"
+            ? "Scheduled"
             : "Draft",
         cover: newSong.coverImage && typeof newSong.coverImage === "object"
           ? URL.createObjectURL(newSong.coverImage)
@@ -38,15 +38,15 @@ export const useAdminDashboardMusicStore = create((set) => ({
           artist: updatedSong.artist,
           album: updatedSong.album || "Single",
           genre: updatedSong.genre,
-          released: updatedSong.releaseDate 
-            ? (updatedSong.releaseDate instanceof Date 
-                ? updatedSong.releaseDate.toISOString().split('T')[0] 
-                : updatedSong.releaseDate)
+          released: updatedSong.releaseDate
+            ? (updatedSong.releaseDate instanceof Date
+              ? updatedSong.releaseDate.toISOString().split('T')[0]
+              : updatedSong.releaseDate)
             : "-",
-          status: updatedSong.visibility === "publish" 
-            ? "Published" 
-            : updatedSong.visibility === "schedule" 
-              ? "Scheduled" 
+          status: updatedSong.visibility === "publish"
+            ? "Published"
+            : updatedSong.visibility === "schedule"
+              ? "Scheduled"
               : "Draft",
           cover: updatedSong.coverImage && typeof updatedSong.coverImage === "object"
             ? URL.createObjectURL(updatedSong.coverImage)
@@ -57,6 +57,9 @@ export const useAdminDashboardMusicStore = create((set) => ({
       }
       return song
     })
+  })),
+  deleteSong: (id) => set((state) => ({
+    songsList: state.songsList.filter((song) => song.id !== id)
   }))
 }))
 
