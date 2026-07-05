@@ -1,6 +1,6 @@
 import React from "react"
 import { Upload } from "lucide-react"
-import UploadNewSongDialog from "./UploadNewSongDialog"
+import UploadNewSongDialog from "../../dialogs/admin/UploadNewSongDialog"
 
 const UploadNewSong = () => {
   return (
