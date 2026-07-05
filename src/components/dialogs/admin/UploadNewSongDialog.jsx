@@ -25,8 +25,8 @@ const UploadNewSongDialog = () => {
 
       <DialogContent>
         {/* Custom Header */}
-        <DialogHeader className="bg-dark-accent p-6 flex flex-row items-center justify-between border-b border-whitetext/5 shrink-0">
-          <DialogTitle className="text-[24px] not-italic font-medium text-whitetext font-sans leading-none">
+        <DialogHeader>
+          <DialogTitle >
             Upload New Song
           </DialogTitle>
         </DialogHeader>

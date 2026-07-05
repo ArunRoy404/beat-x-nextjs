@@ -88,7 +88,9 @@ function DialogHeader({
   return (
     <div
       data-slot="dialog-header"
-      className={cn("flex flex-col gap-1", className)}
+      className={cn("flex flex-col gap-1",
+        "bg-dark-accent p-6 flex flex-row items-center justify-between border-b border-whitetext/5 shrink-0",
+        className)}
       {...props} />
   );
 }
@@ -121,7 +123,8 @@ function DialogTitle({
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn("font-heading text-sm font-medium", className)}
+      className={cn("font-heading text-sm font-medium",
+        "text-[24px] not-italic font-medium text-whitetext font-sans leading-none", className)}
       {...props} />
   );
 }
