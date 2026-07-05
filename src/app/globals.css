@@ -44,6 +44,7 @@
   --color-green-success: var(--green-success);
   --color-red-error: var(--red-error);
   --color-yellow-warning: var(--yellow-warning);
+  --color-button-text: var(--button-text);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -76,6 +77,7 @@
   --border-radius: 32px;
   --button-bg: var(--Button-Background, linear-gradient(270deg, #3ADFFA 0%, #B1FE4D 100%));
   --nav-icon-bg: rgba(30, 36, 87, 0.40);
+  --button-text: #004B56;
 
   /* Standard Theme Mapping (Mapped to custom) */
   --background: #0E0E0E;

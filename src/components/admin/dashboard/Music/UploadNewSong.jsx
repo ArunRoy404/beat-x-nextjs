@@ -1,5 +1,6 @@
 import React from "react"
-import { Upload, Plus } from "lucide-react"
+import { Upload, Plus, PlusCircle } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 const UploadNewSong = () => {
   return (
@@ -22,12 +23,9 @@ const UploadNewSong = () => {
       </div>
 
       {/* Button */}
-      <button
-        className="flex items-center gap-2 bg-secondary text-black font-semibold text-sm px-5 py-2.5 rounded-full cursor-pointer hover:opacity-90 active:scale-95 transition-all select-none shrink-0"
-      >
-        <Plus className="w-4.5 h-4.5" />
-        <span>Upload Song</span>
-      </button>
+      <Button>
+        <PlusCircle /> Upload Song
+      </Button>
     </div>
   )
 }
