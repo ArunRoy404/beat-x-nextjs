@@ -418,10 +418,10 @@ const UploadNewSongDialog = () => {
 
           {/* Footer Actions */}
           <div className="flex items-center gap-4 mt-2 shrink-0">
-            <DialogClose asChild>
+            <DialogClose asChild className="flex-1 w-full">
               <button
                 type="button"
-                className="flex-1 h-[52px] flex items-center justify-center rounded-full border border-white/40 text-white hover:bg-white/5 font-semibold text-[16px] cursor-pointer transition-colors bg-transparent"
+                className="w-full h-[52px] flex items-center justify-center rounded-full border border-white/40 text-white hover:bg-white/5 font-semibold text-[16px] cursor-pointer transition-colors bg-transparent"
               >
                 Cancel
               </button>
