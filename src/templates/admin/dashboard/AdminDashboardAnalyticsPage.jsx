@@ -3,10 +3,10 @@
 import React from "react"
 import { useAdminDashboardAnalyticsStore } from "@/zustandStore/admin/adminStore/adminDashboardAnalyticsStore"
 import DashboardStats from "@/components/shared/Dashboard/DashboardStats/DashboardStats"
-import TimeFilters from "@/components/admin/analytics/Analytics/TimeFilters"
-import GrowthOverview from "@/components/admin/analytics/Analytics/GrowthOverview"
-import PeakListeningHours from "@/components/admin/analytics/Analytics/PeakListeningHours"
-import GenreDistribution from "@/components/admin/analytics/Analytics/GenreDistribution"
+import TimeFilters from "@/components/admin/analytics/TimeFilters"
+import GrowthOverview from "@/components/admin/analytics/GrowthOverview"
+import PeakListeningHours from "@/components/admin/analytics/PeakListeningHours"
+import GenreDistribution from "@/components/admin/analytics/GenreDistribution"
 
 const AdminDashboardAnalyticsPage = () => {
     const statsCards = useAdminDashboardAnalyticsStore((state) => state.analyticsStatsCards)
@@ -23,7 +23,7 @@ const AdminDashboardAnalyticsPage = () => {
 
             {/* Analytics Stats Row */}
             <DashboardStats statsCards={statsCards} />
-            
+
             {/* Full-width Growth Area Chart */}
             <GrowthOverview data={growthOverviewData} />
 
