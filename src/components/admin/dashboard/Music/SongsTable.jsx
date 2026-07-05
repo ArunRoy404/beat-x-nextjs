@@ -24,7 +24,7 @@ const SongsTable = ({ songs = [] }) => {
           />
 
           {/* Search Input */}
-          <CommonSearch readOnly /></>
+          <CommonSearch /></>
       }
     >
       {/* Reusable DataTable */}

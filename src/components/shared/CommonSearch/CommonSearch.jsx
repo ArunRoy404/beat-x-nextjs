@@ -13,7 +13,7 @@ const CommonSearch = ({
   return (
     <InputGroup
       className={cn(
-        "w-full md:w-72 h-auto bg-transparent border border-border rounded-full text-whitetext placeholder-dark-gray focus-within:border-border",
+        "w-full md:w-72 h-auto bg-transparent border border-border rounded-full text-whitetext placeholder-dark-gray has-[[data-slot=input-group-control]:focus-visible]:border-secondary has-[[data-slot=input-group-control]:focus-visible]:ring-secondary/30",
         className
       )}
     >
