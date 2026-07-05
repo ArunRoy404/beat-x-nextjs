@@ -3,10 +3,10 @@
 import React from "react"
 import { useAdminDashboardAnalyticsStore } from "@/zustandStore/admin/adminStore/adminDashboardAnalyticsStore"
 import DashboardStats from "@/components/shared/Dashboard/DashboardStats/DashboardStats"
-import TimeFilters from "@/components/admin/dashboard/Analytics/TimeFilters"
-import GrowthOverview from "@/components/admin/dashboard/Analytics/GrowthOverview"
-import PeakListeningHours from "@/components/admin/dashboard/Analytics/PeakListeningHours"
-import GenreDistribution from "@/components/admin/dashboard/Analytics/GenreDistribution"
+import TimeFilters from "@/components/admin/analytics/Analytics/TimeFilters"
+import GrowthOverview from "@/components/admin/analytics/Analytics/GrowthOverview"
+import PeakListeningHours from "@/components/admin/analytics/Analytics/PeakListeningHours"
+import GenreDistribution from "@/components/admin/analytics/Analytics/GenreDistribution"
 
 const AdminDashboardAnalyticsPage = () => {
     const statsCards = useAdminDashboardAnalyticsStore((state) => state.analyticsStatsCards)

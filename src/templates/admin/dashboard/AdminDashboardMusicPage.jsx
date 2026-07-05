@@ -3,8 +3,8 @@
 import React from "react"
 import { useAdminDashboardMusicStore } from "@/zustandStore/admin/adminStore/adminDashboardMusicStore"
 import DashboardStats from "@/components/shared/Dashboard/DashboardStats/DashboardStats"
-import UploadNewSong from "@/components/admin/dashboard/Music/UploadNewSong"
-import SongsTable from "@/components/admin/dashboard/Music/SongsTable"
+import UploadNewSong from "@/components/admin/music/Music/UploadNewSong"
+import SongsTable from "@/components/admin/music/Music/SongsTable"
 
 const AdminDashboardMusicPage = () => {
   const statsCards = useAdminDashboardMusicStore((state) => state.musicStatsCards)
