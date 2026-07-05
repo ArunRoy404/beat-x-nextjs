@@ -9,7 +9,7 @@ const CommonFilterItem = ({ label, isActive, onClick, className }) => {
       onClick={onClick}
       variant="ghost"
       className={cn(
-        "h-auto px-4 py-1.5 rounded-full text-[12px] font-semibold transition-all duration-200 select-none whitespace-nowrap border shadow-none hover:text-inherit active:translate-y-0",
+        "h-auto px-4! py-1.5! rounded-full text-[12px] font-semibold transition-all duration-200 select-none whitespace-nowrap border shadow-none hover:text-inherit active:translate-y-0",
         isActive
           ? "bg-nav-icon-bg border-secondary text-secondary hover:bg-nav-icon-bg"
           : "bg-white/[0.03] text-light-gray border-transparent hover:bg-white/[0.06]",

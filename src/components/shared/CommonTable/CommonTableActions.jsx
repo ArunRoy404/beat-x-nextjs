@@ -1,5 +1,5 @@
 import React from "react"
-import { Eye, Check, X, Trash2 } from "lucide-react"
+import { Eye, Check, X, Trash2, SquarePen } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
@@ -10,6 +10,7 @@ const CommonTableActions = ({
     onRestore,
     onApprove,
     onReject,
+    onEdit,
     onDelete,
     className
 }) => {
@@ -21,7 +22,7 @@ const CommonTableActions = ({
                     notImplemented
                     onClick={onTakeDown}
                     variant="outline"
-                    className="text-yellow-warning border border-yellow-warning/20 bg-yellow-warning/10 rounded-full"
+                    className="text-yellow-warning border border-yellow-warning/20 bg-yellow-warning/10 rounded-full px-3! py-3!"
                 >
                     Take Down
                 </Button>
@@ -32,7 +33,7 @@ const CommonTableActions = ({
                     notImplemented
                     onClick={onRestore}
                     variant="outline"
-                    className="text-green-success border border-green-success/20 bg-green-success/10 rounded-full"
+                    className="text-green-success border border-green-success/20 bg-green-success/10 rounded-full px-3! py-3!"
                 >
                     Restore
                 </Button>
@@ -73,6 +74,17 @@ const CommonTableActions = ({
                 className="text-secondary border border-secondary/20 bg-secondary/10 rounded-full"
             >
                 <Eye className="w-3.5 h-3.5 shrink-0" />
+            </Button>
+
+            <Button
+                notImplemented
+                onClick={onEdit}
+                title="Edit Song"
+                size="icon"
+                variant="outline"
+                className="text-secondary border border-secondary/20 bg-secondary/10 rounded-full"
+            >
+                <SquarePen className="w-3.5 h-3.5 shrink-0" />
             </Button>
 
             {/* Delete icon */}

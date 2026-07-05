@@ -80,7 +80,7 @@ const CommonPagination = ({
                     onClick={() => onPageChange?.(page)}
                     variant="outline"
                     size="icon"
-                    className={cn("px-3! py-3!", isActive ? "bg-secondary border-secondary" : "")}
+                    className={isActive ? "bg-secondary border-secondary" : ""}
                 >
                     {page}
                 </Button>
@@ -104,7 +104,6 @@ const CommonPagination = ({
                     disabled={currentPage === 1}
                     variant="outline"
                     size="icon"
-                    className='px-3! py-3!'
                 >
                     <ChevronLeft />
                 </Button>
@@ -118,7 +117,6 @@ const CommonPagination = ({
                     disabled={currentPage === calculatedTotalPages}
                     variant="outline"
                     size="icon"
-                    className='px-3! py-3!'
                 >
                     <ChevronRight />
                 </Button>
