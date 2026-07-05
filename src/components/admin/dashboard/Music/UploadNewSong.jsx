@@ -24,7 +24,7 @@ const UploadNewSong = () => {
       </div>
 
       {/* Button */}
-      <Button onClick={() => toast.success('hello')}>
+      <Button>
         <PlusCircle /> Upload Song
       </Button>
     </div>
