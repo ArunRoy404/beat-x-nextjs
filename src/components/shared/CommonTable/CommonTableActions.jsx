@@ -2,15 +2,16 @@ import React from "react"
 import { Eye, Check, X, Trash2, SquarePen } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import EditSongDialog from "@/components/dialogs/admin/EditSongDialog"
 
 const CommonTableActions = ({
     status,
+    song,
     onViewDetails,
     onTakeDown,
     onRestore,
     onApprove,
     onReject,
-    onEdit,
     onDelete,
     className
 }) => {
@@ -76,16 +77,17 @@ const CommonTableActions = ({
                 <Eye className="w-3.5 h-3.5 shrink-0" />
             </Button>
 
-            <Button
-                notImplemented
-                onClick={onEdit}
-                title="Edit Song"
-                size="icon"
-                variant="outline"
-                className="text-secondary border border-secondary/20 bg-secondary/10 rounded-full"
-            >
-                <SquarePen className="w-3.5 h-3.5 shrink-0" />
-            </Button>
+            <EditSongDialog song={song}>
+                <Button
+                    title="Edit Song"
+                    size="icon"
+                    variant="outline"
+                    className="text-secondary border border-secondary/20 bg-secondary/10 rounded-full cursor-pointer"
+                >
+                    <SquarePen className="w-3.5 h-3.5 shrink-0" />
+                </Button>
+            </EditSongDialog>
+
 
             {/* Delete icon */}
             <Button

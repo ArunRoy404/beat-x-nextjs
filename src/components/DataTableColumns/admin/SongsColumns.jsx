@@ -71,7 +71,7 @@ export const getSongsColumns = () => [
       const status = song?.status
 
       return (
-        <CommonTableActions status={status} />
+        <CommonTableActions status={status} song={song} />
       )
     }
   }

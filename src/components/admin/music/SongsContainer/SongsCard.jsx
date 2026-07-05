@@ -45,7 +45,7 @@ const SongsCard = ({ song }) => {
 
             {/* Action buttons */}
             <div className="flex items-center justify-end">
-                <CommonTableActions status={song?.status} className="w-full justify-between pr-0" />
+                <CommonTableActions status={song?.status} song={song} className="w-full justify-between pr-0" />
             </div>
         </div>
     )

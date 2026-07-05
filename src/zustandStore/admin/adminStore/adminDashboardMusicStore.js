@@ -28,5 +28,35 @@ export const useAdminDashboardMusicStore = create((set) => ({
       },
       ...state.songsList
     ]
+  })),
+  updateSong: (id, updatedSong) => set((state) => ({
+    songsList: state.songsList.map((song) => {
+      if (song.id === id) {
+        return {
+          ...song,
+          title: updatedSong.songTitle,
+          artist: updatedSong.artist,
+          album: updatedSong.album || "Single",
+          genre: updatedSong.genre,
+          released: updatedSong.releaseDate 
+            ? (updatedSong.releaseDate instanceof Date 
+                ? updatedSong.releaseDate.toISOString().split('T')[0] 
+                : updatedSong.releaseDate)
+            : "-",
+          status: updatedSong.visibility === "publish" 
+            ? "Published" 
+            : updatedSong.visibility === "schedule" 
+              ? "Scheduled" 
+              : "Draft",
+          cover: updatedSong.coverImage && typeof updatedSong.coverImage === "object"
+            ? URL.createObjectURL(updatedSong.coverImage)
+            : (updatedSong.coverImage || song.cover),
+          isExplicit: updatedSong.isExplicit,
+          description: updatedSong.description,
+        }
+      }
+      return song
+    })
   }))
 }))
+

@@ -39,15 +39,16 @@ const CommonAudioInput = ({
                     <Music className="w-5 h-5" />
                 </div>
                 {value ? (
-                    <div className="text-center min-w-0 w-full px-4">
+                    <div className="text-center min-w-0 w-full px-4 flex flex-col items-center gap-1">
                         <p className="text-whitetext text-sm font-medium truncate">
-                            {value.name}
+                            {typeof value === "string" ? "Audio file" : value.name}
                         </p>
-                        {value.size && (
-                            <p className="text-light-whitetext text-xs mt-0.5">
-                                {(value.size / 1024 / 1024).toFixed(2)} MB
-                            </p>
-                        )}
+                        <p className="text-light-whitetext text-xs">
+                            {typeof value === "string" ? "MP3, 230MB" : `${(value.size / 1024 / 1024).toFixed(2)} MB`}
+                        </p>
+                        <span className="mt-1 px-3 py-1 rounded-full bg-secondary/20 hover:bg-secondary/30 text-secondary text-[11px] font-medium transition-colors">
+                            Replace File
+                        </span>
                     </div>
                 ) : (
                     <div className="text-center">
