@@ -93,7 +93,7 @@ const GenresContainer = () => {
               <div className="flex items-center justify-between border-t border-white/5 pt-3">
                 <div className="flex flex-col gap-1">
                   <span className="text-white/40 text-[10px] uppercase font-semibold">Count</span>
-                  <span className="text-whitetext font-medium text-sm">{genre.count.toLocaleString()}</span>
+                  <span className="text-whitetext font-medium text-sm">{(genre.count || 0).toLocaleString()}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <EditGenreDialog genre={genre}>

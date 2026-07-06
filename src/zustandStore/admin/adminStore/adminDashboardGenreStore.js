@@ -27,6 +27,7 @@ export const useAdminDashboardGenreStore = create((set) => ({
         id: state.genresList.length ? Math.max(...state.genresList.map(g => g.id)) + 1 : 1,
         progress: 0,
         status: "Active",
+        count: 0,
         ...genre
       }
     ]
