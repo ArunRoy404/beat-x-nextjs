@@ -9,9 +9,9 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Trash2 } from "lucide-react"
-import DeleteGenreForm from "@/components/forms/DeleteGenreForm"
+import DeleteUserForm from "@/components/forms/DeleteUserForm"
 
-const DeleteGenreDialog = ({ genre, children }) => {
+const DeleteUserDialog = ({ user, children }) => {
     const [open, setOpen] = useState(false)
 
     return (
@@ -32,8 +32,8 @@ const DeleteGenreDialog = ({ genre, children }) => {
                 </DialogHeader>
 
                 {/* Modular Form */}
-                <DeleteGenreForm
-                    genre={genre}
+                <DeleteUserForm
+                    user={user}
                     onSuccess={() => setOpen(false)}
                     onCancel={() => setOpen(false)}
                 />
@@ -42,4 +42,4 @@ const DeleteGenreDialog = ({ genre, children }) => {
     )
 }
 
-export default DeleteGenreDialog
+export default DeleteUserDialog
