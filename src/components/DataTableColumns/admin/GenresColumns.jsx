@@ -3,6 +3,7 @@ import { Pencil, Trash2, Tag } from "lucide-react"
 import CommonTableHeader from "@/components/shared/CommonTable/CommonTableHeader"
 import EditGenreDialog from "@/components/dialogs/admin/EditGenreDialog"
 import DeleteGenreDialog from "@/components/dialogs/admin/DeleteGenreDialog"
+import { Button } from "@/components/ui/button"
 
 export const getGenresColumns = () => [
   {
@@ -82,14 +83,24 @@ export const getGenresColumns = () => [
       return (
         <div className="flex items-center justify-end gap-2.5 pr-4">
           <EditGenreDialog genre={genre}>
-            <button className="text-[#3ADFFA] hover:text-[#3ADFFA]/80 transition-colors p-1.5 hover:bg-[#3ADFFA]/10 rounded-[8px] cursor-pointer">
-              <Pencil className="w-4 h-4" />
-            </button>
+            <Button
+              title="Edit Genre"
+              size="icon"
+              variant="outline"
+              className="text-secondary border border-secondary/20 bg-secondary/10 rounded-full cursor-pointer"
+            >
+              <Pencil className="w-3.5 h-3.5 shrink-0" />
+            </Button>
           </EditGenreDialog>
           <DeleteGenreDialog genre={genre}>
-            <button className="text-[#FF453A] hover:text-[#FF453A]/80 transition-colors p-1.5 hover:bg-[#FF453A]/10 rounded-[8px] cursor-pointer">
-              <Trash2 className="w-4 h-4" />
-            </button>
+            <Button
+              title="Delete Genre"
+              size="icon"
+              variant="outline"
+              className="text-red-error border border-red-error/20 bg-red-error/10 rounded-full cursor-pointer"
+            >
+              <Trash2 className="w-4 h-4 shrink-0" />
+            </Button>
           </DeleteGenreDialog>
         </div>
       )
