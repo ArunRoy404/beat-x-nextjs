@@ -3,6 +3,7 @@
 import React from "react"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import SongDetailContent from "./SongDetailContent"
+import SongDetailAnalytics from "./SongDetailAnalytics"
 
 const SongDetailsTabs = ({ song }) => {
     return (
@@ -28,8 +29,8 @@ const SongDetailsTabs = ({ song }) => {
                 <SongDetailContent song={song} />
             </TabsContent>
 
-            <TabsContent value="analytics" className="flex-1 min-h-0 flex flex-col items-center justify-center p-8 text-dark-gray m-0 text-sm">
-                No analytics data available.
+            <TabsContent value="analytics" className="flex-1 min-h-0 flex flex-col overflow-hidden m-0">
+                <SongDetailAnalytics song={song} />
             </TabsContent>
         </Tabs>
     )
