@@ -6,7 +6,7 @@ import EditSongDialog from "@/components/dialogs/admin/EditSongDialog"
 
 import DeleteSongDialog from "@/components/dialogs/admin/DeleteSongDialog"
 
-const CommonTableActions = ({
+const SongsTableActions = ({
     status,
     song,
     onViewDetails,
@@ -106,4 +106,4 @@ const CommonTableActions = ({
     )
 }
 
-export default CommonTableActions
+export default SongsTableActions

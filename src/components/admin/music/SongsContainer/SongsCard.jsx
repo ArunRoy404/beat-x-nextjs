@@ -3,7 +3,7 @@ import CommonSongCell from "@/components/shared/CommonTable/CommonSongCell"
 import CommonTableTag from "@/components/shared/CommonTable/CommonTableTag"
 import CommonTableStat from "@/components/shared/CommonTable/CommonTableStat"
 import CommonTableStatus from "@/components/shared/CommonTable/CommonTableStatus"
-import CommonTableActions from "@/components/shared/CommonTable/CommonTableActions"
+import SongsTableActions from "@/components/admin/music/SongsContainer/SongsTableActions"
 
 const SongsCard = ({ song }) => {
     if (!song) return null
@@ -45,7 +45,7 @@ const SongsCard = ({ song }) => {
 
             {/* Action buttons */}
             <div className="flex items-center justify-end">
-                <CommonTableActions status={song?.status} song={song} className="w-full justify-between pr-0" />
+                <SongsTableActions status={song?.status} song={song} className="w-full justify-between pr-0" />
             </div>
         </div>
     )

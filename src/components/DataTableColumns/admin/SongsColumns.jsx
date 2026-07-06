@@ -5,7 +5,7 @@ import CommonTableHeader from "@/components/shared/CommonTable/CommonTableHeader
 import CommonTableTag from "@/components/shared/CommonTable/CommonTableTag"
 import CommonTableStat from "@/components/shared/CommonTable/CommonTableStat"
 import CommonTableStatus from "@/components/shared/CommonTable/CommonTableStatus"
-import CommonTableActions from "@/components/shared/CommonTable/CommonTableActions"
+import SongsTableActions from "@/components/admin/music/SongsContainer/SongsTableActions"
 
 export const getSongsColumns = () => [
   {
@@ -71,7 +71,7 @@ export const getSongsColumns = () => [
       const status = song?.status
 
       return (
-        <CommonTableActions status={status} song={song} />
+        <SongsTableActions status={status} song={song} />
       )
     }
   }
