@@ -7,11 +7,11 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-    DialogClose,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Eye, Calendar, Sparkles, Mail, Shield, Play } from "lucide-react"
+import { Mail, MapPin, Calendar, Headphones, Music, Package, Ticket, Pencil, Trash2 } from "lucide-react"
 import CommonAvatar from "@/components/shared/CommonAvatar"
+import CommonCard from "@/components/shared/CommonCard/CommonCard"
 
 const UserDetailsDialog = ({ user, children }) => {
     const [open, setOpen] = useState(false)
@@ -19,20 +19,31 @@ const UserDetailsDialog = ({ user, children }) => {
     if (!user) return null
 
     const statusColors = {
-        Active: "text-[#34C759] bg-[#34C759]/10 border border-[#34C759]/20",
-        Rejected: "text-[#FF453A] bg-[#FF453A]/10 border border-[#FF453A]/20",
-        Pending: "text-[#FFCC00] bg-[#FFCC00]/10 border border-[#FFCC00]/20"
+        Active: "text-[#34C759] border-[#34C759]/25 bg-[#34C759]/10",
+        Rejected: "text-[#FF453A] border-[#FF453A]/25 bg-[#FF453A]/10",
+        Pending: "text-[#FFCC00] border-[#FFCC00]/25 bg-[#FFCC00]/10"
     }
 
     const planColors = {
-        Premium: "text-[#3ADFFA] bg-[#3ADFFA]/10 border border-[#3ADFFA]/20",
-        Family: "text-[#CC97FF] bg-[#CC97FF]/10 border border-[#CC97FF]/20",
-        Student: "text-[#E5F97D] bg-[#E5F97D]/10 border border-[#E5F97D]/20",
-        Free: "text-white/40 bg-white/5 border border-white/10"
+        Premium: "text-[#3ADFFA] border-[#3ADFFA]/25 bg-[#3ADFFA]/10",
+        Family: "text-[#CC97FF] border-[#CC97FF]/25 bg-[#CC97FF]/10",
+        Student: "text-[#E5F97D] border-[#E5F97D]/25 bg-[#E5F97D]/10",
+        Free: "text-white/40 border-white/10 bg-white/5"
     }
 
     const statusClass = statusColors[user.status] || statusColors.Pending
     const planClass = planColors[user.plan] || planColors.Free
+
+    // Get initials for avatar fallback
+    const getInitials = (name) => {
+        if (!name) return "US"
+        return name
+            .split(" ")
+            .map((n) => n[0])
+            .join("")
+            .toUpperCase()
+            .slice(0, 2)
+    }
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -40,95 +51,140 @@ const UserDetailsDialog = ({ user, children }) => {
                 {children}
             </DialogTrigger>
 
-            <DialogContent className="sm:max-w-[480px]">
-                {/* Header */}
+            <DialogContent className="sm:max-w-[800px]">
+                {/* Custom Header */}
                 <DialogHeader>
-                    <DialogTitle className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-secondary/10 border border-secondary/25 flex items-center justify-center text-secondary shrink-0">
-                            <Eye className="w-5 h-5" />
-                        </div>
-                        <span className="text-[20px] font-semibold leading-none">User Account Details</span>
-                    </DialogTitle>
+                    <DialogTitle>User Details</DialogTitle>
                 </DialogHeader>
 
-                {/* Profile Detail Card */}
-                <div className="flex flex-col items-center text-center gap-4 py-4 shrink-0">
-                    <div className="relative">
-                        <CommonAvatar
-                            src={user.avatar || ""}
-                            alt={user.name}
-                            className="w-24 h-24 rounded-full border-2 border-[#A175FF]/30 shadow-[0_0_15px_rgba(161,117,255,0.2)]"
-                        />
-                        <span className={`absolute bottom-0 right-0 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusClass}`}>
-                            {user.status}
-                        </span>
-                    </div>
+                {/* Content body with padding */}
+                <div className="p-6 flex flex-col gap-6 overflow-y-auto max-h-[75vh]">
+                    {/* User Info Block */}
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/5">
+                        {/* Left details info */}
+                        <div className="flex items-center gap-4">
+                            {user.avatar ? (
+                                <CommonAvatar
+                                    src={user.avatar}
+                                    alt={user.name}
+                                    className="w-12 h-12 rounded-full border border-white/10"
+                                />
+                            ) : (
+                                <div className="w-12 h-12 rounded-full bg-[#3E1F1F] text-[#FF453A] border border-[#FF453A]/25 flex items-center justify-center font-bold text-base shrink-0">
+                                    {getInitials(user.name)}
+                                </div>
+                            )}
 
-                    <div className="flex flex-col gap-1">
-                        <h3 className="text-whitetext font-bold text-[22px] tracking-tight">{user.name}</h3>
-                        <div className="flex items-center justify-center gap-1.5 text-light-whitetext/60 text-[14px]">
-                            <Mail className="w-4 h-4" />
-                            <span>{user.email}</span>
+                            <div className="flex flex-col gap-1.5">
+                                <div className="flex items-center flex-wrap gap-2.5">
+                                    <span className="text-whitetext text-[18px] font-bold tracking-tight">
+                                        {user.name.toUpperCase()}
+                                    </span>
+                                    <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${planClass}`}>
+                                        {user.plan}
+                                    </span>
+                                    <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${statusClass}`}>
+                                        {user.status}
+                                    </span>
+                                </div>
+
+                                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-light-gray/40 text-[12px] font-medium">
+                                    <span className="flex items-center gap-1">
+                                        <Mail className="w-3.5 h-3.5 shrink-0" />
+                                        {user.email}
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                        <MapPin className="w-3.5 h-3.5 shrink-0" />
+                                        {user.location || "Bangladesh"}
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                        <Calendar className="w-3.5 h-3.5 shrink-0" />
+                                        Joined : {user.joined}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Right action buttons */}
+                        <div className="flex items-center gap-2 mt-2 md:mt-0 shrink-0">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="rounded-lg h-9 border-white/10 bg-white/5 text-whitetext hover:bg-white/10 gap-1.5 px-3 font-semibold text-xs cursor-pointer"
+                            >
+                                <Pencil className="w-3.5 h-3.5" /> Edit
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="rounded-lg h-9 border-red-error/20 bg-[#FF453A]/10 text-[#FF453A] hover:bg-[#FF453A]/20 gap-1.5 px-3 font-semibold text-xs cursor-pointer border-0"
+                            >
+                                Suspend Artist
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="rounded-lg h-9 border-red-error/20 bg-[#FF453A]/10 text-[#FF453A] hover:bg-[#FF453A]/20 gap-1.5 px-3 font-semibold text-xs cursor-pointer border-0"
+                            >
+                                <Trash2 className="w-3.5 h-3.5" /> Delete
+                            </Button>
                         </div>
                     </div>
-                </div>
 
-                {/* Detail Metrics grid */}
-                <div className="grid grid-cols-2 gap-3 shrink-0">
-                    {/* Role */}
-                    <div className="bg-white/[0.02] border border-white/5 rounded-[12px] p-3 flex flex-col gap-1 text-left">
-                        <span className="text-white/40 text-[10px] uppercase font-bold tracking-wider flex items-center gap-1">
-                            <Shield className="w-3 h-3 text-secondary" /> Role
-                        </span>
-                        <span className="text-whitetext font-semibold text-[15px]">
-                            {user.role}
-                        </span>
+                    {/* 4 Stat Cards grid */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {/* Streams Card */}
+                        <CommonCard className="flex flex-col items-center text-center justify-center gap-2 rounded-[16px]! p-5 bg-[#20201F99]!">
+                            <div className="relative z-10 w-12 h-12 rounded-full bg-[#3ADFFA]/15 border border-[#3ADFFA]/20 text-[#3ADFFA] flex items-center justify-center shrink-0">
+                                <Headphones className="w-5 h-5" />
+                            </div>
+                            <span className="relative z-10 text-whitetext font-bold text-[24px] leading-tight">
+                                {(user.streams || 0).toLocaleString()}
+                            </span>
+                            <span className="relative z-10 text-light-gray/40 text-[12px] font-medium uppercase tracking-wider">
+                                Streams
+                            </span>
+                        </CommonCard>
+
+                        {/* Playlist Card */}
+                        <CommonCard className="flex flex-col items-center text-center justify-center gap-2 rounded-[16px]! p-5 bg-[#20201F99]!">
+                            <div className="relative z-10 w-12 h-12 rounded-full bg-[#E5F97D]/15 border border-[#E5F97D]/20 text-[#E5F97D] flex items-center justify-center shrink-0">
+                                <Music className="w-5 h-5" />
+                            </div>
+                            <span className="relative z-10 text-whitetext font-bold text-[24px] leading-tight">
+                                {user.playlists || 18}
+                            </span>
+                            <span className="relative z-10 text-light-gray/40 text-[12px] font-medium uppercase tracking-wider">
+                                Playlist
+                            </span>
+                        </CommonCard>
+
+                        {/* Orders Card */}
+                        <CommonCard className="flex flex-col items-center text-center justify-center gap-2 rounded-[16px]! p-5 bg-[#20201F99]!">
+                            <div className="relative z-10 w-12 h-12 rounded-full bg-[#CC97FF]/15 border border-[#CC97FF]/20 text-[#CC97FF] flex items-center justify-center shrink-0">
+                                <Package className="w-5 h-5" />
+                            </div>
+                            <span className="relative z-10 text-whitetext font-bold text-[24px] leading-tight">
+                                {user.orders || 18}
+                            </span>
+                            <span className="relative z-10 text-light-gray/40 text-[12px] font-medium uppercase tracking-wider">
+                                Orders
+                            </span>
+                        </CommonCard>
+
+                        {/* Tickets Card */}
+                        <CommonCard className="flex flex-col items-center text-center justify-center gap-2 rounded-[16px]! p-5 bg-[#20201F99]!">
+                            <div className="relative z-10 w-12 h-12 rounded-full bg-[#34C759]/15 border border-[#34C759]/20 text-[#34C759] flex items-center justify-center shrink-0">
+                                <Ticket className="w-5 h-5" />
+                            </div>
+                            <span className="relative z-10 text-whitetext font-bold text-[24px] leading-tight">
+                                {user.tickets || 18}
+                            </span>
+                            <span className="relative z-10 text-light-gray/40 text-[12px] font-medium uppercase tracking-wider">
+                                Tickets
+                            </span>
+                        </CommonCard>
                     </div>
-
-                    {/* Plan */}
-                    <div className="bg-white/[0.02] border border-white/5 rounded-[12px] p-3 flex flex-col gap-1 text-left">
-                        <span className="text-white/40 text-[10px] uppercase font-bold tracking-wider flex items-center gap-1">
-                            <Sparkles className="w-3 h-3 text-[#A175FF]" /> Subscription
-                        </span>
-                        <span className={`inline-self-start px-2 py-0.5 rounded-full text-[12px] font-medium leading-normal w-fit ${planClass}`}>
-                            {user.plan}
-                        </span>
-                    </div>
-
-                    {/* Streams */}
-                    <div className="bg-white/[0.02] border border-white/5 rounded-[12px] p-3 flex flex-col gap-1 text-left">
-                        <span className="text-white/40 text-[10px] uppercase font-bold tracking-wider flex items-center gap-1">
-                            <Play className="w-3 h-3 text-green-success" /> Streams
-                        </span>
-                        <span className="text-whitetext font-semibold text-[15px]">
-                            {(user.streams || 0).toLocaleString()} streams
-                        </span>
-                    </div>
-
-                    {/* Joined */}
-                    <div className="bg-white/[0.02] border border-white/5 rounded-[12px] p-3 flex flex-col gap-1 text-left">
-                        <span className="text-white/40 text-[10px] uppercase font-bold tracking-wider flex items-center gap-1">
-                            <Calendar className="w-3 h-3 text-yellow-warning" /> Joined Date
-                        </span>
-                        <span className="text-whitetext font-semibold text-[15px]">
-                            {user.joined}
-                        </span>
-                    </div>
-                </div>
-
-                {/* Footer close */}
-                <div className="flex justify-end mt-4 shrink-0">
-                    <DialogClose asChild>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            className="w-full rounded-full h-[52px]!"
-                            size="lg"
-                            onClick={() => setOpen(false)}
-                        >
-                            Close Details
-                        </Button>
-                    </DialogClose>
                 </div>
             </DialogContent>
         </Dialog>
