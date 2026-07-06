@@ -30,7 +30,7 @@
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
+  --color-muted-foreground: var(--muted-foreground); 
   --color-muted: var(--muted);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
@@ -40,10 +40,12 @@
   --color-dark-gray: var(--dark-gray);
   --color-dark-accent: var(--dark-accent);
   --color-whitetext: var(--whitetext);
+  --color-light-whitetext: var(--light-whitetext);
   --color-nav-icon-bg: var(--nav-icon-bg);
   --color-green-success: var(--green-success);
   --color-red-error: var(--red-error);
   --color-yellow-warning: var(--yellow-warning);
+  --color-button-text: var(--button-text);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -76,6 +78,7 @@
   --border-radius: 32px;
   --button-bg: var(--Button-Background, linear-gradient(270deg, #3ADFFA 0%, #B1FE4D 100%));
   --nav-icon-bg: rgba(30, 36, 87, 0.40);
+  --button-text: #004B56;
 
   /* Standard Theme Mapping (Mapped to custom) */
   --background: #0E0E0E;

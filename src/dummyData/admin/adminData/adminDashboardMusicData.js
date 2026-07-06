@@ -53,7 +53,7 @@ export const songsList = [
     genre: "Synthwave",
     streams: "2.8M",
     released: "2026-01-24",
-    status: "Published",
+    status: "Rejected",
     cover: "/images/bhalo_thako_mon.png"
   },
   {
@@ -64,7 +64,7 @@ export const songsList = [
     genre: "R&B",
     streams: "6.8M",
     released: "2026-01-24",
-    status: "Published",
+    status: "Under Review",
     cover: "/images/neon_prophets.png"
   },
   {
@@ -88,5 +88,27 @@ export const songsList = [
     released: "2026-01-24",
     status: "Scheduled",
     cover: "/images/bhalo_thako_mon.png"
+  },
+  {
+    id: 6,
+    title: "Tumi Onek Dami",
+    duration: "4:20",
+    album: "Single",
+    genre: "POP",
+    streams: "4.2M",
+    released: "2026-01-24",
+    status: "Take Down",
+    cover: "/images/bhalo_thako_mon.png"
+  },
+  {
+    id: 7,
+    title: "Tumi Onek Dami",
+    duration: "4:20",
+    album: "Single",
+    genre: "POP",
+    streams: "4.2M",
+    released: "2026-01-24",
+    status: "Published",
+    cover: "/images/tumi_onek_dami.png"
   }
 ]

@@ -31,6 +31,20 @@ export const adminDashboardNavigation = {
           subtitle: "Manage all platform music and songs"
         },
         { 
+          title: "Albums", 
+          navbarTitle: "Album Management",
+          url: "/admin/dashboard/albums", 
+          iconName: "AlbumIcon",
+          subtitle: "Manage music albums and compilations"
+        },
+        { 
+          title: "Genre", 
+          navbarTitle: "Genre Management",
+          url: "/admin/dashboard/genre", 
+          iconName: "TagIcon",
+          subtitle: "Add, edit and remove platform genres"
+        },
+        { 
           title: "Podcasts", 
           navbarTitle: "Podcast Management",
           url: "/admin/dashboard/podcasts", 
