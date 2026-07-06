@@ -14,14 +14,21 @@ const DashboardStatCard = ({ card }) => {
         <span className="text-whitetext text-[24px] not-italic font-medium">
           {card?.value}
         </span>
-        {IconComponent && (
-          <div
-            className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-            style={{ backgroundColor: card?.iconBg || "rgba(255, 255, 255, 0.1)" }}
-          >
-            <IconComponent className="w-5 h-5" style={{ color: card?.iconColor || "#fff" }} />
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {card?.badge && (
+            <span className="text-[10px] font-medium text-green-success bg-green-success/15 border border-green-success/20 px-1.5 py-0.5 rounded-[4px] shrink-0">
+              {card.badge}
+            </span>
+          )}
+          {IconComponent && (
+            <div
+              className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+              style={{ backgroundColor: card?.iconBg || "rgba(255, 255, 255, 0.1)" }}
+            >
+              <IconComponent className="w-5 h-5" style={{ color: card?.iconColor || "#fff" }} />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Title label */}
