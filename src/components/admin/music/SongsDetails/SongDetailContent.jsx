@@ -8,12 +8,12 @@ import SongDetailHeader from "./SongDetailHeader"
 
 const SongDetailContent = ({ song }) => {
     return (
-        <div className="flex flex-col">
+        <div className="flex flex-col flex-1 min-h-0">
             {/* Modal Header */}
             <SongDetailHeader song={song} />
 
             {/* Scrollable Body Content */}
-            <div className="p-4 flex flex-col gap-5 overflow-y-auto max-h-[60vh] scrollbar-thin">
+            <div className="p-4 flex flex-col gap-5 overflow-y-auto flex-1 min-h-0 scrollbar-thin">
                 <div className="grid grid-cols-2 gap-4">
                     {/* Song Box */}
                     <div className="border border-white/10 bg-white/5 rounded-[16px] p-4 flex flex-col justify-between">
