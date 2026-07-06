@@ -5,18 +5,30 @@ import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
+import { DialogClose } from "@/components/ui/dialog"
+import { CheckCircle, Clock, FileText } from "lucide-react"
 import { toast } from "sonner"
 import { useAdminDashboardAlbumsStore } from "@/zustandStore/admin/adminStore/adminDashboardAlbumsStore"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
+import CommonImageUpload from "@/components/shared/CommonInputs/CommonImageUpload/CommonImageUpload"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSelect"
+import CommonSelectCards from "@/components/shared/CommonInputs/CommonInput/CommonSelectCards"
+
+const GENRES = ["Pop", "Hip Hop", "Electronic", "Rock", "Lofi", "Jazz", "R&B"]
+
+const VISIBILITY_OPTIONS = [
+    { value: "publish", label: "Publish Now", icon: CheckCircle },
+    { value: "schedule", label: "Schedule", icon: Clock },
+    { value: "draft", label: "Save as Draft", icon: FileText },
+]
 
 const albumSchema = z.object({
-    name: z.string().min(1, "Album Name is required"),
-    artist: z.string().min(1, "Artist Name is required"),
+    coverImage: z.any().optional(),
+    name: z.string().min(1, "Album Title is required"),
     genre: z.string().min(1, "Genre is required"),
-    status: z.string().min(1, "Status is required"),
     description: z.string().optional(),
+    visibility: z.enum(["publish", "schedule", "draft"]),
 })
 
 const EditAlbumForm = ({ album, onSuccess, onCancel }) => {
@@ -26,130 +38,130 @@ const EditAlbumForm = ({ album, onSuccess, onCancel }) => {
         register,
         handleSubmit,
         control,
+        setValue,
         formState: { errors },
     } = useForm({
         resolver: zodResolver(albumSchema),
         defaultValues: {
+            coverImage: album?.avatar || null,
             name: album?.name || "",
-            artist: album?.artist || "",
             genre: album?.genre || "",
-            status: album?.status || "Under Review",
             description: album?.description || "",
+            visibility: album?.status === "Published"
+                ? "publish"
+                : album?.status === "Scheduled"
+                  ? "schedule"
+                  : "draft",
         },
     })
 
     const onSubmit = (data) => {
+        const statusMap = {
+            publish: "Published",
+            schedule: "Scheduled",
+            draft: "Under Review"
+        }
+
         updateAlbum({
             ...album,
             name: data.name,
-            artist: data.artist,
             genre: data.genre,
-            status: data.status,
+            status: statusMap[data.visibility] || album.status,
             description: data.description,
+            // Update cover if new image file was selected
+            avatar: data.coverImage instanceof File ? URL.createObjectURL(data.coverImage) : data.coverImage
         })
-        toast.success("Album updated successfully!")
+        toast.success("Album details updated successfully!")
         onSuccess?.()
     }
 
+    const onInvalid = (validationErrors) => {
+        const errorKeys = Object.keys(validationErrors)
+        if (errorKeys.length > 0) {
+            toast.error(validationErrors[errorKeys[0]].message)
+        }
+    }
+
     return (
-        <CommonFormContainer onSubmit={handleSubmit(onSubmit)}>
-            {/* Album Name */}
-            <div className="flex flex-col gap-2 shrink-0">
-                <label className="text-[#A175FF] text-[14px] font-medium font-sans">
-                    Album Name
-                </label>
-                <CommonInput
-                    placeholder="e.g. Asha"
-                    className="rounded-full bg-white/[0.03] border-white/10"
-                    {...register("name")}
-                    error={errors.name?.message}
-                />
-            </div>
-
-            {/* Artist Name */}
-            <div className="flex flex-col gap-2 shrink-0">
-                <label className="text-[#A175FF] text-[14px] font-medium font-sans">
-                    Artist Name
-                </label>
-                <CommonInput
-                    placeholder="e.g. Tahsin"
-                    className="rounded-full bg-white/[0.03] border-white/10"
-                    {...register("artist")}
-                    error={errors.artist?.message}
-                />
-            </div>
-
-            {/* Genre & Status row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 shrink-0">
-                {/* Genre */}
-                <div className="flex flex-col gap-2 shrink-0">
-                    <label className="text-[#A175FF] text-[14px] font-medium font-sans">
-                        Genre
-                    </label>
-                    <Controller
-                        name="genre"
-                        control={control}
-                        render={({ field }) => (
-                            <CommonSelect
-                                value={field.value}
-                                onChange={field.onChange}
-                                placeholder="Select Genre"
-                                options={["Pop", "Hip Hop", "Electronic", "Rock", "R&B", "Jazz"]}
-                                error={errors.genre?.message}
-                            />
-                        )}
+        <CommonFormContainer onSubmit={handleSubmit(onSubmit, onInvalid)}>
+            {/* Cover Art Dropzone */}
+            <Controller
+                name="coverImage"
+                control={control}
+                render={({ field }) => (
+                    <CommonImageUpload
+                        value={field.value}
+                        onChange={(file) => setValue("coverImage", file, { shouldValidate: true })}
+                        error={errors.coverImage?.message}
                     />
-                </div>
+                )}
+            />
 
-                {/* Status */}
-                <div className="flex flex-col gap-2 shrink-0">
-                    <label className="text-[#A175FF] text-[14px] font-medium font-sans">
-                        Status
-                    </label>
-                    <Controller
-                        name="status"
-                        control={control}
-                        render={({ field }) => (
-                            <CommonSelect
-                                value={field.value}
-                                onChange={field.onChange}
-                                placeholder="Select Status"
-                                options={["Published", "Under Review", "Scheduled", "Rejected"]}
-                                error={errors.status?.message}
-                            />
-                        )}
+            {/* Album Title */}
+            <CommonInput
+                label="Album Title"
+                placeholder="e.g. Asha"
+                {...register("name")}
+                error={errors.name?.message}
+            />
+
+            {/* Genre */}
+            <Controller
+                name="genre"
+                control={control}
+                render={({ field }) => (
+                    <CommonSelect
+                        label="Genre"
+                        placeholder="Select genre"
+                        value={field.value}
+                        onChange={field.onChange}
+                        options={GENRES}
+                        error={errors.genre?.message}
                     />
-                </div>
-            </div>
+                )}
+            />
 
             {/* Description */}
-            <div className="flex flex-col gap-2 shrink-0">
-                <label className="text-[#A175FF] text-[14px] font-medium font-sans">
-                    Description
-                </label>
-                <textarea
-                    placeholder="Album description..."
-                    rows={3}
-                    className="w-full bg-white/[0.03] border border-white/10 rounded-[12px] p-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-secondary/50 placeholder-white/20 resize-none font-sans"
-                    {...register("description")}
-                />
-            </div>
+            <CommonInput
+                label="Description"
+                type="textarea"
+                placeholder="Type a short description..."
+                {...register("description")}
+                error={errors.description?.message}
+            />
 
-            {/* Footer Buttons */}
-            <div className="flex items-center gap-4 mt-6 shrink-0">
-                <Button
-                    type="button"
-                    variant="outline"
-                    className="flex-1 rounded-full h-[52px]!"
-                    size="lg"
-                    onClick={onCancel}
-                >
-                    Cancel
-                </Button>
+            {/* Visibility Section */}
+            <Controller
+                name="visibility"
+                control={control}
+                render={({ field }) => (
+                    <CommonSelectCards
+                        label="Visibility"
+                        value={field.value}
+                        onChange={field.onChange}
+                        options={VISIBILITY_OPTIONS}
+                        error={errors.visibility?.message}
+                    />
+                )}
+            />
+
+            {/* Footer Actions */}
+            <div className="flex items-center gap-4 mt-2 shrink-0">
+                <DialogClose asChild className="flex-1 w-full">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full rounded-full"
+                        size="lg"
+                        onClick={onCancel}
+                    >
+                        Cancel
+                    </Button>
+                </DialogClose>
                 <Button
                     type="submit"
                     variant="gradient"
-                    className="flex-1 h-[52px]! rounded-full font-semibold"
+                    className="flex-1"
                     size="lg"
                 >
                     Save Changes
