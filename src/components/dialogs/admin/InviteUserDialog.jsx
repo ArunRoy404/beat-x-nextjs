@@ -23,10 +23,10 @@ const InviteUserDialog = () => {
                 </Button>
             </DialogTrigger>
 
-            <DialogContent className="sm:max-w-[600px]">
+            <DialogContent className="sm:max-w-[500px]">
                 {/* Custom Header */}
                 <DialogHeader>
-                    <DialogTitle>Invite New User</DialogTitle>
+                    <DialogTitle>Add User</DialogTitle>
                 </DialogHeader>
 
                 {/* Modular Form */}

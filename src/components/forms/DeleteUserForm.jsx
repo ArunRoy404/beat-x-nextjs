@@ -45,17 +45,17 @@ const DeleteUserForm = ({ user, onSuccess, onCancel }) => {
         <CommonFormContainer onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-col gap-4">
                 <p className="text-light-whitetext text-[14px] not-italic font-normal leading-[22px] font-sans">
-                    You are about to permanently delete the user account <strong className="text-whitetext">"{user?.name}"</strong>. This action cannot be undone.
+                    You are about to permanently delete this User. This action cannot be undone.
                 </p>
                 <p className="text-light-whitetext text-[14px] not-italic font-normal leading-[22px] font-sans">
-                    Enter the password to proceed.
+                    Enter the admin password to proceed.
                 </p>
             </div>
 
             {/* Password input */}
             <div className="flex flex-col gap-2 shrink-0">
                 <label className="text-[#A175FF] text-[14px] font-medium font-sans">
-                    Password
+                    Admin Password
                 </label>
                 <CommonInput
                     type="password"
@@ -83,7 +83,7 @@ const DeleteUserForm = ({ user, onSuccess, onCancel }) => {
                     className="flex-1 rounded-full bg-red-error hover:bg-red-error/90 text-white font-semibold h-[52px]! flex items-center justify-center gap-2 border-0 cursor-pointer"
                     size="lg"
                 >
-                    <Trash2 className="w-4 h-4 shrink-0" /> Delete User
+                    <Trash2 className="w-4 h-4 shrink-0" /> Delete user
                 </Button>
             </div>
         </CommonFormContainer>
