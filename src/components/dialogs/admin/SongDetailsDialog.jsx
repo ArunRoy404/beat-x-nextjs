@@ -8,10 +8,10 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import SongDetailHeader from "@/components/admin/music/SongsDetails/SongDetailHeader"
-import SongDetailContent from "@/components/admin/music/SongsDetails/SongDetailContent"
-import SongUnderReviewDialogFooter from "@/components/admin/music/SongsDetails/SongUnderReviewDialogFooter"
+import SongDetailsTabs from "@/components/admin/music/SongsDetails/SongDetailsTabs"
+import SongDetailFooter from "@/components/admin/music/SongsDetails/SongDetailFooter"
 
-const SongUnderReviewDialog = ({ song, children }) => {
+const SongDetailsDialog = ({ song, children }) => {
     const [open, setOpen] = useState(false)
 
     return (
@@ -23,24 +23,20 @@ const SongUnderReviewDialog = ({ song, children }) => {
             <DialogContent className="sm:max-w-[672px] p-0 overflow-hidden flex flex-col max-h-[95vh]">
                 {/* Screen reader only title for accessibility compliance */}
                 <DialogTitle className="sr-only">
-                    Song Details (Under Review) - {song?.title || "Unknown"}
+                    Song Details - {song?.title || "Unknown"}
                 </DialogTitle>
 
                 {/* Common Header */}
                 <SongDetailHeader song={song} />
 
-                {/* Modular Song Details UI Content */}
-                <SongDetailContent
-                    song={song}
-                />
+                {/* Switchable Tabs between Details & Analytics */}
+                <SongDetailsTabs song={song} />
 
-                {/* Modular Footer containing Admin Note and Actions */}
-                <SongUnderReviewDialogFooter
-                    song={song}
-                />
+                {/* Footer with Delete and Close buttons */}
+                <SongDetailFooter song={song} />
             </DialogContent>
         </Dialog>
     )
 }
 
-export default SongUnderReviewDialog
+export default SongDetailsDialog

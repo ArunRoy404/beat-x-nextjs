@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import EditSongDialog from "@/components/dialogs/admin/EditSongDialog"
 import DeleteSongDialog from "@/components/dialogs/admin/DeleteSongDialog"
 import SongUnderReviewDialog from "@/components/dialogs/admin/SongUnderReviewDialog"
+import SongDetailsDialog from "@/components/dialogs/admin/SongDetailsDialog"
 
 const SongsTableActions = ({
     status,
@@ -80,15 +81,16 @@ const SongsTableActions = ({
                     </Button>
                 </SongUnderReviewDialog>
             ) : (
-                <Button
-                    title="View Details"
-                    size="icon"
-                    variant="outline"
-                    className="text-secondary border border-secondary/20 bg-secondary/10 rounded-full cursor-pointer"
-                    onClick={onViewDetails}
-                >
-                    <Eye className="w-3.5 h-3.5 shrink-0" />
-                </Button>
+                <SongDetailsDialog song={song}>
+                    <Button
+                        title="View Details"
+                        size="icon"
+                        variant="outline"
+                        className="text-secondary border border-secondary/20 bg-secondary/10 rounded-full cursor-pointer"
+                    >
+                        <Eye className="w-3.5 h-3.5 shrink-0" />
+                    </Button>
+                </SongDetailsDialog>
             )}
 
             <EditSongDialog song={song}>
