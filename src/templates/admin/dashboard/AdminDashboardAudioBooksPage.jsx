@@ -4,6 +4,7 @@ import React from "react"
 import { useAdminDashboardAudioBooksStore } from "@/zustandStore/admin/adminStore/adminDashboardAudioBooksStore"
 import DashboardStats from "@/components/shared/Dashboard/DashboardStats/DashboardStats"
 import AudioBooksContainer from "@/components/admin/audiobooks/AudioBooksContainer"
+import UploadAudioBookDialog from "@/components/dialogs/admin/UploadAudioBookDialog"
 import { Upload } from "lucide-react"
 
 const AdminDashboardAudioBooksPage = () => {
@@ -32,12 +33,13 @@ const AdminDashboardAudioBooksPage = () => {
           </div>
         </div>
 
-        <button
-          onClick={() => alert("Audiobook upload flow is under development.")}
-          className="rounded-full bg-gradient-to-r from-secondary to-[#B1FE4D] text-button-text font-semibold hover:opacity-90 transition-opacity border-0 px-5 py-2 cursor-pointer shadow-md flex items-center gap-1.5"
-        >
-          Upload Podcasts
-        </button>
+        <UploadAudioBookDialog>
+          <button
+            className="rounded-full bg-gradient-to-r from-secondary to-[#B1FE4D] text-button-text font-semibold hover:opacity-90 transition-opacity border-0 px-5 py-2 cursor-pointer shadow-md flex items-center gap-1.5"
+          >
+            Upload Podcasts
+          </button>
+        </UploadAudioBookDialog>
       </div>
 
       {/* Audiobooks grid container */}

@@ -97,7 +97,7 @@ const AudioBookCard = ({ book }) => {
               </button>
             </EditAudioBookDialog>
 
-            <DeleteAudioBookDialog bookId={book.id}>
+            <DeleteAudioBookDialog book={book}>
               <button
                 title="Delete Audiobook"
                 className="w-7 h-7 rounded-full flex items-center justify-center border border-red-error/20 bg-red-error/10 hover:bg-red-error/20 text-red-error cursor-pointer transition-colors active:scale-95 shrink-0"

@@ -12,7 +12,7 @@ const AudioBookDetailFooter = ({ book }) => {
             <div className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-3">
                     {/* Delete trigger */}
-                    <DeleteAudioBookDialog bookId={book?.id}>
+                    <DeleteAudioBookDialog book={book}>
                         <Button
                             className="bg-red-error/10 hover:bg-red-error/20 border border-red-error/20 text-red-error font-medium rounded-[10px] px-4 h-10 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
                         >
