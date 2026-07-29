@@ -189,13 +189,10 @@ const UploadAudioBookDialog = ({ children }) => {
 
       <DialogContent className="sm:max-w-[650px] p-0 overflow-hidden flex flex-col bg-[#121212] border border-white/10 rounded-[24px] max-h-[95vh]">
         {/* Header Title */}
-        <div className="p-4 flex items-center justify-between border-b border-white/5 bg-[#181818]">
+        <div className="p-4 flex items-center border-b border-white/5 bg-[#181818]">
           <DialogTitle className="text-[18px] font-semibold text-white">
             Upload New Audiobook
           </DialogTitle>
-          <DialogClose className="text-light-gray hover:text-white cursor-pointer">
-            <X className="w-5 h-5" />
-          </DialogClose>
         </div>
 
         {/* Wizard Progress Steps Bar */}
