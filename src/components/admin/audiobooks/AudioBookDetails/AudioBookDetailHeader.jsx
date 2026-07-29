@@ -76,7 +76,7 @@ const AudioBookDetailHeader = ({ book }) => {
 
             {/* Absolute Edit Button placed to the left of Close button (Close is at top-4 right-6) */}
             <div className="absolute top-4 right-16 z-50">
-                <EditAudioBookDialog>
+                <EditAudioBookDialog book={book}>
                     <button
                         className="h-7 border border-secondary/20 bg-secondary/10 hover:bg-secondary/20 text-secondary text-[11px] font-medium rounded-full px-3 flex items-center gap-1.5 cursor-pointer transition-colors active:scale-95"
                     >

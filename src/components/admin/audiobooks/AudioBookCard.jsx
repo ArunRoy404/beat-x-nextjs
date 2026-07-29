@@ -88,7 +88,7 @@ const AudioBookCard = ({ book }) => {
 
           {/* Action triggers */}
           <div className="flex items-center gap-2">
-            <EditAudioBookDialog>
+            <EditAudioBookDialog book={book}>
               <button
                 title="Edit Audiobook"
                 className="w-7 h-7 rounded-full flex items-center justify-center border border-secondary/20 bg-secondary/10 hover:bg-secondary/20 text-secondary cursor-pointer transition-colors active:scale-95 shrink-0"
