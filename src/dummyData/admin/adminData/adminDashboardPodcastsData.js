@@ -1,0 +1,163 @@
+export const podcastsStatsCards = [
+  {
+    id: 1,
+    title: "Total Podcasts",
+    value: "60K",
+    icon: "Radio",
+    iconColor: "#3ADFFA",
+    iconBg: "rgba(58, 223, 250, 0.15)"
+  },
+  {
+    id: 2,
+    title: "Published",
+    value: "33K",
+    icon: "CheckCircle",
+    iconColor: "#34C759",
+    iconBg: "rgba(52, 199, 89, 0.15)"
+  },
+  {
+    id: 3,
+    title: "Awaiting Review",
+    value: "2",
+    icon: "Clock",
+    iconColor: "#FFAE00",
+    iconBg: "rgba(254, 174, 0, 0.15)"
+  },
+  {
+    id: 4,
+    title: "Total Streams",
+    value: "22.6M",
+    icon: "Headphones",
+    iconColor: "#CC97FF",
+    iconBg: "rgba(204, 151, 255, 0.15)"
+  }
+]
+
+export const podcastsList = [
+  {
+    id: 1,
+    title: "Bangladesh Tech Weekly",
+    duration: "45:20",
+    artist: "Arif Hossain", // Host
+    series: "Tech BD",
+    genre: "Technology", // Category
+    streams: "4.2M",
+    released: "2026-01-24",
+    status: "Published",
+    cover: "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&q=80&w=150",
+    season: "2",
+    episode: "14",
+    listeners: "28.4K",
+    description: "Bangladesh Tech Weekly — episode 14 of Tech BD, season 2, hosted by Arif Hossain. Category: Technology.",
+    isExplicit: false,
+    audioFile: { name: "Audio file Seasonal", size: "230MB", format: "MP3" }
+  },
+  {
+    id: 2,
+    title: "Startup Stories",
+    duration: "3:58",
+    artist: "Amar Hote Hote",
+    series: "Business BD",
+    genre: "Business",
+    streams: "2.8M",
+    released: "2026-01-24",
+    status: "Rejected",
+    cover: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80&w=150",
+    season: "1",
+    episode: "8",
+    listeners: "12.3K",
+    description: "Inspirational stories from startup founders in Bangladesh discussing early challenges and key milestones.",
+    isExplicit: false,
+    audioFile: { name: "Audio file Seasonal", size: "120MB", format: "MP3" }
+  },
+  {
+    id: 3,
+    title: "Neon Horizon",
+    duration: "4:20",
+    artist: "Cyber-Neon Derams",
+    series: "Wellness",
+    genre: "Health",
+    streams: "6.8M",
+    released: "2026-01-24",
+    status: "Under Review",
+    cover: "https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&q=80&w=150",
+    season: "3",
+    episode: "5",
+    listeners: "5.4K",
+    description: "A podcast exploring ambient lifestyle trends, digital mental wellness, and finding focus in an urban neon landscape.",
+    isExplicit: true,
+    audioFile: { name: "Audio file Seasonal", size: "85MB", format: "MP3" }
+  },
+  {
+    id: 4,
+    title: "Midnight",
+    duration: "4:20",
+    artist: "Cyber-Neon Dreams",
+    series: "History BD",
+    genre: "History",
+    streams: "0",
+    released: "-",
+    status: "Draft",
+    cover: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&q=80&w=150",
+    season: "1",
+    episode: "1",
+    listeners: "0",
+    description: "Late night reflections and analysis on lesser known historical events across East Bengal.",
+    isExplicit: false,
+    audioFile: { name: "Audio file Seasonal", size: "90MB", format: "MP3" }
+  },
+  {
+    id: 5,
+    title: "Tumi Onek Dami",
+    duration: "4:20",
+    artist: "Single",
+    series: "Cinema",
+    genre: "Entertainment",
+    streams: "0",
+    released: "2026-01-24",
+    status: "Scheduled",
+    cover: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=150",
+    season: "1",
+    episode: "12",
+    listeners: "0",
+    description: "Behind the scenes talk of local cinema, independent filmmaking, and script reviews.",
+    isExplicit: false,
+    audioFile: { name: "Audio file Seasonal", size: "110MB", format: "MP3" }
+  },
+  {
+    id: 6,
+    title: "Mindful Living",
+    duration: "4:20",
+    artist: "Single",
+    series: "Single",
+    genre: "POP",
+    streams: "4.2M",
+    released: "2026-01-24",
+    status: "Take Down",
+    cover: "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&q=80&w=150",
+    season: "2",
+    episode: "3",
+    listeners: "15.2K",
+    description: "Actionable tips for slow living, minimalism, and focus in a hyper-connected society.",
+    isExplicit: false,
+    audioFile: { name: "Audio file Seasonal", size: "75MB", format: "MP3" }
+  },
+  {
+    id: 7,
+    title: "History of Bengal",
+    duration: "4:20",
+    artist: "Single",
+    series: "Single",
+    genre: "POP",
+    streams: "4.2M",
+    released: "2026-01-24",
+    status: "Published",
+    cover: "https://images.unsplash.com/photo-1461360370896-922624d12aa1?auto=format&fit=crop&q=80&w=150",
+    season: "1",
+    episode: "15",
+    listeners: "95K",
+    description: "Deep dive into ancient Bengal dynasties, folklore, and structural archaeological sites.",
+    isExplicit: false,
+    audioFile: { name: "Audio file Seasonal", size: "135MB", format: "MP3" }
+  }
+]
