@@ -136,7 +136,7 @@
 
 ::-webkit-scrollbar-track {
   background: var(--background);
-}
+} 
 
 ::-webkit-scrollbar-thumb {
   background: var(--border);
