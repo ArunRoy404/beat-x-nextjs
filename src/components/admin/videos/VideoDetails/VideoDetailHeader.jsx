@@ -57,17 +57,17 @@ const VideoDetailHeader = ({ video }) => {
                     </p>
                 </div>
 
-                {/* Short Stats (4 Columns: Duration, Views, Likes, Dislikes) */}
-                <div className="grid grid-cols-4 gap-2 mt-3 w-full border-t border-white/5 pt-2 text-left">
-                    <div className="flex flex-col gap-[2px]">
+                {/* Short Stats (Duration, Views, Likes, Dislikes aligned left with right borders) */}
+                <div className="flex items-center gap-6 mt-3 w-full border-t border-white/5 pt-2.5 text-left flex-wrap">
+                    <div className="flex flex-col pr-6 border-r border-white/10 gap-[2px]">
                         <span className="text-[14px] sm:text-[15px] font-semibold text-whitetext truncate">{video?.duration || "-"}</span>
-                        <span className="text-[10px] font-medium text-dark-gray uppercase tracking-wider">Duration</span>
+                        <span className="text-[11px] font-medium text-dark-gray uppercase tracking-wider">Duration</span>
                     </div>
-                    <div className="flex flex-col gap-[2px]">
+                    <div className="flex flex-col pr-6 border-r border-white/10 gap-[2px]">
                         <span className="text-[14px] sm:text-[15px] font-semibold text-whitetext truncate">{video?.streams || "0"}</span>
                         <span className="text-[10px] font-medium text-dark-gray uppercase tracking-wider">Views</span>
                     </div>
-                    <div className="flex flex-col gap-[2px]">
+                    <div className="flex flex-col pr-6 border-r border-white/10 gap-[2px]">
                         <span className="text-[14px] sm:text-[15px] font-semibold text-whitetext truncate">{video?.likes || "0"}</span>
                         <span className="text-[10px] font-medium text-dark-gray uppercase tracking-wider">Likes</span>
                     </div>

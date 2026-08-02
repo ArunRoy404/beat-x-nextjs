@@ -20,7 +20,7 @@ const VideoDetailsDialog = ({ video, children }) => {
                 {children}
             </DialogTrigger>
 
-            <DialogContent className="sm:max-w-[672px] p-0 overflow-hidden flex flex-col max-h-[95vh] border-white/10 bg-[#1A1A19]">
+            <DialogContent showCloseButton={false} className="sm:max-w-[672px] p-0 overflow-hidden flex flex-col max-h-[95vh] border-white/10 bg-[#1A1A19]">
                 <DialogTitle className="sr-only">
                     Video Details - {video?.title || "Unknown"}
                 </DialogTitle>

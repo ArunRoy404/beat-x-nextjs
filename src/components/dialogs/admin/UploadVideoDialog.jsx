@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useRef } from "react"
 import {
   Dialog,
   DialogContent,
@@ -15,8 +15,6 @@ import { toast } from "sonner"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSelect"
 import CommonSelectCards from "@/components/shared/CommonInputs/CommonInput/CommonSelectCards"
-import CommonImageUpload from "@/components/shared/CommonInputs/CommonImageUpload/CommonImageUpload"
-import CommonAudioInput from "@/components/shared/CommonInputs/CommonAudioInput/CommonAudioInput"
 import { Switch } from "@/components/ui/switch"
 import { useAdminDashboardVideosStore } from "@/zustandStore/admin/adminStore/adminDashboardVideosStore"
 
@@ -32,6 +30,9 @@ const VISIBILITY_OPTIONS = [
 const UploadVideoDialog = ({ children }) => {
   const [open, setOpen] = useState(false)
   const addVideo = useAdminDashboardVideosStore((state) => state.addVideo)
+
+  const videoInputRef = useRef(null)
+  const imageInputRef = useRef(null)
 
   // Form states
   const [videoFile, setVideoFile] = useState(null)
@@ -89,6 +90,16 @@ const UploadVideoDialog = ({ children }) => {
     setOpen(false)
   }
 
+  const handleVideoSelect = (e) => {
+    const file = e.target.files?.[0]
+    if (file) setVideoFile(file)
+  }
+
+  const handleImageSelect = (e) => {
+    const file = e.target.files?.[0]
+    if (file) setCoverImage(file)
+  }
+
   return (
     <Dialog open={open} onOpenChange={(val) => {
       setOpen(val)
@@ -98,9 +109,9 @@ const UploadVideoDialog = ({ children }) => {
         {children}
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[620px] max-h-[90vh] overflow-y-auto scrollbar-thin p-0 border-white/10 bg-[#1A1A19] flex flex-col">
+      <DialogContent showCloseButton={false} className="sm:max-w-[620px] max-h-[90vh] overflow-y-auto scrollbar-thin p-0 border-white/10 bg-[#1A1A19] flex flex-col">
         {/* Header */}
-        <DialogHeader className="p-4 border-b border-white/5 flex items-center justify-between">
+        <DialogHeader className="p-6 border-b border-white/5 flex items-center justify-between">
           <DialogTitle className="text-[20px] font-semibold text-white font-sans">
             Upload New Video
           </DialogTitle>
@@ -112,46 +123,96 @@ const UploadVideoDialog = ({ children }) => {
         </DialogHeader>
 
         {/* Scrollable Body Content */}
-        <div className="p-5 flex flex-col gap-4 overflow-y-auto flex-1 scrollbar-thin">
+        <div className="p-5 flex flex-col gap-5 overflow-y-auto flex-1 scrollbar-thin">
           
-          {/* Video Dropzone */}
+          {/* Custom Video Dropzone */}
           <div className="flex flex-col gap-1.5 w-full">
             <span className="text-[12px] text-dark-gray font-semibold uppercase tracking-wider">Video File *</span>
-            <CommonAudioInput
-              value={videoFile}
-              onChange={(file) => setVideoFile(file)}
-              accept="video/*"
-              className="bg-secondary/[0.03] border-secondary/20 hover:bg-secondary/[0.06] text-secondary"
-            />
-            {/* Override label text style if needed (or custom rendered inside) */}
-            {!videoFile && (
-              <div className="absolute pointer-events-none flex flex-col items-center gap-1 text-center justify-center w-full mt-[30px]">
-                <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
-                  <VideoIcon className="w-5 h-5" />
+            <div
+              onClick={() => videoInputRef.current?.click()}
+              className="group flex flex-col items-center justify-center p-6 h-32 rounded-[16px] border border-dashed border-secondary/15 bg-secondary/5 hover:bg-secondary/10 cursor-pointer transition-all gap-2 relative"
+            >
+              <input
+                type="file"
+                ref={videoInputRef}
+                onChange={handleVideoSelect}
+                accept="video/*"
+                className="hidden"
+              />
+              {videoFile ? (
+                <div className="text-center min-w-0 w-full px-4 flex flex-col items-center gap-1">
+                  <p className="text-whitetext text-sm font-medium truncate">
+                    {typeof videoFile === "string" ? videoFile : videoFile.name}
+                  </p>
+                  <p className="text-light-whitetext text-xs">
+                    {typeof videoFile === "string" ? "MP4, 230MB" : `${(videoFile.size / 1024 / 1024).toFixed(2)} MB`}
+                  </p>
+                  <span className="mt-1 px-3 py-1 rounded-full bg-secondary/20 hover:bg-secondary/30 text-secondary text-[11px] font-medium transition-colors">
+                    Replace File
+                  </span>
                 </div>
-                <p className="text-whitetext text-[14px] font-medium font-sans mt-1">Drop video file here</p>
-                <p className="text-light-whitetext text-[11px] font-sans">MP4 / MOV / AVI &middot; Max 2GB</p>
-              </div>
-            )}
+              ) : (
+                <div className="text-center flex flex-col items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center text-secondary group-hover:scale-105 transition-transform">
+                    <VideoIcon className="w-4 h-4" />
+                  </div>
+                  <p className="text-whitetext text-[14px] font-medium font-sans">
+                    Drop video file here
+                  </p>
+                  <p className="text-light-whitetext text-[11px] mt-0.5 font-sans">
+                    MP4 / MOV / AVI &middot; Max 2GB
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Thumbnail Image Dropzone */}
+          {/* Custom Thumbnail Image Dropzone */}
           <div className="flex flex-col gap-1.5 w-full">
             <span className="text-[12px] text-dark-gray font-semibold uppercase tracking-wider">Thumbnail Image *</span>
-            <CommonImageUpload
-              value={coverImage}
-              onChange={(file) => setCoverImage(file)}
-              className="h-32 min-h-0 bg-secondary/[0.03] border-secondary/20 hover:bg-secondary/[0.06]"
-            />
-            {!coverImage && (
-              <div className="absolute pointer-events-none flex flex-col items-center gap-1 text-center justify-center w-full mt-[30px]">
-                <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
-                  <ImageIcon className="w-5 h-5" />
+            <div
+              onClick={() => imageInputRef.current?.click()}
+              className="group flex flex-col items-center justify-center p-4 min-h-[140px] rounded-[16px] border border-dashed border-secondary/15 bg-secondary/5 hover:bg-secondary/10 cursor-pointer transition-all gap-2 relative w-full"
+            >
+              <input
+                type="file"
+                ref={imageInputRef}
+                onChange={handleImageSelect}
+                accept="image/*"
+                className="hidden"
+              />
+              {coverImage ? (
+                <div className="relative flex flex-col items-center gap-2">
+                  <div className="relative w-[120px] h-[72px] rounded-[12px] overflow-hidden border border-whitetext/10">
+                    <img
+                      src={typeof coverImage === "string" ? coverImage : URL.createObjectURL(coverImage)}
+                      alt="Thumbnail Preview"
+                      className="object-cover w-full h-full"
+                    />
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-90 group-hover:opacity-100 transition-opacity">
+                      <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-dark-accent">
+                        <Upload className="w-4 h-4 text-white" />
+                      </div>
+                    </div>
+                  </div>
+                  <span className="text-light-whitetext text-[13px] font-sans">
+                    thumbnail image
+                  </span>
                 </div>
-                <p className="text-whitetext text-[14px] font-medium font-sans mt-1">Upload thumbnail image</p>
-                <p className="text-light-whitetext text-[11px] font-sans">min 1920&times;1080px</p>
-              </div>
-            )}
+              ) : (
+                <div className="text-center flex flex-col items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center text-secondary group-hover:scale-105 transition-transform">
+                    <ImageIcon className="w-4 h-4" />
+                  </div>
+                  <p className="text-whitetext text-[14px] font-medium font-sans">
+                    Upload thumbnail image
+                  </p>
+                  <p className="text-light-whitetext text-[11px] font-sans">
+                    min 1920&times;1080px
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Video Title */}
