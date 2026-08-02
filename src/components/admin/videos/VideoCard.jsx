@@ -4,6 +4,7 @@ import PlayButton from "./PlayButton"
 import VideoDetailsDialog from "@/components/dialogs/admin/VideoDetailsDialog"
 import EditVideoDialog from "@/components/dialogs/admin/EditVideoDialog"
 import DeleteVideoDialog from "@/components/dialogs/admin/DeleteVideoDialog"
+import { toast } from "sonner"
 
 const VideoCard = ({ video }) => {
   if (!video) return null
@@ -25,9 +26,13 @@ const VideoCard = ({ video }) => {
         }}
       >
         {/* Play Button Overlay */}
-        <VideoDetailsDialog video={video}>
-          <PlayButton className="transition-transform group-hover:scale-110" />
-        </VideoDetailsDialog>
+        <PlayButton
+          onClick={(e) => {
+            e.stopPropagation()
+            toast.success(`Playing: ${video.title}`)
+          }}
+          className="transition-transform group-hover:scale-110"
+        />
 
         {/* Status Pill (Top-Right) */}
         <span className={`absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[12px] font-semibold tracking-wide select-none ${statusColor}`}>

@@ -11,7 +11,7 @@ export const videoStatsCards = [
   },
   {
     id: 2,
-    title: "Total Likes",
+    title: "Total Likes", 
     value: "65k",
     change: "-8%",
     isPositive: false,

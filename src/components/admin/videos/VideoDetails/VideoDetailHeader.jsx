@@ -24,57 +24,41 @@ const VideoDetailHeader = ({ video }) => {
             </div>
 
             {/* Title & Actions Row (below player) */}
-            <div className="p-4 flex flex-col gap-3 border-b border-white/5">
-                <div className="flex items-center justify-between gap-4 w-full">
-                    <div className="flex items-center gap-2 flex-wrap min-w-0">
-                        <h2 className="text-[20px] font-semibold text-whitetext not-italic leading-none truncate max-w-[240px] sm:max-w-xs">
+            <div
+                className="p-4 border-b border-white/5 flex flex-col gap-3 shrink-0 relative w-full"
+                style={{ background: "var(--modal-header-bg)" }}
+            >
+                <div className="flex flex-col gap-[12px] pr-24 text-left">
+                    {/* Title row */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                        <h2 className="text-[18px] font-medium text-whitetext not-italic leading-none truncate max-w-[200px] sm:max-w-xs">
                             {video?.title}
                         </h2>
-                        {/* Verification Check */}
+                        {/* Verification Checkmark */}
                         <div className="w-4 h-4 rounded-full bg-yellow-warning flex items-center justify-center text-black shrink-0">
                             <ShieldCheck className="w-2.5 h-2.5 stroke-[3px]" />
                         </div>
                         {/* Status Pill */}
-                        <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-0.5 rounded-full border ${
+                        <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2.5 py-0.5 rounded-full border ${
                             isPublished ? "bg-green-success/15 text-green-success border-green-success/20" : "bg-yellow-warning/15 text-yellow-warning border-yellow-warning/20"
                         }`}>
                             <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isPublished ? "bg-green-success" : "bg-yellow-warning"}`} />
                             {status}
                         </span>
                         {/* Genre Pill */}
-                        <span className="inline-flex items-center text-[10px] font-semibold px-2.5 py-0.5 rounded-full border bg-secondary/15 text-secondary border-secondary/20 select-none">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2.5 py-0.5 rounded-full border bg-secondary/15 text-secondary border-secondary/20 select-none">
                             {video?.genre}
                         </span>
                     </div>
 
-                    {/* Edit and Dialog Close buttons */}
-                    <div className="flex items-center gap-2 shrink-0">
-                        <EditVideoDialog video={video}>
-                            <button
-                                className="h-7 border border-secondary/20 bg-secondary/10 hover:bg-secondary/20 text-secondary text-[11px] font-medium rounded-full px-3 flex items-center gap-1.5 cursor-pointer transition-colors active:scale-95"
-                            >
-                                <SquarePen className="w-3.5 h-3.5" />
-                                Edit
-                            </button>
-                        </EditVideoDialog>
-                        
-                        <DialogClose asChild>
-                            <button
-                                className="w-7 h-7 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 text-light-gray flex items-center justify-center cursor-pointer transition-colors active:scale-95"
-                            >
-                                <X className="w-3.5 h-3.5" />
-                            </button>
-                        </DialogClose>
-                    </div>
+                    {/* Subtitle / Artist */}
+                    <p className="text-[14px] font-normal not-italic text-light-gray leading-none truncate">
+                        {video?.artist || "Unknown Artist"} &middot; {video?.released}
+                    </p>
                 </div>
 
-                {/* Subtitle / Artist */}
-                <p className="text-[14px] font-normal not-italic text-light-gray leading-none truncate">
-                    {video?.artist || "Unknown Artist"}
-                </p>
-
-                {/* Short Stats row matching Image 2 */}
-                <div className="grid grid-cols-4 gap-2 mt-2 w-full border-t border-white/5 pt-3 text-left">
+                {/* Short Stats (4 Columns: Duration, Views, Likes, Dislikes) */}
+                <div className="grid grid-cols-4 gap-2 mt-3 w-full border-t border-white/5 pt-2 text-left">
                     <div className="flex flex-col gap-[2px]">
                         <span className="text-[14px] sm:text-[15px] font-semibold text-whitetext truncate">{video?.duration || "-"}</span>
                         <span className="text-[10px] font-medium text-dark-gray uppercase tracking-wider">Duration</span>
@@ -91,6 +75,18 @@ const VideoDetailHeader = ({ video }) => {
                         <span className="text-[14px] sm:text-[15px] font-semibold text-whitetext truncate">{video?.dislikes || "0"}</span>
                         <span className="text-[10px] font-medium text-dark-gray uppercase tracking-wider">Dislikes</span>
                     </div>
+                </div>
+
+                {/* Absolute Edit Button placed to the left of Close button (Close is top-right in DialogContent) */}
+                <div className="absolute top-4 right-4 z-50">
+                    <EditVideoDialog video={video}>
+                        <button
+                            className="h-7 border border-secondary/20 bg-secondary/10 hover:bg-secondary/20 text-secondary text-[11px] font-medium rounded-full px-3 flex items-center gap-1.5 cursor-pointer transition-colors active:scale-95"
+                        >
+                            <SquarePen className="w-3.5 h-3.5" />
+                            Edit
+                        </button>
+                    </EditVideoDialog>
                 </div>
             </div>
         </div>
