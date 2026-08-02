@@ -12,7 +12,7 @@ const PodcastDetailAnalytics = () => {
     const podcastCountryData = usePodcastDetailsAnalyticsStore((state) => state.podcastCountryData)
 
     return (
-        <div className="p-4 flex flex-col gap-5 overflow-y-auto flex-1 min-h-0 scrollbar-thin">
+        <div className="p-4 overflow-y-auto flex-1 min-h-0 scrollbar-thin space-y-5">
             {/* Stats Cards */}
             <DashboardStats statsCards={podcastStatsCards} className="grid-cols-2! sm:grid-cols-2! lg:grid-cols-2!" />
 
@@ -28,8 +28,8 @@ const PodcastDetailAnalytics = () => {
                     Performance Over Time
                 </h3>
 
-                <div className="h-[200px] w-full z-10 relative min-h-0">
-                    <ResponsiveContainer width="100%" height="100%">
+                <div style={{ height: "200px", minHeight: "200px" }} className="w-full z-10 relative">
+                    <ResponsiveContainer width="100%" height="100%" minHeight={200} debounce={1000}>
                         <AreaChart data={podcastPerformanceData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                             <defs>
                                 <linearGradient id="colorPodcastStream" x1="0" y1="0" x2="0" y2="1">

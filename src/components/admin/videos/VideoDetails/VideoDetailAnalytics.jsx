@@ -12,7 +12,7 @@ const VideoDetailAnalytics = () => {
     const deviceData = useVideoDetailsAnalyticsStore((state) => state.videoDeviceData)
 
     return (
-        <div className="p-4 flex flex-col gap-5 overflow-y-auto flex-1 min-h-0 scrollbar-thin">
+        <div className="p-4 overflow-y-auto flex-1 min-h-0 scrollbar-thin space-y-5">
             {/* Stats Cards Grid - 4 cards */}
             <DashboardStats statsCards={statsCards} className="grid-cols-2! sm:grid-cols-2! lg:grid-cols-2!" />
 
