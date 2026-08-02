@@ -14,7 +14,7 @@ const VideoDetailAnalytics = () => {
     return (
         <div className="p-4 flex flex-col gap-5 overflow-y-auto flex-1 min-h-0 scrollbar-thin">
             {/* Stats Cards Grid - 4 cards */}
-            <DashboardStats statsCards={statsCards} className="grid-cols-2! sm:grid-cols-2! lg:grid-cols-4!" />
+            <DashboardStats statsCards={statsCards} className="grid-cols-2! sm:grid-cols-2! lg:grid-cols-2!" />
 
             {/* Views Over Time Chart */}
             <div className="relative overflow-hidden rounded-[16px] border border-white/10 p-5 bg-[#0E0E0E]">
@@ -27,8 +27,8 @@ const VideoDetailAnalytics = () => {
                     Views Over Time
                 </h3>
 
-                <div className="h-[200px] w-full z-10 relative min-h-[200px]">
-                    <ResponsiveContainer width="100%" height={200}>
+                <div className="h-[240px] w-full z-10 relative min-h-[240px]">
+                    <ResponsiveContainer width="100%" height="100%" debounce={1000}>
                         <AreaChart data={performanceData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                             <defs>
                                 <linearGradient id="colorVideoViews" x1="0" y1="0" x2="0" y2="1">
