@@ -4,6 +4,7 @@ import CommonTableCell from "@/components/shared/CommonTable/CommonTableCell"
 import CommonTableTag from "@/components/shared/CommonTable/CommonTableTag"
 import CommonAvatar from "@/components/shared/CommonAvatar"
 import { Button } from "@/components/ui/button"
+import DeleteArtistDialog from "@/components/dialogs/admin/DeleteArtistDialog"
 
 const formatFollowers = (val) => {
   if (val >= 1000000) {
@@ -156,15 +157,16 @@ export const getArtistsColumns = ({ onViewDetails, onEdit, onDelete } = {}) => [
           >
             <SquarePen className="w-3.5 h-3.5 shrink-0" />
           </Button>
-          <Button
-            title="Delete Artist"
-            size="icon"
-            variant="outline"
-            className="text-red-error border border-red-error/20 bg-red-error/10 rounded-full cursor-pointer"
-            onClick={() => onDelete && onDelete(artist)}
-          >
-            <Trash2 className="w-4 h-4 shrink-0" />
-          </Button>
+          <DeleteArtistDialog artist={artist}>
+            <Button
+              title="Delete Artist"
+              size="icon"
+              variant="outline"
+              className="text-red-error border border-red-error/20 bg-red-error/10 rounded-full cursor-pointer"
+            >
+              <Trash2 className="w-4 h-4 shrink-0" />
+            </Button>
+          </DeleteArtistDialog>
         </div>
       )
     }

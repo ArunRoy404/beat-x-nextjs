@@ -11,6 +11,7 @@ import { useAdminDashboardArtistsStore } from "@/zustandStore/admin/adminStore/a
 import { Eye, SquarePen, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import CommonAvatar from "@/components/shared/CommonAvatar"
+import DeleteArtistDialog from "@/components/dialogs/admin/DeleteArtistDialog"
 
 const formatFollowers = (val) => {
   if (val >= 1000000) {
@@ -200,19 +201,16 @@ const ArtistsContainer = () => {
                   >
                     <SquarePen className="w-3.5 h-3.5 shrink-0" />
                   </Button>
-                  <Button
-                    title="Delete Artist"
-                    size="icon"
-                    variant="outline"
-                    className="text-red-error border border-red-error/20 bg-red-error/10 rounded-full cursor-pointer"
-                    onClick={() => {
-                      if (confirm(`Are you sure you want to delete ${artist.name}?`)) {
-                        deleteArtist(artist.id)
-                      }
-                    }}
-                  >
-                    <Trash2 className="w-4 h-4 shrink-0" />
-                  </Button>
+                  <DeleteArtistDialog artist={artist}>
+                    <Button
+                      title="Delete Artist"
+                      size="icon"
+                      variant="outline"
+                      className="text-red-error border border-red-error/20 bg-red-error/10 rounded-full cursor-pointer"
+                    >
+                      <Trash2 className="w-4 h-4 shrink-0" />
+                    </Button>
+                  </DeleteArtistDialog>
                 </div>
               </div>
             )

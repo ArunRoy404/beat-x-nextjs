@@ -2,7 +2,7 @@
 
 import React from "react"
 import { UserPlus } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import AddArtistDialog from "../../dialogs/admin/AddArtistDialog"
 
 const AddNewArtist = () => {
   return (
@@ -24,11 +24,8 @@ const AddNewArtist = () => {
         </div>
       </div>
 
-      {/* Trigger Button - will link to dialog later */}
-      <Button variant="gradient" notImplemented>
-        <UserPlus className="w-4 h-4 shrink-0 mr-1.5" />
-        <span>Add Artist</span>
-      </Button>
+      {/* Upload Dialog */}
+      <AddArtistDialog />
     </div>
   )
 }
