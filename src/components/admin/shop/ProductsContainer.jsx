@@ -3,6 +3,7 @@
 import React from "react"
 import { useAdminDashboardShopStore } from "@/zustandStore/admin/adminStore/adminDashboardShopStore"
 import ProductCard from "./ProductCard"
+import ProductDetailsDialog from "@/components/dialogs/admin/ProductDetailsDialog"
 import CommonFilter from "@/components/shared/commonFilter/commonFilter"
 import CommonSearch from "@/components/shared/CommonSearch/CommonSearch"
 import CommonPagination from "@/components/shared/CommonPagination/CommonPagination"
@@ -76,7 +77,11 @@ const ProductsContainer = () => {
         {/* Grid of Product Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 p-4">
           {paginatedProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductDetailsDialog key={product.id} product={product}>
+              <div className="cursor-pointer transition-transform duration-100 active:scale-95 w-full">
+                <ProductCard product={product} />
+              </div>
+            </ProductDetailsDialog>
           ))}
 
           {/* Add New Product Card placeholder at the end */}
