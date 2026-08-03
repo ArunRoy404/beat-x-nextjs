@@ -190,7 +190,7 @@ const ArtistsContainer = () => {
                       <Eye className="w-3.5 h-3.5 shrink-0" />
                     </Button>
                   </ArtistDetailsDialog>
-                  <Button
+                  {/* <Button
                     title="Edit Artist"
                     size="icon"
                     variant="outline"
@@ -200,7 +200,7 @@ const ArtistsContainer = () => {
                     }}
                   >
                     <SquarePen className="w-3.5 h-3.5 shrink-0" />
-                  </Button>
+                  </Button> */}
                   <DeleteArtistDialog artist={artist}>
                     <Button
                       title="Delete Artist"
