@@ -24,8 +24,8 @@ export const navigationDetails = {
     subtitle: "Manage platform videos and watch contents"
   },
   "/admin/dashboard/artists": {
-    title: "Artist Management",
-    subtitle: "Manage artists and content creators"
+    title: "Artist's Management",
+    subtitle: "Manage all artists, verify accounts, and monitor activity"
   },
   "/admin/dashboard/users": {
     title: "User Management",
