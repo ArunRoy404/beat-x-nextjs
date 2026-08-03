@@ -12,6 +12,7 @@ import { Eye, SquarePen, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import CommonAvatar from "@/components/shared/CommonAvatar"
 import DeleteArtistDialog from "@/components/dialogs/admin/DeleteArtistDialog"
+import ArtistDetailsDialog from "@/components/dialogs/admin/ArtistDetailsDialog"
 
 const formatFollowers = (val) => {
   if (val >= 1000000) {
@@ -179,17 +180,16 @@ const ArtistsContainer = () => {
                 </div>
 
                 <div className="flex items-center justify-end gap-3 border-t border-white/5 pt-3">
-                  <Button
-                    title="View Details"
-                    size="icon"
-                    variant="outline"
-                    className="text-secondary border border-secondary/20 bg-secondary/10 rounded-full cursor-pointer"
-                    onClick={() => {
-                      console.log("View details", artist)
-                    }}
-                  >
-                    <Eye className="w-3.5 h-3.5 shrink-0" />
-                  </Button>
+                  <ArtistDetailsDialog artist={artist}>
+                    <Button
+                      title="View Details"
+                      size="icon"
+                      variant="outline"
+                      className="text-secondary border border-secondary/20 bg-secondary/10 rounded-full cursor-pointer"
+                    >
+                      <Eye className="w-3.5 h-3.5 shrink-0" />
+                    </Button>
+                  </ArtistDetailsDialog>
                   <Button
                     title="Edit Artist"
                     size="icon"

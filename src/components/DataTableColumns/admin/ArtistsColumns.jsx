@@ -5,6 +5,7 @@ import CommonTableTag from "@/components/shared/CommonTable/CommonTableTag"
 import CommonAvatar from "@/components/shared/CommonAvatar"
 import { Button } from "@/components/ui/button"
 import DeleteArtistDialog from "@/components/dialogs/admin/DeleteArtistDialog"
+import ArtistDetailsDialog from "@/components/dialogs/admin/ArtistDetailsDialog"
 
 const formatFollowers = (val) => {
   if (val >= 1000000) {
@@ -139,15 +140,16 @@ export const getArtistsColumns = ({ onViewDetails, onEdit, onDelete } = {}) => [
 
       return (
         <div className="flex items-center justify-end gap-3 pr-2">
-          <Button
-            title="View Details"
-            size="icon"
-            variant="outline"
-            className="text-secondary border border-secondary/20 bg-secondary/10 rounded-full cursor-pointer"
-            onClick={() => onViewDetails && onViewDetails(artist)}
-          >
-            <Eye className="w-3.5 h-3.5 shrink-0" />
-          </Button>
+          <ArtistDetailsDialog artist={artist}>
+            <Button
+              title="View Details"
+              size="icon"
+              variant="outline"
+              className="text-secondary border border-secondary/20 bg-secondary/10 rounded-full cursor-pointer"
+            >
+              <Eye className="w-3.5 h-3.5 shrink-0" />
+            </Button>
+          </ArtistDetailsDialog>
           <Button
             title="Edit Artist"
             size="icon"
