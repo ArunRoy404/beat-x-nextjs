@@ -7,6 +7,39 @@ const DashboardStatCard = ({ card }) => {
 
   const IconComponent = card?.icon ? (LucideIcons[card.icon] || LucideIcons.HelpCircle) : null
 
+  if (card?.layout === "vertical") {
+    return (
+      <CommonCard className="flex flex-col gap-4 justify-between min-h-[140px]">
+        {/* Upper row: Icon & Badge */}
+        <div className="relative z-10 flex items-center justify-between">
+          {IconComponent && (
+            <div
+              className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+              style={{ backgroundColor: card?.iconBg || "rgba(255, 255, 255, 0.1)" }}
+            >
+              <IconComponent className="w-5 h-5" style={{ color: card?.iconColor || "#fff" }} />
+            </div>
+          )}
+          {card?.badge && (
+            <span className="text-[10px] font-medium text-green-success bg-green-success/15 border border-green-success/20 px-1.5 py-0.5 rounded-[4px] shrink-0">
+              {card.badge}
+            </span>
+          )}
+        </div>
+
+        {/* Lower block: Value & Title */}
+        <div className="relative z-10 flex flex-col mt-auto">
+          <span className="text-whitetext text-[28px] not-italic font-semibold leading-tight">
+            {card?.value}
+          </span>
+          <span className="text-light-gray text-[14px] not-italic font-normal mt-0.5">
+            {card?.title}
+          </span>
+        </div>
+      </CommonCard>
+    )
+  }
+
   return (
     <CommonCard className="flex flex-col justify-between">
       {/* Upper row: Number & Icon */}

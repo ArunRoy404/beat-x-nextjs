@@ -16,8 +16,7 @@ const AdminDashboardMusicPage = () => {
       <DashboardStats statsCards={statsCards} />
 
       {/* Upload song selector container */}
-      <UploadNewSong />
-
+      <UploadNewSong />  
       {/* Songs collection container */}
       <SongsContainer songs={songs} />
     </div>
