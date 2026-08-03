@@ -50,13 +50,13 @@ const SocialRow = ({ platform, link, isOptional = false }) => {
 
 const ArtistDetailSocials = ({ artist }) => {
   return (
-    <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-6 max-h-[50vh]">
+    <div className="p-4 flex flex-col gap-5 overflow-y-auto flex-1 min-h-0 scrollbar-thin">
       {/* Required Social Profiles */}
       <div className="flex flex-col gap-3">
         <h3 className="text-whitetext text-[18px] font-semibold font-sans leading-none">
           Required Social Profiles
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="flex flex-col gap-3">
           <SocialRow platform="Facebook *" link={`https://facebook.com/${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}.official`} />
           <SocialRow platform="Instagram *" link={`@${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}.music`} />
           <SocialRow platform="X (Twitter) *" link={`@${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}official`} />
@@ -69,7 +69,7 @@ const ArtistDetailSocials = ({ artist }) => {
         <h3 className="text-whitetext text-[18px] font-semibold font-sans leading-none">
           Optional Social Profiles
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="flex flex-col gap-3">
           <SocialRow platform="TikTok" link={`@${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}.bd`} isOptional />
           <SocialRow platform="Official Website" link={`https://${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}.com.bd`} isOptional />
         </div>
@@ -80,7 +80,7 @@ const ArtistDetailSocials = ({ artist }) => {
         <h3 className="text-whitetext text-[18px] font-semibold font-sans leading-none">
           Music Platform Links
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="flex flex-col gap-3">
           <SocialRow platform="Spotify" link={`https://open.spotify.com/artist/${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}`} />
           <SocialRow platform="Apple Music" link={`https://music.apple.com/artist/${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}`} />
           <SocialRow platform="YouTube Music" link={`https://music.youtube.com/channel/${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}`} />

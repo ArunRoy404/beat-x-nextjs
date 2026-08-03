@@ -28,7 +28,7 @@ const KYCCard = ({ title, bg, strokeColor, icon: Icon, iconColor }) => (
 
 const ArtistDetailKYC = () => {
   return (
-    <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-6 max-h-[50vh]">
+    <div className="p-4 flex flex-col gap-5 overflow-y-auto flex-1 min-h-0 scrollbar-thin">
       {/* Title & Document type row */}
       <div className="flex items-center justify-between shrink-0">
         <div className="flex flex-col gap-1">

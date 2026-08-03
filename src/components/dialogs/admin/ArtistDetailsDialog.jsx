@@ -41,7 +41,7 @@ const ArtistDetailsDialog = ({ artist, children }) => {
         {children}
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden flex flex-col max-h-[95vh] bg-[#0E0E0E] border border-white/10 rounded-[24px]">
+      <DialogContent className="sm:max-w-[672px] p-0 overflow-hidden flex flex-col max-h-[95vh]" showCloseButton={false}>
         {/* Screen reader only title for accessibility compliance */}
         <DialogTitle className="sr-only">
           Artist Details - {artist?.name || "Unknown"}

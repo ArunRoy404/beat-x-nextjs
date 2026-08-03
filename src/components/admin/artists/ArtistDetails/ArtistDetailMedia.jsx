@@ -44,7 +44,7 @@ const ArtistDetailMedia = ({ artist }) => {
     : (artist?.name?.slice(0, 2).toUpperCase() || "TA")
 
   return (
-    <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-6 max-h-[50vh]">
+    <div className="p-4 flex flex-col gap-5 overflow-y-auto flex-1 min-h-0 scrollbar-thin">
       {/* Profile Picture banner section */}
       <div className="flex flex-col gap-2 shrink-0">
         <h4 className="text-whitetext text-[14px] font-semibold font-sans tracking-wide">
