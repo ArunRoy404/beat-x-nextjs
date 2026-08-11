@@ -29,7 +29,7 @@ const RecentActivity = ({ data }) => {
               className="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0"
               style={{ backgroundColor: item?.color || "#3ADFFA" }}
             />
-            
+
             {/* Log Details */}
             <div className="flex flex-col min-w-0">
               <span className="text-whitetext text-[14px] not-italic font-normal leading-relaxed">

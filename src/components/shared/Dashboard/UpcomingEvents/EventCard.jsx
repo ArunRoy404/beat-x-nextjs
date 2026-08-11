@@ -16,7 +16,7 @@ const EventCard = ({ event }) => {
           <span className="text-[20px] font-bold text-whitetext leading-none">
             {event?.day || "00"}
           </span>
-        </div> 
+        </div>
 
         {/* Text details */}
         <div className="flex flex-col min-w-0">
@@ -26,7 +26,7 @@ const EventCard = ({ event }) => {
           <span className="text-dark-gray text-[14px] truncate mt-0.5">
             {event?.location || "Online"}
           </span>
-          
+
           {/* Ticket count progress */}
           <div className="flex items-center gap-1.5 text-green-success text-[12px] mt-1.5">
             <Ticket className="w-3.5 h-3.5 shrink-0" />

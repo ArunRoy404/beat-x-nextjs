@@ -2,12 +2,12 @@ import React from "react"
 import CommonCard from "@/components/shared/CommonCard/CommonCard"
 import EventCard from "./EventCard"
 
-const UpcomingEvents = ({ data }) => {
+const UpcomingEvents = ({ data, viewAllHref = "/admin/dashboard/tours" }) => {
   return (
     <CommonCard
       title="Upcoming Events"
       subtitle="Scheduled shows & events"
-      link={{ text: "View All", href: "/admin/dashboard/tours" }}
+      link={{ text: "View All", href: viewAllHref }}
       className="flex flex-col gap-4 h-[380px] w-full"
     >
       {/* Scrollable Event List */}
