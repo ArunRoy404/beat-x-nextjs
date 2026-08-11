@@ -7,7 +7,7 @@ const UpcomingEvents = ({ data }) => {
     <CommonCard
       title="Upcoming Events"
       subtitle="Scheduled shows & events"
-      link={{ text: "View All", href: "/admin/dashboard/events" }}
+      link={{ text: "View All", href: "/admin/dashboard/tours" }}
       className="flex flex-col gap-4 h-[380px] w-full"
     >
       {/* Scrollable Event List */}

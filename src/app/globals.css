@@ -79,6 +79,10 @@
   --button-bg: var(--Button-Background, linear-gradient(270deg, #3ADFFA 0%, #B1FE4D 100%));
   --nav-icon-bg: rgba(30, 36, 87, 0.40);
   --button-text: #004B56;
+  --slate-card-bg: rgba(30, 41, 59, 0.40);
+  --slate-card-border: rgba(51, 65, 85, 0.25);
+  --date-badge-bg: #222A3D;
+  --date-badge-border: rgba(59, 73, 74, 0.30);
 
   /* Standard Theme Mapping (Mapped to custom) */
   --background: #0E0E0E;
