@@ -33,9 +33,14 @@ function DialogPortal({
 }
 
 function DialogClose({
+  asChild,
+  children,
   ...props
 }) {
-  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />;
+  if (asChild) {
+    return <DialogPrimitive.Close data-slot="dialog-close" render={children} {...props} />
+  }
+  return <DialogPrimitive.Close data-slot="dialog-close" {...props}>{children}</DialogPrimitive.Close>;
 }
 
 function DialogOverlay({

@@ -3,7 +3,7 @@
 import React from "react"
 import { Mic } from "lucide-react"
 import Image from "next/image"
-import InfoBox from "./InfoBox"
+import CommonInfoBox from "@/components/shared/CommonInfoBox/CommonInfoBox"
 
 const PodcastDetailContent = ({ podcast }) => {
     return (
@@ -43,12 +43,12 @@ const PodcastDetailContent = ({ podcast }) => {
                 </div>
 
                 {/* Info rows */}
-                <InfoBox label="Host" value={podcast?.artist || "Unknown Host"} />
-                <InfoBox label="Series" value={podcast?.series || "Single"} />
-                <InfoBox label="Season" value={podcast?.season || "1"} />
-                <InfoBox label="Episode" value={podcast?.episode || "1"} />
-                <InfoBox label="Category" value={podcast?.genre || "-"} />
-                <InfoBox label="Listeners" value={podcast?.listeners || "0"} />
+                <CommonInfoBox label="Host" value={podcast?.artist || "Unknown Host"} />
+                <CommonInfoBox label="Series" value={podcast?.series || "Single"} />
+                <CommonInfoBox label="Season" value={podcast?.season || "1"} />
+                <CommonInfoBox label="Episode" value={podcast?.episode || "1"} />
+                <CommonInfoBox label="Category" value={podcast?.genre || "-"} />
+                <CommonInfoBox label="Listeners" value={podcast?.listeners || "0"} />
 
                 {/* Description Box (Full Width) */}
                 <div className="col-span-2 border border-white/10 bg-white/5 rounded-[16px] p-3 px-4 flex flex-col gap-1.5 w-full">

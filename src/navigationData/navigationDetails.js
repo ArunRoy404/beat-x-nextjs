@@ -62,5 +62,53 @@ export const navigationDetails = {
   "/admin/dashboard/settings": {
     title: "Settings",
     subtitle: "Configure dashboard and layout settings"
+  },
+  "/artist/dashboard": {
+    title: "Artist Dashboard",
+    subtitle: "Welcome back, TAHSIN"
+  },
+  "/artist/dashboard/analytics": {
+    title: "Analytics",
+    subtitle: "Deep insights into your music performance"
+  },
+  "/artist/dashboard/music": {
+    title: "My Music",
+    subtitle: "Manage your songs, albums and releases"
+  },
+  "/artist/dashboard/podcasts": {
+    title: "Podcasts",
+    subtitle: "Manage your Podcasts, episodes and series"
+  },
+  "/artist/dashboard/albums": {
+    title: "My Albums",
+    subtitle: "Organize your discography"
+  },
+  "/artist/dashboard/revenue": {
+    title: "Revenue",
+    subtitle: "Your earnings breakdown"
+  },
+  "/artist/dashboard/payout": {
+    title: "Payout",
+    subtitle: "Manage payout methods and history"
+  },
+  "/artist/dashboard/merchandise": {
+    title: "Merchandise",
+    subtitle: "Manage your merch store"
+  },
+  "/artist/dashboard/followers": {
+    title: "Followers",
+    subtitle: "See who's following you"
+  },
+  "/artist/dashboard/events": {
+    title: "Events & Tours",
+    subtitle: "Manage your live events and tours"
+  },
+  "/artist/dashboard/verification": {
+    title: "Verification",
+    subtitle: "Manage your account verification"
+  },
+  "/artist/dashboard/settings": {
+    title: "Settings",
+    subtitle: "Account preferences"
   }
 }

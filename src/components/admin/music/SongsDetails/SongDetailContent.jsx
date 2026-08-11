@@ -3,7 +3,7 @@
 import React from "react"
 import { Music } from "lucide-react"
 import Image from "next/image"
-import InfoBox from "./InfoBox"
+import CommonInfoBox from "@/components/shared/CommonInfoBox/CommonInfoBox"
 
 const SongDetailContent = ({ song }) => {
     return (
@@ -43,14 +43,14 @@ const SongDetailContent = ({ song }) => {
                 </div>
 
                 {/* Info rows */}
-                <InfoBox label="Artist" value={song?.artist || "Unknown Artist"} />
-                <InfoBox label="Album" value={song?.album || "Single"} />
-                <InfoBox label="Genre" value={song?.genre || "-"} />
-                <InfoBox label="Duration" value={song?.duration || "-"} />
-                <InfoBox label="Release Date" value={song?.released || "-"} />
-                <InfoBox label="Total Streams" value={song?.streams || "0"} />
-                <InfoBox label="Format" value="MP3 · 320kbps" />
-                <InfoBox label="Explicit" value={song?.isExplicit ? "Yes" : "No"} />
+                <CommonInfoBox label="Artist" value={song?.artist || "Unknown Artist"} />
+                <CommonInfoBox label="Album" value={song?.album || "Single"} />
+                <CommonInfoBox label="Genre" value={song?.genre || "-"} />
+                <CommonInfoBox label="Duration" value={song?.duration || "-"} />
+                <CommonInfoBox label="Release Date" value={song?.released || "-"} />
+                <CommonInfoBox label="Total Streams" value={song?.streams || "0"} />
+                <CommonInfoBox label="Format" value="MP3 · 320kbps" />
+                <CommonInfoBox label="Explicit" value={song?.isExplicit ? "Yes" : "No"} />
 
                 {/* Description Box (Full Width) */}
                 <div className="col-span-2 border border-white/10 bg-white/5 rounded-[16px] p-3 px-4 flex flex-col gap-1.5 w-full">

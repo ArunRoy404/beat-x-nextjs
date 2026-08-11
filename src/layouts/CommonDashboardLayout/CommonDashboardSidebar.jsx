@@ -18,7 +18,7 @@ import {
 import Logo from "@/components/shared/Logo"
 import * as Icons from "@/icons/DashboardIcons"
 
-const CommonDashboardSidebar = ({ data, title, ...props }) => {
+const CommonDashboardSidebar = ({ data, title, footer, ...props }) => {
     const pathname = usePathname()
     const { state } = useSidebar()
     const isCollapsed = state === "collapsed"
@@ -140,6 +140,9 @@ const CommonDashboardSidebar = ({ data, title, ...props }) => {
                             </div>
                         ))}
                     </SidebarContent>
+
+                    {/* Optional footer slot (e.g. logout + user profile card) */}
+                    {footer}
                 </div>
             </Sidebar>
         </TooltipProvider>

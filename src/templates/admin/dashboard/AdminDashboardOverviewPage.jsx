@@ -8,8 +8,8 @@ import PlatformGrowth from "@/components/admin/dashboard/PlatformGrowth/Platform
 import GenreMix from "@/components/admin/dashboard/GenreMix/GenreMix"
 import RevenueStreams from "@/components/admin/dashboard/RevenueStreams/RevenueStreams"
 import RecentUploads from "@/components/admin/dashboard/RecentUploads/RecentUploads"
-import RecentActivity from "@/components/admin/dashboard/RecentActivity/RecentActivity"
-import UpcomingEvents from "@/components/admin/dashboard/UpcomingEvents/UpcomingEvents"
+import RecentActivity from "@/components/shared/Dashboard/RecentActivity/RecentActivity"
+import UpcomingEvents from "@/components/shared/Dashboard/UpcomingEvents/UpcomingEvents"
 
 const AdminDashboardOverviewPage = () => {
     const greetingData = useAdminDashboardOverviewStore((state) => state.greetingData)
@@ -33,7 +33,7 @@ const AdminDashboardOverviewPage = () => {
                 <RevenueStreams data={revenueStreamsData} />
                 <RecentUploads uploads={recentUploadsData} />
                 <RecentActivity data={recentActivity} />
-                <UpcomingEvents data={upcomingEvents} />
+                <UpcomingEvents data={upcomingEvents} viewAllHref="/admin/dashboard/tours" />
             </div>
         </div>
     )
