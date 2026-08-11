@@ -81,7 +81,7 @@ export const navigationDetails = {
   },
   "/artist/dashboard/albums": {
     title: "My Albums",
-    subtitle: "Manage your albums"
+    subtitle: "Organize your discography"
   },
   "/artist/dashboard/revenue": {
     title: "Revenue",
