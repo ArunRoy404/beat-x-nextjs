@@ -68,8 +68,8 @@ export const navigationDetails = {
     subtitle: "Welcome back, TAHSIN"
   },
   "/artist/dashboard/analytics": {
-    title: "Artist Analytics",
-    subtitle: "Deep dive into your streams and audience"
+    title: "Analytics",
+    subtitle: "Deep insights into your music performance"
   },
   "/artist/dashboard/music": {
     title: "My Musics",

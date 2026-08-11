@@ -13,10 +13,10 @@ export const artistDashboardNavigation = {
         },
         {
           title: "Analytics",
-          navbarTitle: "Artist Analytics",
+          navbarTitle: "Analytics",
           url: "/artist/dashboard/analytics",
           iconName: "Analytics01Icon",
-          subtitle: "Deep dive into your streams and audience"
+          subtitle: "Deep insights into your music performance"
         }
       ]
     },
