@@ -72,8 +72,8 @@ export const navigationDetails = {
     subtitle: "Deep insights into your music performance"
   },
   "/artist/dashboard/music": {
-    title: "My Musics",
-    subtitle: "Manage your uploaded tracks"
+    title: "My Music",
+    subtitle: "Manage your songs, albums and releases"
   },
   "/artist/dashboard/podcasts": {
     title: "My Podcasts",

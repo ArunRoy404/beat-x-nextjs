@@ -33,7 +33,7 @@ const SongDetailContent = ({ song }) => {
                     <span className="text-[12px] text-dark-gray font-normal mb-2 uppercase tracking-wider">Thumbnail</span>
                     <div className="relative w-full h-32 rounded-[16px] overflow-hidden">
                         <Image
-                            src="/bg-images/card_bg.png"
+                            src={song?.cover || "/bg-images/card_bg.png"}
                             alt="Thumbnail"
                             fill
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -56,7 +56,7 @@ const SongDetailContent = ({ song }) => {
                 <div className="col-span-2 border border-white/10 bg-white/5 rounded-[16px] p-3 px-4 flex flex-col gap-1.5 w-full">
                     <span className="text-[12px] text-dark-gray font-normal not-italic uppercase tracking-wider">Description</span>
                     <span className="text-[13px] text-whitetext/90 leading-relaxed font-normal">
-                        {song?.description || `"${song?.title}" is a ${song?.genre || "Pop"} track by ${song?.artist || "Unknown Artist"} from the album ${song?.album || "Asha"}. It has accumulated ${song?.streams || "0"} streams since release.`}
+                        {song?.description || `"${song?.title}" is a ${song?.genre || "Pop"} track by ${song?.artist || "Unknown Artist"} from the album ${song?.album || "Single"}. It has accumulated ${song?.streams || "0"} streams since release.`}
                     </span>
                 </div>
             </div>

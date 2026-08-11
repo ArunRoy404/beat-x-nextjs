@@ -25,10 +25,10 @@ export const artistDashboardNavigation = {
       items: [
         {
           title: "My Musics",
-          navbarTitle: "My Musics",
+          navbarTitle: "My Music",
           url: "/artist/dashboard/music",
           iconName: "MusicNote01Icon",
-          subtitle: "Manage your uploaded tracks"
+          subtitle: "Manage your songs, albums and releases"
         },
         {
           title: "My Podcasts",

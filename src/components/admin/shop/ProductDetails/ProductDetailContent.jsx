@@ -2,7 +2,7 @@
 
 import React from "react"
 import Image from "next/image"
-import InfoBox from "@/components/admin/music/SongsDetails/InfoBox"
+import CommonInfoBox from "@/components/shared/CommonInfoBox/CommonInfoBox"
 
 const ProductDetailContent = ({ product }) => {
   // Gallery items using public/product-images fallback lists
@@ -40,12 +40,12 @@ const ProductDetailContent = ({ product }) => {
 
       {/* Info Boxes Grid */}
       <div className="grid grid-cols-2 gap-4 shrink-0">
-        <InfoBox label="Category" value={product?.category || "vinyl"} />
-        <InfoBox label="Price" value={`${product?.currency === "$" ? "$" : "৳"}${product?.price ?? 2800}`} />
-        <InfoBox label="In Stock" value={product?.stock ?? 12} />
-        <InfoBox label="Units Sold" value={product?.sold ?? 43} />
-        <InfoBox label="Coin Reward" value={product?.coinBadge ? `${product.coinBadge}s` : "50 coins"} />
-        <InfoBox label="Artist" value="Various" />
+        <CommonInfoBox label="Category" value={product?.category || "vinyl"} />
+        <CommonInfoBox label="Price" value={`${product?.currency === "$" ? "$" : "৳"}${product?.price ?? 2800}`} />
+        <CommonInfoBox label="In Stock" value={product?.stock ?? 12} />
+        <CommonInfoBox label="Units Sold" value={product?.sold ?? 43} />
+        <CommonInfoBox label="Coin Reward" value={product?.coinBadge ? `${product.coinBadge}s` : "50 coins"} />
+        <CommonInfoBox label="Artist" value="Various" />
       </div>
 
       {/* Color Variants Section */}
