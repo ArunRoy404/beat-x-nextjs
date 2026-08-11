@@ -32,10 +32,10 @@ export const artistDashboardNavigation = {
         },
         {
           title: "My Podcasts",
-          navbarTitle: "My Podcasts",
+          navbarTitle: "Podcasts",
           url: "/artist/dashboard/podcasts",
           iconName: "PodcastIcon",
-          subtitle: "Manage your podcast episodes"
+          subtitle: "Manage your Podcasts, episodes and series"
         },
         {
           title: "My Albums",
@@ -54,7 +54,7 @@ export const artistDashboardNavigation = {
           navbarTitle: "Revenue",
           url: "/artist/dashboard/revenue",
           iconName: "MoneyBag01Icon",
-          subtitle: "Track your earnings"
+          subtitle: "Your earnings breakdown"
         },
         {
           title: "Payout",

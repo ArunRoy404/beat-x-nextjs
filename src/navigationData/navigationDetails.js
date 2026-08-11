@@ -76,8 +76,8 @@ export const navigationDetails = {
     subtitle: "Manage your songs, albums and releases"
   },
   "/artist/dashboard/podcasts": {
-    title: "My Podcasts",
-    subtitle: "Manage your podcast episodes"
+    title: "Podcasts",
+    subtitle: "Manage your Podcasts, episodes and series"
   },
   "/artist/dashboard/albums": {
     title: "My Albums",
@@ -85,7 +85,7 @@ export const navigationDetails = {
   },
   "/artist/dashboard/revenue": {
     title: "Revenue",
-    subtitle: "Track your earnings"
+    subtitle: "Your earnings breakdown"
   },
   "/artist/dashboard/payout": {
     title: "Payout",
