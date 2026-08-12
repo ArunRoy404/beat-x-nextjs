@@ -93,7 +93,7 @@ export const navigationDetails = {
   },
   "/artist/dashboard/merchandise": {
     title: "Merchandise",
-    subtitle: "Manage your merch store"
+    subtitle: "Your online store"
   },
   "/artist/dashboard/followers": {
     title: "Followers",
