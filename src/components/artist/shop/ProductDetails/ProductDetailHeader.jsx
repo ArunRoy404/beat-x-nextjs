@@ -37,7 +37,7 @@ const ProductDetailHeader = ({ product, onClose }) => {
 
             {/* Subtitle */}
             <p className="text-[13px] font-normal text-light-gray/80 leading-none">
-              Various · {product?.category || "vinyl"}
+              {product?.artist || "Various"} · {product?.category || "vinyl"}
             </p>
           </div>
 

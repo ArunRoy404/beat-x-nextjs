@@ -10,7 +10,7 @@ import { DialogClose } from "@/components/ui/dialog"
 import { CheckCircle2, Clock, FileText } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
-import { useArtistShopStore } from "@/zustandStore/artist/artistStore/artistShopStore"
+import { useAdminDashboardShopStore } from "@/zustandStore/admin/adminStore/adminDashboardShopStore"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
 import CommonMultiImageUpload from "@/components/shared/CommonInputs/CommonImageUpload/CommonMultiImageUpload"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
@@ -41,8 +41,8 @@ const productSchema = z.object({
     visibility: z.enum(["publish", "schedule", "draft"]),
 })
 
-const ArtistEditProductForm = ({ product, onSuccess, onCancel }) => {
-    const updateProduct = useArtistShopStore((state) => state.updateProduct)
+const EditProductForm = ({ product, onSuccess, onCancel }) => {
+    const updateProduct = useAdminDashboardShopStore((state) => state.updateProduct)
 
     const existingImages = product?.images?.length
         ? [...product.images, ...Array(4 - product.images.length).fill(null)].slice(0, 4)
@@ -60,7 +60,7 @@ const ArtistEditProductForm = ({ product, onSuccess, onCancel }) => {
             images: existingImages,
             productName: product?.title || "",
             category: product?.category || "",
-            artist: "TAHSIN",
+            artist: product?.artist || "Various",
             price: product?.price ? String(product.price) : "",
             stock: product?.stock !== undefined ? String(product.stock) : "",
             coinReward: product?.coinBadge ? product.coinBadge.replace(/\D/g, "") : "",
@@ -89,8 +89,8 @@ const ArtistEditProductForm = ({ product, onSuccess, onCancel }) => {
         updateProduct({
             ...product,
             title: data.productName,
-            artist: data.artist,
             category: data.category,
+            artist: data.artist,
             price: Number(data.price) || product.price,
             stock: Number(data.stock) || product.stock,
             status: data.visibility === "draft" ? "Draft" : "Active",
@@ -157,7 +157,7 @@ const ArtistEditProductForm = ({ product, onSuccess, onCancel }) => {
 
                 <CommonInput
                     label="Artist"
-                    placeholder="e.g. Tech Weekly BD"
+                    placeholder="e.g. Various"
                     {...register("artist")}
                     error={errors.artist?.message}
                 />
@@ -241,7 +241,7 @@ const ArtistEditProductForm = ({ product, onSuccess, onCancel }) => {
             <CommonInput
                 label="Description"
                 type="textarea"
-                placeholder="Episode description / show notes..."
+                placeholder="Product description..."
                 {...register("description")}
                 error={errors.description?.message}
             />
@@ -280,11 +280,11 @@ const ArtistEditProductForm = ({ product, onSuccess, onCancel }) => {
                     className="flex-1"
                     size="lg"
                 >
-                    Submit for Review
+                    Save Changes
                 </Button>
             </div>
         </CommonFormContainer>
     )
 }
 
-export default ArtistEditProductForm
+export default EditProductForm

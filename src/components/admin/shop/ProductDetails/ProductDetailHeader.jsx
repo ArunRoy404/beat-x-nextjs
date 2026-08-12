@@ -2,6 +2,7 @@ import React from "react"
 import Image from "next/image"
 import { Edit3, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import EditProductDialog from "@/components/dialogs/admin/EditProductDialog"
 
 const ProductDetailHeader = ({ product, onClose }) => {
   const isActive = product?.status === "Active"
@@ -48,7 +49,7 @@ const ProductDetailHeader = ({ product, onClose }) => {
 
             {/* Subtitle */}
             <p className="text-[13px] font-normal text-light-gray/80 leading-none">
-              Various · {product?.category || "vinyl"}
+              {product?.artist || "Various"} · {product?.category || "vinyl"}
             </p>
           </div>
 
@@ -78,13 +79,15 @@ const ProductDetailHeader = ({ product, onClose }) => {
       {/* Right controls */}
       <div className="flex items-center gap-2 shrink-0">
         {isActive && (
-          <Button
-            variant="outline"
-            className="border-secondary/20 bg-secondary/10 hover:bg-secondary/20 text-secondary gap-1 rounded-md h-8 text-[12px] px-3 font-semibold"
-          >
-            <Edit3 className="w-3.5 h-3.5" />
-            <span>Edit</span>
-          </Button>
+          <EditProductDialog product={product}>
+            <Button
+              variant="outline"
+              className="border-secondary/20 bg-secondary/10 hover:bg-secondary/20 text-secondary gap-1 rounded-md h-8 text-[12px] px-3 font-semibold"
+            >
+              <Edit3 className="w-3.5 h-3.5" />
+              <span>Edit</span>
+            </Button>
+          </EditProductDialog>
         )}
         <button
           onClick={onClose}

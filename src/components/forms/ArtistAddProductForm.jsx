@@ -85,6 +85,7 @@ const ArtistAddProductForm = ({ onSuccess, onCancel }) => {
 
         addProduct({
             title: data.productName,
+            artist: data.artist,
             category: data.category,
             price: Number(data.price) || 0,
             currency: "৳",

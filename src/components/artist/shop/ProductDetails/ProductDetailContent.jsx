@@ -48,7 +48,7 @@ const ProductDetailContent = ({ product }) => {
         <CommonInfoBox label="In Stock" value={product?.stock ?? 12} />
         <CommonInfoBox label="Units Sold" value={product?.sold ?? 43} />
         <CommonInfoBox label="Coin Reward" value={product?.coinBadge ? `${product.coinBadge}s` : "50 coins"} />
-        <CommonInfoBox label="Artist" value="Various" />
+        <CommonInfoBox label="Artist" value={product?.artist || "Various"} />
       </div>
 
       {/* Color Variants Section */}
