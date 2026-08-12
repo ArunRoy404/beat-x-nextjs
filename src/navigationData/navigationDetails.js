@@ -101,7 +101,7 @@ export const navigationDetails = {
   },
   "/artist/dashboard/events": {
     title: "Events & Tours",
-    subtitle: "Manage your live events and tours"
+    subtitle: "Manage your live events"
   },
   "/artist/dashboard/verification": {
     title: "Verification",
