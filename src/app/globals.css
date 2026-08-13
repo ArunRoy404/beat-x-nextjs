@@ -88,6 +88,8 @@
   --payout-balance-border: rgba(52, 199, 89, 0.20);
   --followers-hero-bg: linear-gradient(135deg, rgba(58, 223, 250, 0.12) 0%, rgba(204, 151, 255, 0.05) 100%);
   --followers-hero-border: rgba(58, 223, 250, 0.20);
+  --verified-badge-gradient: linear-gradient(135deg, #FFD700 0%, #FF8C00 100%);
+  --verified-badge-glow: 0 0 24px 0 rgba(255, 215, 0, 0.30);
 
   /* Standard Theme Mapping (Mapped to custom) */
   --background: #0E0E0E;

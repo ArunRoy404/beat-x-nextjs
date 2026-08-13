@@ -104,8 +104,8 @@ export const navigationDetails = {
     subtitle: "Manage your live events"
   },
   "/artist/dashboard/verification": {
-    title: "Verification",
-    subtitle: "Manage your account verification"
+    title: "Verification Status",
+    subtitle: "Your verification journey"
   },
   "/artist/dashboard/settings": {
     title: "Settings",
