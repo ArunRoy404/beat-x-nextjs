@@ -1,7 +1,7 @@
 import React from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
-import SettingsConfirmDialog from "@/components/dialogs/admin/SettingsConfirmDialog"
+import SettingsConfirmDialog from "@/components/shared/Settings/SettingsConfirmDialog"
 
 const DangerZoneActionRow = ({ action }) => {
     const handleConfirm = () => {

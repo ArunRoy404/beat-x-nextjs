@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { TriangleAlert } from "lucide-react"
 
-const SettingsConfirmDialog = ({ title, description, confirmLabel = "Yes, Proceed", onConfirm, children }) => {
+const SettingsConfirmDialog = ({ title, description, confirmLabel = "Yes, Proceed", onConfirm, nativeButton, children }) => {
     const [open, setOpen] = useState(false)
 
     const handleConfirm = () => {
@@ -21,7 +21,7 @@ const SettingsConfirmDialog = ({ title, description, confirmLabel = "Yes, Procee
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
+            <DialogTrigger asChild nativeButton={nativeButton}>
                 {children}
             </DialogTrigger>
 
