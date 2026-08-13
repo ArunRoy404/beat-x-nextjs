@@ -110,5 +110,9 @@ export const navigationDetails = {
   "/artist/dashboard/settings": {
     title: "Settings",
     subtitle: "Account preferences"
+  },
+  "/artist/dashboard/profile": {
+    title: "My Profile",
+    subtitle: "Edit your artist profile"
   }
 }
