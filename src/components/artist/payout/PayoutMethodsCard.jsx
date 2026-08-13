@@ -4,7 +4,7 @@ import React from "react"
 import { useArtistPayoutStore } from "@/zustandStore/artist/artistStore/artistPayoutStore"
 import CommonCard from "@/components/shared/CommonCard/CommonCard"
 import PayoutMethodRow from "./PayoutMethodRow"
-import AddPayoutMethodDialog from "@/components/dialogs/artist/AddPayoutMethodDialog"
+import AddPayoutMethodDialog from "@/components/dialogs/artist/payout/AddPayoutMethodDialog"
 
 const PayoutMethodsCard = () => {
     const methods = useArtistPayoutStore((state) => state.payoutMethods)

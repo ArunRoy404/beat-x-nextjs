@@ -1,6 +1,6 @@
 import React from "react"
 import { ShieldCheck, SquarePen, Play, X } from "lucide-react"
-import EditVideoDialog from "@/components/dialogs/admin/EditVideoDialog"
+import EditVideoDialog from "@/components/dialogs/admin/videos/EditVideoDialog"
 import { DialogClose } from "@/components/ui/dialog"
 
 const VideoDetailHeader = ({ video }) => {

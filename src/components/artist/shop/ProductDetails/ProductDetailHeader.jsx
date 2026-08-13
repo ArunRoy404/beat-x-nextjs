@@ -2,7 +2,7 @@ import React from "react"
 import Image from "next/image"
 import { Edit3, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import EditProductDialog from "@/components/dialogs/artist/EditProductDialog"
+import EditProductDialog from "@/components/dialogs/artist/shop/EditProductDialog"
 import ProductStatusBadge from "@/components/shared/ProductStatusBadge/ProductStatusBadge"
 
 const ProductDetailHeader = ({ product, onClose }) => {

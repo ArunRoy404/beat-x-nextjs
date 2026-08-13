@@ -4,7 +4,7 @@ import React from "react"
 import { Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DialogClose } from "@/components/ui/dialog"
-import DeletePodcastDialog from "@/components/dialogs/artist/DeletePodcastDialog"
+import DeletePodcastDialog from "@/components/dialogs/artist/podcasts/DeletePodcastDialog"
 
 const PodcastDetailFooter = ({ podcast }) => {
     return (

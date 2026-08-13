@@ -1,9 +1,9 @@
 import React from "react"
 import { Eye, ThumbsUp, ThumbsDown, Pencil, Trash2 } from "lucide-react"
 import PlayButton from "./PlayButton"
-import VideoDetailsDialog from "@/components/dialogs/admin/VideoDetailsDialog"
-import EditVideoDialog from "@/components/dialogs/admin/EditVideoDialog"
-import DeleteVideoDialog from "@/components/dialogs/admin/DeleteVideoDialog"
+import VideoDetailsDialog from "@/components/dialogs/admin/videos/VideoDetailsDialog"
+import EditVideoDialog from "@/components/dialogs/admin/videos/EditVideoDialog"
+import DeleteVideoDialog from "@/components/dialogs/admin/videos/DeleteVideoDialog"
 import { toast } from "sonner"
 
 const VideoCard = ({ video }) => {

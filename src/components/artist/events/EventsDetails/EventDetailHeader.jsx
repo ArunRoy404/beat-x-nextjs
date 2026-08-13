@@ -1,7 +1,7 @@
 import React from "react"
 import Image from "next/image"
 import { SquarePen } from "lucide-react"
-import EditEventDialog from "@/components/dialogs/artist/EditEventDialog"
+import EditEventDialog from "@/components/dialogs/artist/events/EditEventDialog"
 import EventStatusBadge from "@/components/shared/EventStatusBadge/EventStatusBadge"
 
 const EventDetailHeader = ({ event }) => {

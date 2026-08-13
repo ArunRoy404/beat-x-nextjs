@@ -1,6 +1,6 @@
 import React from "react"
 import { PlusCircle } from "lucide-react"
-import AddProductDialog from "@/components/dialogs/admin/AddProductDialog"
+import AddProductDialog from "@/components/dialogs/admin/shop/AddProductDialog"
 
 const AddNewProduct = () => {
   return (

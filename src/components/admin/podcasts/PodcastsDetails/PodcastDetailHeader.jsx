@@ -1,7 +1,7 @@
 import React from "react"
 import Image from "next/image"
 import { ShieldCheck, SquarePen } from "lucide-react"
-import EditPodcastDialog from "@/components/dialogs/admin/EditPodcastDialog"
+import EditPodcastDialog from "@/components/dialogs/admin/podcasts/EditPodcastDialog"
 import { Button } from "@/components/ui/button"
 
 const PodcastDetailHeader = ({ podcast }) => {

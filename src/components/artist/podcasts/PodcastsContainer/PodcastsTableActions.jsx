@@ -2,10 +2,10 @@ import React from "react"
 import { Eye, Check, X, Trash2, SquarePen } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import EditPodcastDialog from "@/components/dialogs/artist/EditPodcastDialog"
-import DeletePodcastDialog from "@/components/dialogs/artist/DeletePodcastDialog"
-import PodcastUnderReviewDialog from "@/components/dialogs/artist/PodcastUnderReviewDialog"
-import PodcastDetailsDialog from "@/components/dialogs/artist/PodcastDetailsDialog"
+import EditPodcastDialog from "@/components/dialogs/artist/podcasts/EditPodcastDialog"
+import DeletePodcastDialog from "@/components/dialogs/artist/podcasts/DeletePodcastDialog"
+import PodcastUnderReviewDialog from "@/components/dialogs/artist/podcasts/PodcastUnderReviewDialog"
+import PodcastDetailsDialog from "@/components/dialogs/artist/podcasts/PodcastDetailsDialog"
 
 const PodcastsTableActions = ({
     status,

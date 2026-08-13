@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button"
 import CommonTableTag from "@/components/shared/CommonTable/CommonTableTag"
 import AlbumStatusBadge from "@/components/shared/AlbumStatusBadge/AlbumStatusBadge"
 import AlbumTrackRow from "./AlbumTrackRow"
-import EditAlbumDialog from "@/components/dialogs/artist/EditAlbumDialog"
-import DeleteAlbumDialog from "@/components/dialogs/artist/DeleteAlbumDialog"
-import AlbumDetailsDialog from "@/components/dialogs/artist/AlbumDetailsDialog"
+import EditAlbumDialog from "@/components/dialogs/artist/albums/EditAlbumDialog"
+import DeleteAlbumDialog from "@/components/dialogs/artist/albums/DeleteAlbumDialog"
+import AlbumDetailsDialog from "@/components/dialogs/artist/albums/AlbumDetailsDialog"
 import { useArtistAlbumsStore } from "@/zustandStore/artist/artistStore/artistAlbumsStore"
 
 const formatStreams = (val) => {

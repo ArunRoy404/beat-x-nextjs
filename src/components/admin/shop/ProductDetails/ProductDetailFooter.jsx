@@ -7,7 +7,7 @@ import { DialogClose } from "@/components/ui/dialog"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSelect"
 import { useAdminDashboardShopStore } from "@/zustandStore/admin/adminStore/adminDashboardShopStore"
-import DeleteProductDialog from "@/components/dialogs/admin/DeleteProductDialog"
+import DeleteProductDialog from "@/components/dialogs/admin/shop/DeleteProductDialog"
 import { toast } from "sonner"
 
 const rejectionReasons = [

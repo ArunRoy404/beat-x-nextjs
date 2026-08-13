@@ -5,7 +5,7 @@ import { Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import CommonCard from "@/components/shared/CommonCard/CommonCard"
 import CommonPagination from "@/components/shared/CommonPagination/CommonPagination"
-import DeletePayoutHistoryDialog from "@/components/dialogs/artist/DeletePayoutHistoryDialog"
+import DeletePayoutHistoryDialog from "@/components/dialogs/artist/payout/DeletePayoutHistoryDialog"
 import { useArtistPayoutStore } from "@/zustandStore/artist/artistStore/artistPayoutStore"
 
 const STATUS_STYLES = {

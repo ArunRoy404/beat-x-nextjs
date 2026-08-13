@@ -1,7 +1,7 @@
 import React from "react"
 import Image from "next/image"
 import { ShieldCheck, SquarePen } from "lucide-react"
-import EditPodcastDialog from "@/components/dialogs/artist/EditPodcastDialog"
+import EditPodcastDialog from "@/components/dialogs/artist/podcasts/EditPodcastDialog"
 
 const PodcastDetailHeader = ({ podcast }) => {
     const status = podcast?.status || "Under Review"

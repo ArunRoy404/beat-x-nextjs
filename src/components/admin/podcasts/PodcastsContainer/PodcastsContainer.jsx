@@ -2,7 +2,7 @@
 
 import React, { useState } from "react"
 import DataTable from "@/components/ui/DataTable"
-import { getPodcastsColumns } from "@/components/DataTableColumns/admin/PodcastsColumns"
+import { getPodcastsColumns } from "@/components/DataTableColumns/admin/podcasts/PodcastsColumns"
 import CommonFilter from "@/components/shared/commonFilter/commonFilter"
 import CommonSearch from "@/components/shared/CommonSearch/CommonSearch"
 import CommonPagination from "@/components/shared/CommonPagination/CommonPagination"

@@ -3,7 +3,7 @@
 import React from "react"
 import { useArtistShopStore } from "@/zustandStore/artist/artistStore/artistShopStore"
 import ProductCard from "./ProductCard"
-import ProductDetailsDialog from "@/components/dialogs/artist/ProductDetailsDialog"
+import ProductDetailsDialog from "@/components/dialogs/artist/shop/ProductDetailsDialog"
 import CommonFilter from "@/components/shared/commonFilter/commonFilter"
 import CommonSearch from "@/components/shared/CommonSearch/CommonSearch"
 import CommonPagination from "@/components/shared/CommonPagination/CommonPagination"

@@ -4,7 +4,7 @@ import React from "react"
 import { Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DialogClose } from "@/components/ui/dialog"
-import DeleteEventDialog from "@/components/dialogs/admin/DeleteEventDialog"
+import DeleteEventDialog from "@/components/dialogs/admin/events/DeleteEventDialog"
 
 const EventDetailFooter = ({ event }) => {
     return (

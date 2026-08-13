@@ -1,6 +1,6 @@
 import React from "react"
 import { FolderPlus } from "lucide-react"
-import CreateAlbumDialog from "@/components/dialogs/artist/CreateAlbumDialog"
+import CreateAlbumDialog from "@/components/dialogs/artist/albums/CreateAlbumDialog"
 
 const CreateNewAlbum = () => {
   return (

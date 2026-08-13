@@ -2,8 +2,8 @@ import React from "react"
 import { SquarePen, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import EditEventDialog from "@/components/dialogs/artist/EditEventDialog"
-import DeleteEventDialog from "@/components/dialogs/artist/DeleteEventDialog"
+import EditEventDialog from "@/components/dialogs/artist/events/EditEventDialog"
+import DeleteEventDialog from "@/components/dialogs/artist/events/DeleteEventDialog"
 
 const EventsTableActions = ({ event, className, onClick }) => {
     return (

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { DialogClose } from "@/components/ui/dialog"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSelect"
-import DeleteProductDialog from "@/components/dialogs/artist/DeleteProductDialog"
+import DeleteProductDialog from "@/components/dialogs/artist/shop/DeleteProductDialog"
 
 const rejectionReasons = [
   { value: "identity_unclear", label: "Identity Music unclear or unreadable" },

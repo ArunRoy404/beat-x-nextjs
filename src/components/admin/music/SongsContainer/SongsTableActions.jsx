@@ -2,10 +2,10 @@ import React from "react"
 import { Eye, Check, X, Trash2, SquarePen } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import EditSongDialog from "@/components/dialogs/admin/EditSongDialog"
-import DeleteSongDialog from "@/components/dialogs/admin/DeleteSongDialog"
-import SongUnderReviewDialog from "@/components/dialogs/admin/SongUnderReviewDialog"
-import SongDetailsDialog from "@/components/dialogs/admin/SongDetailsDialog"
+import EditSongDialog from "@/components/dialogs/admin/music/EditSongDialog"
+import DeleteSongDialog from "@/components/dialogs/admin/music/DeleteSongDialog"
+import SongUnderReviewDialog from "@/components/dialogs/admin/music/SongUnderReviewDialog"
+import SongDetailsDialog from "@/components/dialogs/admin/music/SongDetailsDialog"
 
 const SongsTableActions = ({
     status,

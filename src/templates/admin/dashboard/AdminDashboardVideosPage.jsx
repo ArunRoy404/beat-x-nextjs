@@ -4,7 +4,7 @@ import React from "react"
 import { useAdminDashboardVideosStore } from "@/zustandStore/admin/adminStore/adminDashboardVideosStore"
 import DashboardStats from "@/components/shared/Dashboard/DashboardStats/DashboardStats"
 import VideosContainer from "@/components/admin/videos/VideosContainer"
-import UploadVideoDialog from "@/components/dialogs/admin/UploadVideoDialog"
+import UploadVideoDialog from "@/components/dialogs/admin/videos/UploadVideoDialog"
 import { Upload } from "lucide-react"
 
 const AdminDashboardVideosPage = () => {

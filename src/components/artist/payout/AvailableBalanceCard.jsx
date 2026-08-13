@@ -3,7 +3,7 @@
 import React from "react"
 import { useArtistPayoutStore } from "@/zustandStore/artist/artistStore/artistPayoutStore"
 import CommonCard from "@/components/shared/CommonCard/CommonCard"
-import RequestPayoutDialog from "@/components/dialogs/artist/RequestPayoutDialog"
+import RequestPayoutDialog from "@/components/dialogs/artist/payout/RequestPayoutDialog"
 
 const AvailableBalanceCard = () => {
     const balance = useArtistPayoutStore((state) => state.payoutBalance)

@@ -4,7 +4,7 @@ import React from "react"
 import { useAdminDashboardAudioBooksStore } from "@/zustandStore/admin/adminStore/adminDashboardAudioBooksStore"
 import DashboardStats from "@/components/shared/Dashboard/DashboardStats/DashboardStats"
 import AudioBooksContainer from "@/components/admin/audiobooks/AudioBooksContainer"
-import UploadAudioBookDialog from "@/components/dialogs/admin/UploadAudioBookDialog"
+import UploadAudioBookDialog from "@/components/dialogs/admin/audiobooks/UploadAudioBookDialog"
 import { Upload } from "lucide-react"
 
 const AdminDashboardAudioBooksPage = () => {

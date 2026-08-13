@@ -2,7 +2,7 @@ import React from "react"
 import Image from "next/image"
 import { Edit3, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import EditProductDialog from "@/components/dialogs/admin/EditProductDialog"
+import EditProductDialog from "@/components/dialogs/admin/shop/EditProductDialog"
 
 const ProductDetailHeader = ({ product, onClose }) => {
   const isActive = product?.status === "Active"
