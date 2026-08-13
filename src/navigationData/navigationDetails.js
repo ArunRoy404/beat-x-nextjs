@@ -88,8 +88,8 @@ export const navigationDetails = {
     subtitle: "Your earnings breakdown"
   },
   "/artist/dashboard/payout": {
-    title: "Payout",
-    subtitle: "Manage payout methods and history"
+    title: "Payouts",
+    subtitle: "Withdraw your earnings"
   },
   "/artist/dashboard/merchandise": {
     title: "Merchandise",

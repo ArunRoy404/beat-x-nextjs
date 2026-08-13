@@ -17,7 +17,7 @@ const AdminDashboardShopPage = () => {
       {/* Add New Product Banner */}
       <AddNewProduct />
 
-      {/* Products list and filter container */}
+      {/* Products list and filter container */} 
       <ProductsContainer />
     </div>
   )
