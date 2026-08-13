@@ -90,6 +90,8 @@
   --followers-hero-border: rgba(58, 223, 250, 0.20);
   --verified-badge-gradient: linear-gradient(135deg, #FFD700 0%, #FF8C00 100%);
   --verified-badge-glow: 0 0 24px 0 rgba(255, 215, 0, 0.30);
+  --auth-card-bg: rgba(38, 38, 38, 0.48);
+  --auth-card-border: rgba(72, 72, 71, 0.30);
 
   /* Standard Theme Mapping (Mapped to custom) */
   --background: #0E0E0E;
