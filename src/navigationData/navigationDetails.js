@@ -97,7 +97,7 @@ export const navigationDetails = {
   },
   "/artist/dashboard/followers": {
     title: "Followers",
-    subtitle: "See who's following you"
+    subtitle: "Your fanbase insights"
   },
   "/artist/dashboard/events": {
     title: "Events & Tours",

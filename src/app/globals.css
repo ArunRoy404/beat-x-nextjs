@@ -86,6 +86,8 @@
   --switch-on-bg: #32D74B;
   --payout-balance-bg: linear-gradient(135deg, rgba(52, 199, 89, 0.10) 0%, rgba(58, 223, 250, 0.05) 100%);
   --payout-balance-border: rgba(52, 199, 89, 0.20);
+  --followers-hero-bg: linear-gradient(135deg, rgba(58, 223, 250, 0.12) 0%, rgba(204, 151, 255, 0.05) 100%);
+  --followers-hero-border: rgba(58, 223, 250, 0.20);
 
   /* Standard Theme Mapping (Mapped to custom) */
   --background: #0E0E0E;
