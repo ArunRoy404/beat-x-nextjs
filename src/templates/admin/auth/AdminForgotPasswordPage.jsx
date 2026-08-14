@@ -10,6 +10,7 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import AuthLayout from "@/components/shared/AuthLayout/AuthLayout"
+import { useForgotPassword } from "@/hooks/api/auth/useForgotPassword"
 
 const forgotPasswordSchema = z.object({
     email: z.string().min(1, "Email is required").email("Enter a valid email address"),
@@ -17,6 +18,7 @@ const forgotPasswordSchema = z.object({
 
 const AdminForgotPasswordPage = () => {
     const router = useRouter()
+    const { mutate: sendResetCode, isPending } = useForgotPassword()
 
     const {
         register,
@@ -27,9 +29,19 @@ const AdminForgotPasswordPage = () => {
         defaultValues: { email: "" },
     })
 
-    const onSubmit = () => {
-        toast.success("Verification code sent to your email!")
-        router.push("/admin/otp-verification")
+    const onSubmit = ({ email }) => {
+        sendResetCode(
+            { email },
+            {
+                onSuccess: () => {
+                    toast.success("Verification code sent to your email!")
+                    router.push(`/admin/otp-verification?email=${encodeURIComponent(email)}`)
+                },
+                onError: (error) => {
+                    toast.error(error.message || "Could not send verification code")
+                },
+            }
+        )
     }
 
     const onInvalid = (validationErrors) => {
@@ -55,7 +67,7 @@ const AdminForgotPasswordPage = () => {
                     error={errors.email?.message}
                 />
 
-                <Button type="submit" variant="gradient" size="lg" className="w-full mt-2">
+                <Button type="submit" variant="gradient" size="lg" className="w-full mt-2" isLoading={isPending}>
                     Continue
                 </Button>
             </form>

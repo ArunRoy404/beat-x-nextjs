@@ -1,7 +1,12 @@
+import { Suspense } from "react";
 import AdminOtpVerificationPage from "@/templates/admin/auth/AdminOtpVerificationPage";
 
 const page = () => {
-    return <AdminOtpVerificationPage />
+    return (
+        <Suspense>
+            <AdminOtpVerificationPage />
+        </Suspense>
+    )
 }
 
 export default page;

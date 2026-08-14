@@ -1,0 +1,559 @@
+{
+  "info": {
+    "_postman_id": "8f2d6c1a-4b3e-4a2f-9c7d-1a9e5f7b2d3c",
+    "name": "Beat-X — Artist Verification API",
+    "description": "# Artist Verification\n\nCovers the artist-facing verification wizard (`/artist-verification`) and the admin review console (`/admin/artist-verification`), plus the minimal Auth flow needed to obtain tokens for both roles.\n\n## Quick Start\n1. Set `baseUrl` in your Postman environment (default `http://localhost:3000/api/v1`).\n2. **Setup → Register (Artist)** then **Verify Email (OTP)** to create an artist account.\n3. **Setup → Login (Artist)** — auto-saves `artistAccessToken`.\n4. **Setup → Login (Admin)** — log in with an existing admin account, auto-saves `adminAccessToken`.\n5. Run the **Artist Verification (Artist)** folder top-to-bottom to walk the 4-step wizard and submit.\n6. Use **Artist Verification (Admin)** to review, checklist, and approve/reject/suspend the submission.\n\n## Auth\n- Artist-role routes use **Bearer `{{artistAccessToken}}`** (set at folder level).\n- Admin-role routes use **Bearer `{{adminAccessToken}}`** (set at folder level).\n\n## Response Envelope\nEvery response is wrapped:\n```json\n{\n  \"status\": true,\n  \"message\": \"...\",\n  \"data\": { ... },\n  \"timestamp\": \"ISO-8601\",\n  \"path\": \"/route\",\n  \"metadata\": { \"duration\": \"4ms\" }\n}\n```\n\n## Verification Flow\n`draft → submitted → under_review → (info_requested)? → approved | rejected`. An approved artist can later be `suspended` then `reactivated` by an admin.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/v1",
+      "description": "API base URL including version prefix"
+    },
+    {
+      "key": "artistAccessToken",
+      "value": "",
+      "description": "JWT for a user with role=artist — set by Setup → Login (Artist)"
+    },
+    {
+      "key": "adminAccessToken",
+      "value": "",
+      "description": "JWT for a user with role=admin — set by Setup → Login (Admin)"
+    },
+    {
+      "key": "verificationId",
+      "value": "",
+      "description": "MongoDB ObjectId of an ArtistVerification record — set by Admin → List Artists / manually"
+    }
+  ],
+  "item": [
+    {
+      "name": "Setup (Auth)",
+      "description": "Minimal auth flow to obtain the two tokens this collection needs. Not part of the artist-verification module itself.",
+      "item": [
+        {
+          "name": "Register (Artist)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Artist Name\",\n    \"email\": \"artist@example.com\",\n    \"password\": \"Password1\",\n    \"role\": \"artist\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Creates an account with `role: artist` and sends a 6-digit OTP to the provided email."
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Email (OTP)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"artist@example.com\",\n    \"otp\": \"123456\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/verify-email",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "verify-email"]
+            },
+            "description": "Verifies the 6-digit OTP sent during registration."
+          },
+          "response": []
+        },
+        {
+          "name": "Login (Artist)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "",
+                  "if (res.status === true && res.data) {",
+                  "    pm.collectionVariables.set(\"artistAccessToken\", res.data.accessToken);",
+                  "    console.log(\"✅ artistAccessToken stored\");",
+                  "} else {",
+                  "    console.warn(\"⚠️ Login failed — token not stored\");",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"artist@example.com\",\n    \"password\": \"Password1\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Logs in as the artist. Saves `artistAccessToken` to the collection variables."
+          },
+          "response": []
+        },
+        {
+          "name": "Login (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "",
+                  "if (res.status === true && res.data) {",
+                  "    pm.collectionVariables.set(\"adminAccessToken\", res.data.accessToken);",
+                  "    console.log(\"✅ adminAccessToken stored\");",
+                  "} else {",
+                  "    console.warn(\"⚠️ Login failed — token not stored\");",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"Password1\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Logs in with an existing account that has `role: admin`. Saves `adminAccessToken` to the collection variables."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Artist Verification (Artist)",
+      "description": "`/artist-verification` — requires role=artist. Walks the 4-step verification wizard: personal info → identity docs → social links → media assets → submit.",
+      "auth": {
+        "type": "bearer",
+        "bearer": [{ "key": "token", "value": "{{artistAccessToken}}", "type": "string" }]
+      },
+      "item": [
+        {
+          "name": "Get My Verification",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/artist-verification/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["artist-verification", "me"]
+            },
+            "description": "Fetches the current user's full verification record (creates a draft on first access if none exists, depending on service implementation)."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/artist-verification/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["artist-verification", "status"]
+            },
+            "description": "Lightweight status check — current `status` (draft/submitted/under_review/info_requested/approved/rejected/suspended) and `currentStep`."
+          },
+          "response": []
+        },
+        {
+          "name": "1. Save Personal Info",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"fullName\": \"John Doe\",\n    \"stageName\": \"JD Beats\",\n    \"dateOfBirth\": \"1995-05-20\",\n    \"gender\": \"male\",\n    \"nationality\": \"Bangladeshi\",\n    \"primaryLanguage\": \"Bengali\",\n    \"artistCategory\": \"Musician\",\n    \"shortBio\": \"Independent hip-hop artist from Dhaka.\",\n    \"fullBio\": \"John Doe, known professionally as JD Beats, is an independent hip-hop artist and producer based in Dhaka with over 5 years of experience.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/artist-verification/personal-info",
+              "host": ["{{baseUrl}}"],
+              "path": ["artist-verification", "personal-info"]
+            },
+            "description": "Step 1 of 4. `gender` enum: `male` | `female` | `other` | `prefer_not_to_say`."
+          },
+          "response": []
+        },
+        {
+          "name": "2. Upload Identity Docs",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "frontSide", "type": "file", "src": [] },
+                { "key": "backSide", "type": "file", "src": [] },
+                { "key": "selfie", "type": "file", "src": [] }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/artist-verification/identity-docs?documentType=nid",
+              "host": ["{{baseUrl}}"],
+              "path": ["artist-verification", "identity-docs"],
+              "query": [
+                {
+                  "key": "documentType",
+                  "value": "nid",
+                  "description": "nid | passport | driving_license"
+                }
+              ]
+            },
+            "description": "Step 2 of 4. Multipart upload. `frontSide`/`backSide`/`selfie` accept JPG/PNG only. `backSide` is typically only required for `nid` and `driving_license`."
+          },
+          "response": []
+        },
+        {
+          "name": "3. Save Social Links",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"facebook\": \"https://www.facebook.com/jdbeats\",\n    \"instagram\": \"https://www.instagram.com/jdbeats\",\n    \"twitter\": \"https://x.com/jdbeats\",\n    \"youtube\": \"https://www.youtube.com/@jdbeats\",\n    \"tiktok\": \"https://www.tiktok.com/@jdbeats\",\n    \"officialWebsite\": \"https://jdbeats.com\",\n    \"spotify\": \"https://open.spotify.com/artist/xxxx\",\n    \"appleMusic\": \"https://music.apple.com/artist/xxxx\",\n    \"youtubeMusic\": \"https://music.youtube.com/channel/xxxx\",\n    \"soundcloud\": \"https://soundcloud.com/jdbeats\",\n    \"amazonMusic\": \"https://music.amazon.com/artists/xxxx\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/artist-verification/social-links",
+              "host": ["{{baseUrl}}"],
+              "path": ["artist-verification", "social-links"]
+            },
+            "description": "Step 3 of 4. `facebook`, `instagram`, `twitter`, `youtube` are required; the rest are optional. Each field is validated against its platform's domain."
+          },
+          "response": []
+        },
+        {
+          "name": "4. Upload Media Assets",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "profilePicture", "type": "file", "src": [] },
+                { "key": "mediaKit", "type": "file", "src": [] },
+                { "key": "pressRelease", "type": "file", "src": [] },
+                { "key": "promotionalMaterials", "type": "file", "src": [] }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/artist-verification/media-assets",
+              "host": ["{{baseUrl}}"],
+              "path": ["artist-verification", "media-assets"]
+            },
+            "description": "Step 4 of 4. Multipart upload, all fields optional at the request level (check service/business rules for what's mandatory before submit)."
+          },
+          "response": []
+        },
+        {
+          "name": "5. Submit Application",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/artist-verification/submit",
+              "host": ["{{baseUrl}}"],
+              "path": ["artist-verification", "submit"]
+            },
+            "description": "Marks the application as `submitted` and moves it into the admin review queue. Fails if a prior step wasn't completed."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Artist Verification (Admin)",
+      "description": "`/admin/artist-verification` — requires role=admin. Review console: list/inspect submissions, checklist documents & social links, review tabs, then approve/reject/request-info/suspend/reactivate/delete.",
+      "auth": {
+        "type": "bearer",
+        "bearer": [{ "key": "token", "value": "{{adminAccessToken}}", "type": "string" }]
+      },
+      "item": [
+        {
+          "name": "List Artists",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "const first = res?.data?.data?.[0] || res?.data?.[0];",
+                  "if (first?._id) {",
+                  "    pm.collectionVariables.set(\"verificationId\", first._id);",
+                  "    console.log(\"✅ verificationId stored:\", first._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/artist-verification?tab=pending&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "artist-verification"],
+              "query": [
+                {
+                  "key": "tab",
+                  "value": "pending",
+                  "description": "all | verified | pending | suspended"
+                },
+                { "key": "q", "value": "", "description": "Search by name/email/stage name", "disabled": true },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            },
+            "description": "Paginated list of artist verification records, filterable by tab and free-text search. Auto-saves the first result's id to `verificationId`."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Verification by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/artist-verification/{{verificationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "artist-verification", "{{verificationId}}"]
+            },
+            "description": "Full verification detail for the review screen, including personal info, documents, social links, media assets, and checklist state."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Document Checklist",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"documentReadable\": true,\n    \"nameMatchesProfile\": true,\n    \"documentNotExpired\": true,\n    \"selfieMatchesPhoto\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/artist-verification/{{verificationId}}/checklist",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "artist-verification", "{{verificationId}}", "checklist"]
+            },
+            "description": "All fields optional — send only what changed. Toggles the identity-document review checklist."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Social Links Checklist",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"facebook\": true,\n    \"instagram\": true,\n    \"twitter\": true,\n    \"youtube\": true,\n    \"tiktok\": true,\n    \"officialWebsite\": true,\n    \"spotify\": true,\n    \"appleMusic\": true,\n    \"youtubeMusic\": true,\n    \"soundcloud\": true,\n    \"amazonMusic\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/artist-verification/{{verificationId}}/social-links/checklist",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "artist-verification", "{{verificationId}}", "social-links", "checklist"]
+            },
+            "description": "All fields optional — send only what changed. Toggles the social-links review checklist."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Tab Review (Overview)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"reviewed\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/artist-verification/{{verificationId}}/review/overview",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "artist-verification", "{{verificationId}}", "review", "overview"]
+            },
+            "description": "`:tab` path param enum: `overview` | `media_assets`. Marks that review tab as reviewed/unreviewed."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Tab Review (Media Assets)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"reviewed\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/artist-verification/{{verificationId}}/review/media_assets",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "artist-verification", "{{verificationId}}", "review", "media_assets"]
+            },
+            "description": "`:tab` path param enum: `overview` | `media_assets`."
+          },
+          "response": []
+        },
+        {
+          "name": "Approve",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/artist-verification/{{verificationId}}/approve",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "artist-verification", "{{verificationId}}", "approve"]
+            },
+            "description": "Approves the application. Sets status to `approved`."
+          },
+          "response": []
+        },
+        {
+          "name": "Reject",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"reasonCode\": \"document_unclear\",\n    \"note\": \"The front side of the ID is blurry, please re-upload a clearer photo.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/artist-verification/{{verificationId}}/reject",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "artist-verification", "{{verificationId}}", "reject"]
+            },
+            "description": "`reasonCode` enum: `document_unclear` | `name_mismatch` | `document_expired` | `selfie_mismatch` | `incomplete_profile` | `suspicious_activity` | `other`. `note` optional."
+          },
+          "response": []
+        },
+        {
+          "name": "Request More Info",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"items\": [\"clearer_id_photos\", \"missing_social_links\"],\n    \"message\": \"Please re-upload a clearer photo of your ID and add your missing music platform links.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/artist-verification/{{verificationId}}/request-info",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "artist-verification", "{{verificationId}}", "request-info"]
+            },
+            "description": "`items[]` enum: `clearer_id_photos` | `higher_res_selfie` | `missing_social_links` | `incomplete_bio` | `music_platform_links`. Sets status to `info_requested`."
+          },
+          "response": []
+        },
+        {
+          "name": "Suspend",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"reason\": \"Violation of community guidelines — reported for copyright infringement.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/artist-verification/{{verificationId}}/suspend",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "artist-verification", "{{verificationId}}", "suspend"]
+            },
+            "description": "Suspends a previously approved artist. `reason` optional."
+          },
+          "response": []
+        },
+        {
+          "name": "Reactivate",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/artist-verification/{{verificationId}}/reactivate",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "artist-verification", "{{verificationId}}", "reactivate"]
+            },
+            "description": "Lifts a suspension and restores `approved` status."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Genres",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"genres\": [\"Hip-Hop\", \"R&B\", \"Afrobeat\"]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/artist-verification/{{verificationId}}/genres",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "artist-verification", "{{verificationId}}", "genres"]
+            },
+            "description": "System-assigned genres for analytics & recommendations — never shown to the artist."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Artist",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"password\": \"AdminPassword1\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/artist-verification/{{verificationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "artist-verification", "{{verificationId}}"]
+            },
+            "description": "Permanently deletes the artist's verification record. Requires the acting admin's own account password for confirmation."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
