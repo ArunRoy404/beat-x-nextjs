@@ -2,8 +2,8 @@
 
 import React from "react"
 import { useAdminDashboardSettingsStore } from "@/zustandStore/admin/adminStore/adminDashboardSettingsStore"
-import SettingsSection from "@/components/admin/settings/SettingsSection"
-import SettingToggleRow from "@/components/admin/settings/SettingToggleRow"
+import SettingsSection from "@/components/shared/Settings/SettingsSection"
+import SettingToggleRow from "@/components/shared/Settings/SettingToggleRow"
 import DangerZoneSection from "@/components/admin/settings/DangerZoneSection"
 
 const AdminDashboardSettingsPage = () => {

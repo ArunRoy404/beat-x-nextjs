@@ -3,7 +3,7 @@
 import React from "react"
 import { useAdminDashboardShopStore } from "@/zustandStore/admin/adminStore/adminDashboardShopStore"
 import ProductCard from "./ProductCard"
-import ProductDetailsDialog from "@/components/dialogs/admin/ProductDetailsDialog"
+import ProductDetailsDialog from "@/components/dialogs/admin/shop/ProductDetailsDialog"
 import CommonFilter from "@/components/shared/commonFilter/commonFilter"
 import CommonSearch from "@/components/shared/CommonSearch/CommonSearch"
 import CommonPagination from "@/components/shared/CommonPagination/CommonPagination"

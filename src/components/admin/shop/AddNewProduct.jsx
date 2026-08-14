@@ -1,6 +1,6 @@
 import React from "react"
-import { PlusCircle, Plus } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { PlusCircle } from "lucide-react"
+import AddProductDialog from "@/components/dialogs/admin/shop/AddProductDialog"
 
 const AddNewProduct = () => {
   return (
@@ -22,11 +22,8 @@ const AddNewProduct = () => {
         </div>
       </div>
 
-      {/* Trigger Button - static as requested */}
-      <Button variant="gradient" className="rounded-full px-5 h-10 flex items-center gap-1.5 font-semibold shrink-0 cursor-pointer">
-        <Plus className="w-4 h-4 shrink-0" />
-        <span>Add Product</span>
-      </Button>
+      {/* Add Dialog */}
+      <AddProductDialog />
     </div>
   )
 }

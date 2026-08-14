@@ -88,27 +88,31 @@ export const navigationDetails = {
     subtitle: "Your earnings breakdown"
   },
   "/artist/dashboard/payout": {
-    title: "Payout",
-    subtitle: "Manage payout methods and history"
+    title: "Payouts",
+    subtitle: "Withdraw your earnings"
   },
   "/artist/dashboard/merchandise": {
     title: "Merchandise",
-    subtitle: "Manage your merch store"
+    subtitle: "Your online store"
   },
   "/artist/dashboard/followers": {
     title: "Followers",
-    subtitle: "See who's following you"
+    subtitle: "Your fanbase insights"
   },
   "/artist/dashboard/events": {
     title: "Events & Tours",
-    subtitle: "Manage your live events and tours"
+    subtitle: "Manage your live events"
   },
   "/artist/dashboard/verification": {
-    title: "Verification",
-    subtitle: "Manage your account verification"
+    title: "Verification Status",
+    subtitle: "Your verification journey"
   },
   "/artist/dashboard/settings": {
     title: "Settings",
     subtitle: "Account preferences"
+  },
+  "/artist/dashboard/profile": {
+    title: "My Profile",
+    subtitle: "Edit your artist profile"
   }
 }

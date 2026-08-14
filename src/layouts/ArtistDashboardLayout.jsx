@@ -16,6 +16,7 @@ const ArtistDashboardLayout = ({ children }) => {
           name="Tashrif Khan"
           role="Artist"
           avatar="https://github.com/shadcn.png"
+          href="/artist/dashboard/profile"
         />
       }
     >

@@ -1,6 +1,6 @@
 import React from "react"
 import { CalendarPlus } from "lucide-react"
-import CreateNewEventDialog from "@/components/dialogs/admin/CreateNewEventDialog"
+import CreateNewEventDialog from "@/components/dialogs/admin/events/CreateNewEventDialog"
 
 const CreateNewEvent = () => {
   return (

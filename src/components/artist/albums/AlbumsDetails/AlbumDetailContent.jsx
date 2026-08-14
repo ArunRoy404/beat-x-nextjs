@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { useArtistAlbumsStore } from "@/zustandStore/artist/artistStore/artistAlbumsStore"
 import { toast } from "sonner"
 import AlbumTrackRow from "../AlbumTrackRow"
-import AddTrackDialog from "@/components/dialogs/artist/AddTrackDialog"
+import AddTrackDialog from "@/components/dialogs/artist/albums/AddTrackDialog"
 
 const AlbumDetailContent = ({ album }) => {
     const addTrackToAlbum = useArtistAlbumsStore((state) => state.addTrackToAlbum)

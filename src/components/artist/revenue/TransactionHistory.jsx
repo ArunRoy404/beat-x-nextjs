@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import CommonCard from "@/components/shared/CommonCard/CommonCard"
 import CommonPagination from "@/components/shared/CommonPagination/CommonPagination"
 import TransactionTypeBadge from "./TransactionTypeBadge"
-import DeleteTransactionDialog from "@/components/dialogs/artist/DeleteTransactionDialog"
+import DeleteTransactionDialog from "@/components/dialogs/artist/revenue/DeleteTransactionDialog"
 import { useArtistRevenueStore } from "@/zustandStore/artist/artistStore/artistRevenueStore"
 
 const STATUS_STYLES = {

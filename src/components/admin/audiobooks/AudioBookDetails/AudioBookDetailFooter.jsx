@@ -4,7 +4,7 @@ import React from "react"
 import { Trash2, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DialogClose } from "@/components/ui/dialog"
-import DeleteAudioBookDialog from "@/components/dialogs/admin/DeleteAudioBookDialog"
+import DeleteAudioBookDialog from "@/components/dialogs/admin/audiobooks/DeleteAudioBookDialog"
 
 const AudioBookDetailFooter = ({ book }) => {
     return (

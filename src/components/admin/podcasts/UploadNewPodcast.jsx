@@ -1,6 +1,6 @@
 import React from "react"
 import { Upload } from "lucide-react"
-import UploadNewPodcastDialog from "@/components/dialogs/admin/UploadNewPodcastDialog"
+import UploadNewPodcastDialog from "@/components/dialogs/admin/podcasts/UploadNewPodcastDialog"
 
 const UploadNewPodcast = () => {
   return (

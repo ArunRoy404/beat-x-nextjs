@@ -87,7 +87,7 @@ export const artistDashboardNavigation = {
           navbarTitle: "Events & Tours",
           url: "/artist/dashboard/events",
           iconName: "Calendar01Icon",
-          subtitle: "Manage your live events and tours"
+          subtitle: "Manage your live events"
         }
       ]
     },

@@ -1,8 +1,8 @@
 import React from "react"
 import { Clock, BookOpen, Play, Pencil, Trash2 } from "lucide-react"
-import AudioBookDetailsDialog from "@/components/dialogs/admin/AudioBookDetailsDialog"
-import EditAudioBookDialog from "@/components/dialogs/admin/EditAudioBookDialog"
-import DeleteAudioBookDialog from "@/components/dialogs/admin/DeleteAudioBookDialog"
+import AudioBookDetailsDialog from "@/components/dialogs/admin/audiobooks/AudioBookDetailsDialog"
+import EditAudioBookDialog from "@/components/dialogs/admin/audiobooks/EditAudioBookDialog"
+import DeleteAudioBookDialog from "@/components/dialogs/admin/audiobooks/DeleteAudioBookDialog"
 
 const AudioBookCard = ({ book }) => {
   if (!book) return null

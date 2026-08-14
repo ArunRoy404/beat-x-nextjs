@@ -1,7 +1,7 @@
 import React from "react"
 import Image from "next/image"
 import { ShieldCheck, SquarePen } from "lucide-react"
-import EditAudioBookDialog from "@/components/dialogs/admin/EditAudioBookDialog"
+import EditAudioBookDialog from "@/components/dialogs/admin/audiobooks/EditAudioBookDialog"
 
 const AudioBookDetailHeader = ({ book }) => {
     const status = book?.status || "Published"

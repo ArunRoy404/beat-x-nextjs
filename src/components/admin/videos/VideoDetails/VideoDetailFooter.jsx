@@ -4,7 +4,7 @@ import React from "react"
 import { Trash2, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DialogClose } from "@/components/ui/dialog"
-import DeleteVideoDialog from "@/components/dialogs/admin/DeleteVideoDialog"
+import DeleteVideoDialog from "@/components/dialogs/admin/videos/DeleteVideoDialog"
 import { toast } from "sonner"
 
 const VideoDetailFooter = ({ video }) => {

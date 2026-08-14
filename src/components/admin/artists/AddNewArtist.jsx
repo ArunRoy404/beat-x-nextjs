@@ -2,7 +2,7 @@
 
 import React from "react"
 import { UserPlus } from "lucide-react"
-import AddArtistDialog from "../../dialogs/admin/AddArtistDialog"
+import AddArtistDialog from "@/components/dialogs/admin/artists/AddArtistDialog"
 
 const AddNewArtist = () => {
   return (

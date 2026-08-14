@@ -2,7 +2,7 @@
 
 import React from "react"
 import DataTable from "@/components/ui/DataTable"
-import { getArtistsColumns } from "@/components/DataTableColumns/admin/ArtistsColumns"
+import { getArtistsColumns } from "@/components/DataTableColumns/admin/artists/ArtistsColumns"
 import CommonFilter from "@/components/shared/commonFilter/commonFilter"
 import CommonSearch from "@/components/shared/CommonSearch/CommonSearch"
 import CommonPagination from "@/components/shared/CommonPagination/CommonPagination"
@@ -11,8 +11,8 @@ import { useAdminDashboardArtistsStore } from "@/zustandStore/admin/adminStore/a
 import { Eye, SquarePen, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import CommonAvatar from "@/components/shared/CommonAvatar"
-import DeleteArtistDialog from "@/components/dialogs/admin/DeleteArtistDialog"
-import ArtistDetailsDialog from "@/components/dialogs/admin/ArtistDetailsDialog"
+import DeleteArtistDialog from "@/components/dialogs/admin/artists/DeleteArtistDialog"
+import ArtistDetailsDialog from "@/components/dialogs/admin/artists/ArtistDetailsDialog"
 
 const formatFollowers = (val) => {
   if (val >= 1000000) {
