@@ -1,17 +1,23 @@
 import * as React from "react"
 import { ThemeProvider } from "next-themes"
 import { Toaster } from "@/components/ui/sonner"
+import AuthSessionProvider from "./AuthSessionProvider"
+import QueryProvider from "./QueryProvider"
 
-export default function ProviderContainer({ children }) {
+export default function ProviderContainer({ children, session }) {
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="dark"
-      enableSystem
-      disableTransitionOnChange
-    >
-      {children}
-      <Toaster position="top-right" closeButton={true} />
-    </ThemeProvider>
+    <AuthSessionProvider session={session}>
+      <QueryProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+          <Toaster position="top-right" closeButton={true} />
+        </ThemeProvider>
+      </QueryProvider>
+    </AuthSessionProvider>
   )
 }

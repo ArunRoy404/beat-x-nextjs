@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import AuthLayout from "@/components/shared/AuthLayout/AuthLayout"
+import { useLogin } from "@/hooks/api/auth/useLogin"
 
 const loginSchema = z.object({
     email: z.string().min(1, "Email is required").email("Enter a valid email address"),
@@ -21,6 +22,7 @@ const loginSchema = z.object({
 
 const AdminLoginPage = () => {
     const router = useRouter()
+    const { mutate: login, isPending } = useLogin()
 
     const {
         register,
@@ -36,9 +38,19 @@ const AdminLoginPage = () => {
         },
     })
 
-    const onSubmit = () => {
-        toast.success("Logged in successfully!")
-        router.push("/admin/dashboard")
+    const onSubmit = ({ email, password }) => {
+        login(
+            { email, password },
+            {
+                onSuccess: () => {
+                    toast.success("Logged in successfully!")
+                    router.push("/admin/dashboard")
+                },
+                onError: (error) => {
+                    toast.error(error.message || "Invalid email or password")
+                },
+            }
+        )
     }
 
     const onInvalid = (validationErrors) => {
@@ -85,7 +97,7 @@ const AdminLoginPage = () => {
                     </Link>
                 </div>
 
-                <Button type="submit" variant="gradient" size="lg" className="w-full mt-2">
+                <Button type="submit" variant="gradient" size="lg" className="w-full mt-2" isLoading={isPending}>
                     Login on your Account
                 </Button>
             </form>
