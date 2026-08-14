@@ -17,7 +17,9 @@ export async function proxy(request) {
   const isAdmin = token?.role === "admin";
 
   if (pathname.startsWith(ADMIN_DASHBOARD_PATH) && !isAdmin) {
-    return NextResponse.redirect(new URL(ADMIN_LOGIN_PATH, request.url));
+    const loginUrl = new URL(ADMIN_LOGIN_PATH, request.url);
+    loginUrl.searchParams.set("callbackUrl", `${pathname}${request.nextUrl.search}`);
+    return NextResponse.redirect(loginUrl);
   }
 
   if (ADMIN_AUTH_PAGES.some((page) => pathname.startsWith(page)) && isAdmin) {

@@ -2,7 +2,7 @@
 
 import React from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import AuthLayout from "@/components/shared/AuthLayout/AuthLayout"
 import { useLogin } from "@/hooks/api/auth/useLogin"
+import { getSafeCallbackUrl } from "@/lib/auth/getSafeCallbackUrl"
 
 const loginSchema = z.object({
     email: z.string().min(1, "Email is required").email("Enter a valid email address"),
@@ -22,6 +23,7 @@ const loginSchema = z.object({
 
 const AdminLoginPage = () => {
     const router = useRouter()
+    const searchParams = useSearchParams()
     const { mutate: login, isPending } = useLogin()
 
     const {
@@ -44,7 +46,7 @@ const AdminLoginPage = () => {
             {
                 onSuccess: () => {
                     toast.success("Logged in successfully!")
-                    router.push("/admin/dashboard")
+                    router.push(getSafeCallbackUrl(searchParams.get("callbackUrl"), "/admin/dashboard"))
                 },
                 onError: (error) => {
                     toast.error(error.message || "Invalid email or password")
