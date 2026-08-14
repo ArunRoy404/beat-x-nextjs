@@ -1,15 +1,13 @@
 import CredentialsProvider from "next-auth/providers/credentials";
-import { axiosPublic } from "@/lib/axios/axiosPublic";
-import { loginRequest } from "@/services/auth/authServices";
+import { loginRequest, refreshTokenRequest } from "@/services/auth/authServices";
 import { decodeJwt } from "./decodeJwt";
 import { env } from "@/config/env";
 
 async function refreshAccessToken(token) {
   try {
-    const res = await axiosPublic.post("/auth/refresh", {
+    const { accessToken, refreshToken } = await refreshTokenRequest({
       refreshToken: token.refreshToken,
     });
-    const { accessToken, refreshToken } = res.data.data;
     const { exp } = decodeJwt(accessToken);
 
     return {

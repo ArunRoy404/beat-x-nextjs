@@ -1,7 +1,7 @@
 "use client"
 
-import React from "react"
-import { useRouter } from "next/navigation"
+import React, { useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -10,6 +10,7 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import AuthLayout from "@/components/shared/AuthLayout/AuthLayout"
+import { useResetPassword } from "@/hooks/api/auth/useResetPassword"
 
 const resetPasswordSchema = z.object({
     newPassword: z.string().min(8, "Password must be at least 8 characters"),
@@ -21,6 +22,10 @@ const resetPasswordSchema = z.object({
 
 const AdminResetPasswordPage = () => {
     const router = useRouter()
+    const searchParams = useSearchParams()
+    const email = searchParams.get("email")
+    const otp = searchParams.get("otp")
+    const { mutate: resetPassword, isPending } = useResetPassword()
 
     const {
         register,
@@ -31,9 +36,25 @@ const AdminResetPasswordPage = () => {
         defaultValues: { newPassword: "", confirmPassword: "" },
     })
 
-    const onSubmit = () => {
-        toast.success("Password changed successfully!")
-        router.push("/admin/reset-password/success")
+    useEffect(() => {
+        if (!email || !otp) {
+            router.replace("/admin/forgot-password")
+        }
+    }, [email, otp, router])
+
+    const onSubmit = ({ newPassword }) => {
+        resetPassword(
+            { email, otp, newPassword },
+            {
+                onSuccess: () => {
+                    toast.success("Password changed successfully!")
+                    router.push("/admin/reset-password/success")
+                },
+                onError: (error) => {
+                    toast.error(error.message || "Could not reset password")
+                },
+            }
+        )
     }
 
     const onInvalid = (validationErrors) => {
@@ -68,7 +89,7 @@ const AdminResetPasswordPage = () => {
                     error={errors.confirmPassword?.message}
                 />
 
-                <Button type="submit" variant="gradient" size="lg" className="w-full mt-2">
+                <Button type="submit" variant="gradient" size="lg" className="w-full mt-2" isLoading={isPending}>
                     Change Password
                 </Button>
             </form>

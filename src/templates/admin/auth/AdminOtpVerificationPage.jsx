@@ -1,19 +1,30 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import CommonOtpInput from "@/components/shared/CommonInputs/CommonOtpInput/CommonOtpInput"
 import AuthLayout from "@/components/shared/AuthLayout/AuthLayout"
+import { useForgotPassword } from "@/hooks/api/auth/useForgotPassword"
 
 const RESEND_SECONDS = 45
 
 const AdminOtpVerificationPage = () => {
     const router = useRouter()
+    const searchParams = useSearchParams()
+    const email = searchParams.get("email")
+    const { mutate: sendResetCode, isPending: isResending } = useForgotPassword()
+
     const [otp, setOtp] = useState("")
     const [error, setError] = useState("")
     const [secondsLeft, setSecondsLeft] = useState(RESEND_SECONDS)
+
+    useEffect(() => {
+        if (!email) {
+            router.replace("/admin/forgot-password")
+        }
+    }, [email, router])
 
     useEffect(() => {
         if (secondsLeft <= 0) return
@@ -24,8 +35,18 @@ const AdminOtpVerificationPage = () => {
     }, [secondsLeft])
 
     const handleResend = () => {
-        setSecondsLeft(RESEND_SECONDS)
-        toast.success("Verification code resent!")
+        sendResetCode(
+            { email },
+            {
+                onSuccess: () => {
+                    setSecondsLeft(RESEND_SECONDS)
+                    toast.success("Verification code resent!")
+                },
+                onError: (error) => {
+                    toast.error(error.message || "Could not resend verification code")
+                },
+            }
+        )
     }
 
     const handleSubmit = (e) => {
@@ -35,8 +56,7 @@ const AdminOtpVerificationPage = () => {
             return
         }
         setError("")
-        toast.success("Code verified successfully!")
-        router.push("/admin/reset-password")
+        router.push(`/admin/reset-password?email=${encodeURIComponent(email)}&otp=${encodeURIComponent(otp)}`)
     }
 
     return (
@@ -68,9 +88,10 @@ const AdminOtpVerificationPage = () => {
                     <button
                         type="button"
                         onClick={handleResend}
-                        className="text-secondary text-[13px] font-medium hover:underline cursor-pointer"
+                        disabled={isResending}
+                        className="text-secondary text-[13px] font-medium hover:underline cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        Resend Code
+                        {isResending ? "Resending..." : "Resend Code"}
                     </button>
                 )}
             </form>

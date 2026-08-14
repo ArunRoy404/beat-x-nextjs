@@ -3,9 +3,14 @@ import Link from "next/link"
 import { LogOut, ChevronRight } from "lucide-react"
 import { toast } from "sonner"
 import CommonAvatar from "@/components/shared/CommonAvatar"
+import { Spinner } from "@/components/ui/spinner"
 
-const SidebarUserFooter = ({ name, role, avatar, href }) => {
+const SidebarUserFooter = ({ name, role, avatar, href, onLogout, isLoggingOut = false }) => {
     const handleLogout = () => {
+        if (onLogout) {
+            onLogout()
+            return
+        }
         toast.success("Logged out")
     }
 
@@ -17,11 +22,16 @@ const SidebarUserFooter = ({ name, role, avatar, href }) => {
             <button
                 type="button"
                 onClick={handleLogout}
-                className="flex items-center gap-[12px] px-[16px] py-[6px] h-8 rounded-[8px] text-red-error hover:bg-red-error/10 transition-all duration-300 cursor-pointer group-data-[state=collapsed]:px-0 group-data-[state=collapsed]:justify-center group-data-[state=collapsed]:mx-auto group-data-[state=collapsed]:w-8"
+                disabled={isLoggingOut}
+                className="flex items-center gap-[12px] px-[16px] py-[6px] h-8 rounded-[8px] text-red-error hover:bg-red-error/10 transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed group-data-[state=collapsed]:px-0 group-data-[state=collapsed]:justify-center group-data-[state=collapsed]:mx-auto group-data-[state=collapsed]:w-8"
             >
-                <LogOut className="w-[18px] h-[18px] shrink-0" />
+                {isLoggingOut ? (
+                    <Spinner className="w-[18px] h-[18px] shrink-0" />
+                ) : (
+                    <LogOut className="w-[18px] h-[18px] shrink-0" />
+                )}
                 <span className="text-[14px] not-italic font-normal leading-normal transition-all duration-300 ease-in-out opacity-100 group-data-[state=collapsed]:opacity-0 group-data-[state=collapsed]:w-0 overflow-hidden whitespace-nowrap">
-                    Logout
+                    {isLoggingOut ? "Logging out..." : "Logout"}
                 </span>
             </button>
 
