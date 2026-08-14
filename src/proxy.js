@@ -11,6 +11,15 @@ const ADMIN_AUTH_PAGES = [
   "/admin/reset-password",
 ];
 
+// Auth-gated redirects must never be cached — a stale 307 (from before
+// login/logout) served by the browser's own HTTP cache would strand the
+// user on the wrong page even on a fresh, typed-URL navigation.
+function redirectNoStore(url) {
+  const response = NextResponse.redirect(url);
+  response.headers.set("Cache-Control", "no-store");
+  return response;
+}
+
 export async function proxy(request) {
   const { pathname } = request.nextUrl;
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
@@ -19,11 +28,11 @@ export async function proxy(request) {
   if (pathname.startsWith(ADMIN_DASHBOARD_PATH) && !isAdmin) {
     const loginUrl = new URL(ADMIN_LOGIN_PATH, request.url);
     loginUrl.searchParams.set("callbackUrl", `${pathname}${request.nextUrl.search}`);
-    return NextResponse.redirect(loginUrl);
+    return redirectNoStore(loginUrl);
   }
 
   if (ADMIN_AUTH_PAGES.some((page) => pathname.startsWith(page)) && isAdmin) {
-    return NextResponse.redirect(new URL(ADMIN_DASHBOARD_PATH, request.url));
+    return redirectNoStore(new URL(ADMIN_DASHBOARD_PATH, request.url));
   }
 
   return NextResponse.next();
