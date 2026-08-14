@@ -19,6 +19,9 @@ const AdminDashboardLayout = ({ children }) => {
       onSuccess: () => {
         toast.success("Logged out successfully");
         router.push("/admin/login");
+        // /admin/login may be cached client-side as an authenticated
+        // redirect (proxy.js) from before logout — force a fresh check.
+        router.refresh();
       },
       onError: () => {
         toast.error("Something went wrong while logging out");

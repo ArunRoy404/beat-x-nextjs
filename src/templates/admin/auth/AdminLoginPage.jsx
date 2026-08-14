@@ -47,6 +47,10 @@ const AdminLoginPage = () => {
                 onSuccess: () => {
                     toast.success("Logged in successfully!")
                     router.push(getSafeCallbackUrl(searchParams.get("callbackUrl"), "/admin/dashboard"))
+                    // The destination may have been cached client-side as an
+                    // unauthenticated redirect (proxy.js) before login — force
+                    // a fresh server round-trip so it isn't served stale.
+                    router.refresh()
                 },
                 onError: (error) => {
                     toast.error(error.message || "Invalid email or password")
