@@ -1,6 +1,6 @@
 import axios from "axios";
-import { env } from "@/config/env";
 import { normalizeAxiosError } from "./normalizeAxiosError";
+import { getApiBaseUrl } from "./getApiBaseUrl";
 
 /**
  * For endpoints that require the signed-in user's access token. Works from
@@ -9,7 +9,7 @@ import { normalizeAxiosError } from "./normalizeAxiosError";
  * aren't interchangeable.
  */
 export const axiosPrivate = axios.create({
-  baseURL: env.apiBaseUrl,
+  baseURL: getApiBaseUrl(),
   headers: { "Content-Type": "application/json" },
 });
 

@@ -3,4 +3,5 @@ export const env = {
   revalidateTime: Number(process.env.NEXT_PUBLIC_REVALIDATE_TIME || 60),
   nextAuthUrl: process.env.NEXTAUTH_URL,
   nextAuthSecret: process.env.NEXTAUTH_SECRET,
+  useApiProxy: process.env.NEXT_PUBLIC_USE_API_PROXY !== "false",
 };
