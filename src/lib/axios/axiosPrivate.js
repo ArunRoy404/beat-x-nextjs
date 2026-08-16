@@ -20,6 +20,12 @@ axiosPrivate.interceptors.request.use(async (config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
+  // Let axios compute the multipart boundary itself instead of sending the
+  // forced "application/json" default from axios.create() above.
+  if (config.data instanceof FormData) {
+    delete config.headers["Content-Type"];
+  }
+
   return config;
 });
 

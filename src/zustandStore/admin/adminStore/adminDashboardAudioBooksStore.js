@@ -1,26 +1,13 @@
 import { create } from "zustand"
-import {
-  audioBooksStatsCards,
-  audioBooksList
-} from "@/dummyData/admin/adminData/adminDashboardAudioBooksData"
 
 export const useAdminDashboardAudioBooksStore = create((set) => ({
-  audioBooksStatsCards: audioBooksStatsCards,
-  audioBooksList: audioBooksList,
-  setAudioBooksStatsCards: (cards) => set({ audioBooksStatsCards: cards }),
-  setAudioBooksList: (list) => set({ audioBooksList: list }),
-  deleteAudioBook: (id) => set((state) => ({
-    audioBooksList: state.audioBooksList.filter((book) => book.id !== id)
-  })),
-  updateAudioBook: (id, updatedBook) => set((state) => ({
-    audioBooksList: state.audioBooksList.map((book) => {
-      if (book.id === id) {
-        return {
-          ...book,
-          ...updatedBook
-        }
-      }
-      return book
-    })
-  }))
+  selectedStatus: "all",
+  selectedGenre: "all",
+  searchQuery: "",
+  currentPage: 1,
+
+  setSelectedStatus: (status) => set({ selectedStatus: status, currentPage: 1 }),
+  setSelectedGenre: (genre) => set({ selectedGenre: genre, currentPage: 1 }),
+  setSearchQuery: (query) => set({ searchQuery: query, currentPage: 1 }),
+  setCurrentPage: (page) => set({ currentPage: page }),
 }))
