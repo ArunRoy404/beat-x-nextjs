@@ -190,7 +190,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ### State Management (Zustand)
 All application state is managed through **Zustand stores** with mock data initialization:
 - `adminDashboardOverviewStore` — Dashboard greeting, stats, charts, activity
-- `adminDashboardMusicStore` — Songs list, stats, CRUD operations
+- `adminDashboardMusicStore` — Songs list UI state (status/genre/search/pagination); list data comes from `useSongs()` (React Query)
 - `adminDashboardAlbumsStore` — Albums list, stats, CRUD + track management
 - `adminDashboardGenreStore` — Genres list UI state (search/pagination); list data comes from `useGenres()`/`useSearchGenres()` (React Query)
 - `adminDashboardAnalyticsStore` — Analytics data and stats

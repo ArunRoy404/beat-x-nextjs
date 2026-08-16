@@ -1,15 +1,59 @@
-import React from "react"
+"use client"
+
+import React, { useEffect, useState } from "react"
 import DataTable from "@/components/ui/DataTable"
 import { getSongsColumns } from "@/components/DataTableColumns/admin/music/SongsColumns"
 import CommonFilter from "@/components/shared/commonFilter/commonFilter"
 import CommonSearch from "@/components/shared/CommonSearch/CommonSearch"
+import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSelect"
 import CommonPagination from "@/components/shared/CommonPagination/CommonPagination"
 import CommonTableContainer from "@/components/shared/CommonTable/CommonTableContainer"
 import SongsCardsContainer from "./SongsCardsContainer"
+import UploadNewSongDialog from "@/components/dialogs/admin/music/UploadNewSongDialog"
+import { Button } from "@/components/ui/button"
+import { Spinner } from "@/components/ui/spinner"
+import { useAdminDashboardMusicStore } from "@/zustandStore/admin/adminStore/adminDashboardMusicStore"
+import { useSongs, SONGS_PAGE_SIZE } from "@/hooks/api/admin/songs/useSongs"
+import { useGenres } from "@/hooks/api/admin/genre/useGenres"
 
-const SongsContainer = ({ songs = [] }) => {
-  const tabs = ["All", "Published", "Under Review", "Scheduled", "Rejected", "My Songs"]
-  const activeTab = "All"
+const STATUS_TABS = ["All", "Draft", "Active", "Archived"]
+const SEARCH_DEBOUNCE_MS = 300
+
+const SongsContainer = () => {
+  const selectedStatus = useAdminDashboardMusicStore((state) => state.selectedStatus)
+  const setSelectedStatus = useAdminDashboardMusicStore((state) => state.setSelectedStatus)
+  const selectedGenre = useAdminDashboardMusicStore((state) => state.selectedGenre)
+  const setSelectedGenre = useAdminDashboardMusicStore((state) => state.setSelectedGenre)
+  const searchQuery = useAdminDashboardMusicStore((state) => state.searchQuery)
+  const setSearchQuery = useAdminDashboardMusicStore((state) => state.setSearchQuery)
+  const currentPage = useAdminDashboardMusicStore((state) => state.currentPage)
+  const setCurrentPage = useAdminDashboardMusicStore((state) => state.setCurrentPage)
+
+  const [debouncedSearch, setDebouncedSearch] = useState("")
+  useEffect(() => {
+    const timeout = setTimeout(() => setDebouncedSearch(searchQuery.trim()), SEARCH_DEBOUNCE_MS)
+    return () => clearTimeout(timeout)
+  }, [searchQuery])
+
+  const { data: genres = [] } = useGenres()
+  const genreOptions = [
+    { value: "all", label: "All Genres" },
+    ...genres.map((genre) => ({ value: genre._id, label: genre.name })),
+  ]
+
+  const params = {
+    page: currentPage,
+    limit: SONGS_PAGE_SIZE,
+    ...(selectedStatus !== "all" && { status: selectedStatus }),
+    ...(selectedGenre !== "all" && { genre: selectedGenre }),
+    ...(debouncedSearch && { q: debouncedSearch }),
+  }
+
+  const { data, isLoading, isError, error, refetch } = useSongs(params)
+  const songs = data?.data ?? []
+  const total = data?.total ?? 0
+  const totalPages = Math.ceil(total / SONGS_PAGE_SIZE) || 1
+
   const columns = getSongsColumns()
 
   return (
@@ -18,35 +62,65 @@ const SongsContainer = ({ songs = [] }) => {
         <>
           {/* Tab pills */}
           <CommonFilter
-            tabs={tabs}
-            activeTab={activeTab}
+            tabs={STATUS_TABS}
+            activeTab={STATUS_TABS.find((tab) => tab.toLowerCase() === selectedStatus) || "All"}
+            onChange={(tab) => setSelectedStatus(tab.toLowerCase())}
           />
 
-          {/* Search Input */}
-          <CommonSearch />
+          <div className="flex items-center gap-3 w-full md:w-auto shrink-0 flex-wrap">
+            <CommonSelect
+              value={selectedGenre}
+              onChange={setSelectedGenre}
+              options={genreOptions}
+              className="w-44 h-8 px-4 text-[12px] border-border bg-transparent"
+            />
+            <CommonSearch
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search songs..."
+              className="flex-1 md:w-72"
+            />
+            <UploadNewSongDialog />
+          </div>
         </>
       }
     >
-      {/* Desktop view */}
-      <div className="hidden md:block">
-        <DataTable
-          columns={columns}
-          data={songs}
-        />
-      </div>
+      {isLoading ? (
+        <div className="flex items-center justify-center py-16">
+          <Spinner className="size-6 text-secondary" />
+        </div>
+      ) : isError ? (
+        <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
+          <span className="text-red-error text-sm">{error?.message || "Failed to load songs."}</span>
+          <Button variant="outline" size="sm" onClick={() => refetch()}>
+            Retry
+          </Button>
+        </div>
+      ) : (
+        <>
+          {/* Desktop view */}
+          <div className="hidden md:block">
+            <DataTable
+              columns={columns}
+              data={songs}
+            />
+          </div>
 
-      {/* Mobile view */}
-      <div className="block md:hidden">
-        <SongsCardsContainer songs={songs} />
-      </div>
+          {/* Mobile view */}
+          <div className="block md:hidden">
+            <SongsCardsContainer songs={songs} />
+          </div>
 
-      {/* Pagination Bar */}
-      <CommonPagination
-        currentPage={1}
-        totalItems={songs.length || 12}
-        pageSize={5}
-        totalPages={Math.ceil((songs.length || 12) / 5)}
-      />
+          {/* Pagination Bar */}
+          <CommonPagination
+            currentPage={currentPage}
+            totalItems={total}
+            pageSize={SONGS_PAGE_SIZE}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        </>
+      )}
     </CommonTableContainer>
   )
 }

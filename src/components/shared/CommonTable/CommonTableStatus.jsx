@@ -35,6 +35,21 @@ const CommonTableStatus = ({ status, className }) => {
           Take Down
         </span>
       )}
+      {status === "active" && (
+        <span className="border border-green-success/20 bg-green-success/10 text-green-success text-[12px] font-normal px-2.5 py-0.5 rounded-full select-none capitalize">
+          Active
+        </span>
+      )}
+      {status === "draft" && (
+        <span className="border border-white/10 bg-white/[0.05] text-light-gray text-[12px] font-normal px-2.5 py-0.5 rounded-full select-none capitalize">
+          Draft
+        </span>
+      )}
+      {status === "archived" && (
+        <span className="border border-yellow-warning/20 bg-yellow-warning/10 text-yellow-warning text-[12px] font-normal px-2.5 py-0.5 rounded-full select-none capitalize">
+          Archived
+        </span>
+      )}
     </div>
   )
 }

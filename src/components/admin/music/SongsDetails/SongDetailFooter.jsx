@@ -4,17 +4,20 @@ import React from "react"
 import { Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DialogClose } from "@/components/ui/dialog"
+import DeleteSongDialog from "@/components/dialogs/admin/music/DeleteSongDialog"
 
-const SongDetailFooter = () => {
+const SongDetailFooter = ({ song }) => {
     return (
         <div className="p-4 border-t border-white/5 mt-auto shrink-0 bg-card">
             <div className="flex items-center justify-between w-full">
-                <Button
-                    className="bg-red-error/10 hover:bg-red-error/20 border border-red-error/20 text-red-error font-medium rounded-[10px] px-4 h-10 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
-                >
-                    <Trash2 className="w-4 h-4" />
-                    Delete
-                </Button>
+                <DeleteSongDialog song={song}>
+                    <Button
+                        className="bg-red-error/10 hover:bg-red-error/20 border border-red-error/20 text-red-error font-medium rounded-[10px] px-4 h-10 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                        Delete
+                    </Button>
+                </DeleteSongDialog>
 
                 <DialogClose asChild>
                     <Button

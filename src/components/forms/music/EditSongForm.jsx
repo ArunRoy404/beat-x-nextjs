@@ -1,205 +1,96 @@
 "use client"
 
-import React from "react"
-import { useForm, Controller } from "react-hook-form"
+import React, { useState } from "react"
+import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { editSongSchema } from "@/zodSchema/UploadNewSongZodSchema"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { DialogClose } from "@/components/ui/dialog"
-import { CheckCircle2, Clock, FileText } from "lucide-react"
 import { toast } from "sonner"
-import { useAdminDashboardMusicStore } from "@/zustandStore/admin/adminStore/adminDashboardMusicStore"
-
+import { Button } from "@/components/ui/button"
+import { DialogClose } from "@/components/ui/dialog"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
-import CommonAudioInput from "@/components/shared/CommonInputs/CommonAudioInput/CommonAudioInput"
-import CommonImageUpload from "@/components/shared/CommonInputs/CommonImageUpload/CommonImageUpload"
-import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
-import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSelect"
-import CommonCalender from "@/components/shared/CommonInputs/CommonInput/CommonCalender"
-import CommonSelectCards from "@/components/shared/CommonInputs/CommonInput/CommonSelectCards"
-import CommonInputContainer from "@/components/shared/CommonInputs/CommonInput/CommonInputContainer"
+import { useUpdateSong } from "@/hooks/api/admin/songs/useUpdateSong"
+import { songSchema } from "./adminSongSchema"
+import AdminSongFormFields from "./AdminSongFormFields"
 
-const GENRES = ["Pop", "Hip Hop", "Electronic", "Rock", "Lofi", "Jazz", "R&B"]
-
-const VISIBILITY_OPTIONS = [
-    { value: "publish", label: "Publish Now", icon: CheckCircle2 },
-    { value: "schedule", label: "Schedule", icon: Clock },
-    { value: "draft", label: "Save as Draft", icon: FileText },
-]
+const getDefaultVisibility = (song) => {
+    if (song?.status === "active") return "publish"
+    if (song?.status === "draft" && song?.scheduledAt) return "schedule"
+    return "draft"
+}
 
 const EditSongForm = ({ song, onSuccess, onCancel }) => {
-    const updateSong = useAdminDashboardMusicStore((state) => state.updateSong)
+    const [audio, setAudio] = useState(song?.audioKey ? "Existing audio" : null)
+    const [cover, setCover] = useState(song?.coverUrl || null)
+
+    const { mutate: updateSong, isPending } = useUpdateSong()
 
     const {
         register,
         handleSubmit,
         control,
-        setValue,
-        reset,
+        watch,
         formState: { errors },
     } = useForm({
-        resolver: zodResolver(editSongSchema),
+        resolver: zodResolver(songSchema),
         defaultValues: {
-            audioFile: song?.audio || "Audio file",
-            coverImage: song?.cover || null,
-            songTitle: song?.title || "",
-            artist: song?.artist || "TAHSIN",
-            album: song?.album || "",
-            genre: song?.genre || "",
-            releaseDate: song?.released && song.released !== "-" ? new Date(song.released) : null,
-            description: song?.description || "",
-            visibility: song?.status === "Published" 
-                ? "publish" 
-                : song?.status === "Scheduled" 
-                  ? "schedule" 
-                  : "draft",
-            isExplicit: song?.isExplicit || false,
+            title: song?.title || "",
+            artist: song?.artist || "",
+            genre: song?.genre?._id || (typeof song?.genre === "string" ? song.genre : ""),
+            explicit: song?.explicit || false,
+            isFeatured: song?.isFeatured || false,
+            isTrending: song?.isTrending || false,
+            trendDirection: song?.trendDirection || "",
+            visibility: getDefaultVisibility(song),
+            scheduledAt: song?.scheduledAt ? new Date(song.scheduledAt) : undefined,
         },
     })
 
     const onSubmit = (data) => {
-        console.log("Updated Song Data:", data)
-        updateSong(song.id, data)
-        toast.success("Song updated successfully!")
-        onSuccess?.()
-    }
+        const formData = new FormData()
+        formData.append("title", data.title)
+        formData.append("artist", data.artist)
+        formData.append("genre", data.genre)
+        formData.append("explicit", String(data.explicit))
+        formData.append("isFeatured", String(data.isFeatured))
+        formData.append("isTrending", String(data.isTrending))
+        if (data.trendDirection) formData.append("trendDirection", data.trendDirection)
 
-    const onInvalid = (validationErrors) => {
-        const errorKeys = Object.keys(validationErrors)
-        if (errorKeys.length > 0) {
-            toast.error(validationErrors[errorKeys[0]].message)
+        // Editing content shouldn't silently un-archive a taken-down song —
+        // that's what the dedicated Restore action is for.
+        const status = song?.status === "archived" ? "archived" : (data.visibility === "publish" ? "active" : "draft")
+        formData.append("status", status)
+        if (data.visibility === "schedule" && data.scheduledAt) {
+            formData.append("scheduledAt", data.scheduledAt.toISOString())
         }
+
+        if (audio instanceof File) formData.append("audio", audio)
+        if (cover instanceof File) formData.append("cover", cover)
+
+        updateSong(
+            { id: song._id, formData },
+            {
+                onSuccess: (result) => {
+                    toast.success(result?.trackingId ? "Song updated — processing new audio now." : "Song updated successfully!")
+                    onSuccess?.()
+                },
+                onError: (error) => toast.error(error?.message || "Failed to update song."),
+            }
+        )
     }
 
     return (
-        <CommonFormContainer onSubmit={handleSubmit(onSubmit, onInvalid)}>
-            {/* Audio Dropzone */}
-            <Controller
-                name="audioFile"
+        <CommonFormContainer onSubmit={handleSubmit(onSubmit)}>
+            <AdminSongFormFields
+                register={register}
                 control={control}
-                render={({ field }) => (
-                    <CommonAudioInput
-                        value={field.value}
-                        onChange={(file) => setValue("audioFile", file, { shouldValidate: true })}
-                        error={errors.audioFile?.message}
-                    />
-                )}
+                errors={errors}
+                watch={watch}
+                audio={audio}
+                onAudioChange={setAudio}
+                cover={cover}
+                onCoverChange={setCover}
             />
 
-            {/* Cover Art Dropzone */}
-            <Controller
-                name="coverImage"
-                control={control}
-                render={({ field }) => (
-                    <CommonImageUpload
-                        value={field.value}
-                        onChange={(file) => setValue("coverImage", file, { shouldValidate: true })}
-                        error={errors.coverImage?.message}
-                    />
-                )}
-            />
-
-            {/* Song Title Input */}
-            <CommonInput
-                label="Song Title"
-                placeholder="Enter song title..."
-                {...register("songTitle")}
-                error={errors.songTitle?.message}
-            />
-
-            {/* Artist & Album inputs */}
-            <CommonInputContainer>
-                <CommonInput
-                    label="Artist"
-                    placeholder="Artist name"
-                    {...register("artist")}
-                    error={errors.artist?.message}
-                />
-
-                <CommonInput
-                    label="Album"
-                    placeholder="Album name (optional)"
-                    {...register("album")}
-                    error={errors.album?.message}
-                />
-            </CommonInputContainer>
-
-            {/* Genre & Release Date picker */}
-            <CommonInputContainer>
-                <Controller
-                    name="genre"
-                    control={control}
-                    render={({ field }) => (
-                        <CommonSelect
-                            label="Genre"
-                            placeholder="Select genre"
-                            value={field.value}
-                            onChange={field.onChange}
-                            options={GENRES}
-                            error={errors.genre?.message}
-                        />
-                    )}
-                />
-
-                <Controller
-                    name="releaseDate"
-                    control={control}
-                    render={({ field }) => (
-                        <CommonCalender
-                            label="Release Date"
-                            placeholder="Choose Date"
-                            value={field.value}
-                            onChange={field.onChange}
-                            error={errors.releaseDate?.message}
-                        />
-                    )}
-                />
-            </CommonInputContainer>
-
-            {/* Song Description */}
-            <CommonInput
-                label="Song Description"
-                type="textarea"
-                placeholder="Type a short description..."
-                {...register("description")}
-                error={errors.description?.message}
-            />
-
-            {/* Visibility Section */}
-            <Controller
-                name="visibility"
-                control={control}
-                render={({ field }) => (
-                    <CommonSelectCards
-                        label="Visibility"
-                        value={field.value}
-                        onChange={field.onChange}
-                        options={VISIBILITY_OPTIONS}
-                        error={errors.visibility?.message}
-                    />
-                )}
-            />
-
-            {/* Explicit Content Toggle using Shadcn Switch */}
-            <Controller
-                name="isExplicit"
-                control={control}
-                render={({ field }) => (
-                    <div className="flex items-center justify-between py-2 border-t border-b border-whitetext/5 shrink-0">
-                        <span className="text-light-gray text-[16px] not-italic font-medium font-sans">
-                            Explicit Content
-                        </span>
-                        <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            className="data-checked:bg-secondary data-unchecked:bg-light-gray/20"
-                        />
-                    </div>
-                )}
-            />
-
-            {/* Footer Actions - ONLY Cancel and Save Changes */}
+            {/* Footer Actions */}
             <div className="flex items-center gap-4 mt-2 shrink-0">
                 <DialogClose asChild className="flex-1 w-full">
                     <Button
@@ -217,6 +108,7 @@ const EditSongForm = ({ song, onSuccess, onCancel }) => {
                     variant="gradient"
                     className="flex-1"
                     size="lg"
+                    isLoading={isPending}
                 >
                     Save Changes
                 </Button>

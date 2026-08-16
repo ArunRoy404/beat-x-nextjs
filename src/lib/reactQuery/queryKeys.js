@@ -23,4 +23,9 @@ export const queryKeys = {
     list: (params) => [...queryKeys.audiobooks.all, "list", params],
     detail: (id) => [...queryKeys.audiobooks.all, "detail", id],
   },
+  music: {
+    all: ["music"],
+    list: (params) => [...queryKeys.music.all, "list", params],
+    detail: (id) => [...queryKeys.music.all, "detail", id],
+  },
 };
