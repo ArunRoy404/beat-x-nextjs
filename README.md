@@ -192,7 +192,7 @@ All application state is managed through **Zustand stores** with mock data initi
 - `adminDashboardOverviewStore` — Dashboard greeting, stats, charts, activity
 - `adminDashboardMusicStore` — Songs list, stats, CRUD operations
 - `adminDashboardAlbumsStore` — Albums list, stats, CRUD + track management
-- `adminDashboardGenreStore` — Genres list, stats, CRUD
+- `adminDashboardGenreStore` — Genres list UI state (search/pagination); list data comes from `useGenres()`/`useSearchGenres()` (React Query)
 - `adminDashboardAnalyticsStore` — Analytics data and stats
 - `adminDashboardUsersStore` — Users list UI state (filter/search/pagination); list data comes from `useUsers()` (React Query)
 - `songDetailsAnalyticsStore` — Per-song analytics data

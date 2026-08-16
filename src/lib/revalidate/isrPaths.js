@@ -5,4 +5,5 @@
  */
 export const isrPaths = [
   "/admin/dashboard/users",
+  "/admin/dashboard/genre",
 ];
