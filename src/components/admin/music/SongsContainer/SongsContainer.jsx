@@ -9,7 +9,6 @@ import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSel
 import CommonPagination from "@/components/shared/CommonPagination/CommonPagination"
 import CommonTableContainer from "@/components/shared/CommonTable/CommonTableContainer"
 import SongsCardsContainer from "./SongsCardsContainer"
-import UploadNewSongDialog from "@/components/dialogs/admin/music/UploadNewSongDialog"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { useUrlListParams } from "@/hooks/useUrlListParams"
@@ -84,7 +83,6 @@ const SongsContainer = () => {
               placeholder="Search songs..."
               className="flex-1 md:w-72"
             />
-            <UploadNewSongDialog />
           </div>
         </>
       }

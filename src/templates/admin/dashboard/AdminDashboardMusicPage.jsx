@@ -2,6 +2,7 @@
 
 import React from "react"
 import DashboardStats from "@/components/shared/Dashboard/DashboardStats/DashboardStats"
+import UploadNewSong from "@/components/admin/music/UploadNewSong"
 import SongsContainer from "@/components/admin/music/SongsContainer/SongsContainer"
 import { useSongs } from "@/hooks/api/admin/songs/useSongs"
 import { buildSongsParams } from "@/hooks/api/admin/songs/songsParams"
@@ -29,6 +30,9 @@ const AdminDashboardMusicPage = () => {
     <div className="flex flex-col gap-6 w-full pb-8">
       {/* Upper Stats grid */}
       <DashboardStats statsCards={statsCards} />
+
+      {/* Upload song selector container */}
+      <UploadNewSong />
 
       {/* Songs table / collection container */}
       <SongsContainer />

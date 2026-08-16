@@ -2,6 +2,7 @@
 
 import React from "react"
 import DashboardStats from "@/components/shared/Dashboard/DashboardStats/DashboardStats"
+import UploadNewAudioBook from "@/components/admin/audiobooks/UploadNewAudioBook"
 import AudioBooksContainer from "@/components/admin/audiobooks/AudioBooksContainer"
 import { useAudioBooks } from "@/hooks/api/admin/audiobooks/useAudioBooks"
 import { buildAudioBooksParams } from "@/hooks/api/admin/audiobooks/audioBooksParams"
@@ -29,6 +30,9 @@ const AdminDashboardAudioBooksPage = () => {
     <div className="flex flex-col gap-6 w-full pb-8">
       {/* Upper Stats grid */}
       <DashboardStats statsCards={statsCards} />
+
+      {/* Upload audiobook selector container */}
+      <UploadNewAudioBook />
 
       {/* Audiobooks grid container */}
       <AudioBooksContainer />
