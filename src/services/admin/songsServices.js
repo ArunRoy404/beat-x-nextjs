@@ -18,8 +18,8 @@ export async function getSongDetailRequest({ id }) {
 }
 
 // Async: the backend accepts the audio upload and immediately returns a
-// trackingId — actual processing/transcode progress is tracked separately
-// via GET /uploads/:trackingId/progress (SSE, see useUploadProgress).
+// trackingId; the song record exists right away, audio processing finishes
+// server-side and updates on its own via the periodic refetch.
 export async function createSongRequest(formData) {
   const res = await axiosPrivate.post("/admin/songs", formData);
   return res.data.data;

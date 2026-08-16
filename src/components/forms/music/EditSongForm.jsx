@@ -36,9 +36,6 @@ const EditSongForm = ({ song, onSuccess, onCancel }) => {
             artist: song?.artist || "",
             genre: song?.genre?._id || (typeof song?.genre === "string" ? song.genre : ""),
             explicit: song?.explicit || false,
-            isFeatured: song?.isFeatured || false,
-            isTrending: song?.isTrending || false,
-            trendDirection: song?.trendDirection || "",
             visibility: getDefaultVisibility(song),
             scheduledAt: song?.scheduledAt ? new Date(song.scheduledAt) : undefined,
         },
@@ -50,9 +47,6 @@ const EditSongForm = ({ song, onSuccess, onCancel }) => {
         formData.append("artist", data.artist)
         formData.append("genre", data.genre)
         formData.append("explicit", String(data.explicit))
-        formData.append("isFeatured", String(data.isFeatured))
-        formData.append("isTrending", String(data.isTrending))
-        if (data.trendDirection) formData.append("trendDirection", data.trendDirection)
 
         // Editing content shouldn't silently un-archive a taken-down song —
         // that's what the dedicated Restore action is for.

@@ -3,12 +3,10 @@
 import React, { useState } from "react"
 import { Play as PlayIcon, Pencil, Trash2, Check, X } from "lucide-react"
 import { toast } from "sonner"
-import { useQueryClient } from "@tanstack/react-query"
 import { formatDurationMs } from "@/lib/format/formatDuration"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import { useUpdateChapter } from "@/hooks/api/admin/audiobooks/useUpdateChapter"
 import { useDeleteChapter } from "@/hooks/api/admin/audiobooks/useDeleteChapter"
-import { queryKeys } from "@/lib/reactQuery/queryKeys"
 
 const ChapterRow = ({ audiobookId, chapter, index }) => {
     const [isEditing, setIsEditing] = useState(false)
@@ -18,7 +16,6 @@ const ChapterRow = ({ audiobookId, chapter, index }) => {
 
     const { mutate: updateChapter, isPending: isUpdating } = useUpdateChapter()
     const { mutate: deleteChapter, isPending: isDeleting } = useDeleteChapter()
-    const queryClient = useQueryClient()
 
     const handleSave = () => {
         const formData = new FormData()
@@ -29,7 +26,6 @@ const ChapterRow = ({ audiobookId, chapter, index }) => {
             { audiobookId, chapterId: chapter._id, formData },
             {
                 onSuccess: () => {
-                    queryClient.invalidateQueries({ queryKey: queryKeys.audiobooks.detail(audiobookId) })
                     toast.success("Chapter updated!")
                     setIsEditing(false)
                 },

@@ -31,8 +31,8 @@ export async function deleteAudioBookRequest({ id }) {
 }
 
 // Async: the backend accepts the audio upload and immediately returns a
-// trackingId — actual processing/transcode progress is tracked separately
-// via GET /uploads/:uploadId/progress (SSE, see useUploadProgress).
+// trackingId; audio processing/transcoding finishes server-side and the
+// chapter's transcodeStatus updates on its own via the periodic refetch.
 export async function createChapterRequest({ audiobookId, formData }) {
   const res = await axiosPrivate.post(`/admin/audiobooks/${audiobookId}/chapters`, formData);
   return res.data.data;

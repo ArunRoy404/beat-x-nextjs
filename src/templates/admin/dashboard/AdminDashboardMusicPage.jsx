@@ -6,8 +6,10 @@ import SongsContainer from "@/components/admin/music/SongsContainer/SongsContain
 import { useSongs, DEFAULT_SONGS_PARAMS } from "@/hooks/api/admin/songs/useSongs"
 
 const AdminDashboardMusicPage = () => {
+  // Only reads the same query the SSR page already prefetched — an extra,
+  // un-prefetched query here would have to fetch client-side after mount
+  // and show a loading state, unlike genre's single-query stats pattern.
   const { data: allData } = useSongs(DEFAULT_SONGS_PARAMS)
-  const { data: activeData } = useSongs({ page: 1, limit: 1, status: "active" })
 
   const statsCards = [
     {
@@ -17,14 +19,6 @@ const AdminDashboardMusicPage = () => {
       icon: "Music",
       iconColor: "#3ADFFA",
       iconBg: "rgba(58, 223, 250, 0.15)"
-    },
-    {
-      id: 2,
-      title: "Active",
-      value: (activeData?.total ?? 0).toLocaleString(),
-      icon: "CheckCircle",
-      iconColor: "#34C759",
-      iconBg: "rgba(52, 199, 89, 0.15)"
     }
   ]
 

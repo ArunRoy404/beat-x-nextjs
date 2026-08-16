@@ -19,12 +19,6 @@ const VISIBILITY_OPTIONS = [
     { value: "draft", label: "Save as Draft", icon: FileText },
 ]
 
-const TREND_DIRECTION_OPTIONS = [
-    { value: "up", label: "Up" },
-    { value: "down", label: "Down" },
-    { value: "stable", label: "Stable" },
-]
-
 const AdminSongFormFields = ({
     register,
     control,
@@ -41,7 +35,6 @@ const AdminSongFormFields = ({
     const genreOptions = genres.map((genre) => ({ value: genre._id, label: genre.name }))
 
     const visibility = watch("visibility")
-    const isTrending = watch("isTrending")
 
     return (
         <>
@@ -108,55 +101,16 @@ const AdminSongFormFields = ({
                 />
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border border-white/10 rounded-[16px] p-4">
-                <Controller
-                    name="explicit"
-                    control={control}
-                    render={({ field }) => (
-                        <div className="flex items-center justify-between gap-3">
-                            <span className="text-whitetext text-[13px] font-medium">Explicit</span>
-                            <Switch checked={field.value} onCheckedChange={field.onChange} />
-                        </div>
-                    )}
-                />
-                <Controller
-                    name="isFeatured"
-                    control={control}
-                    render={({ field }) => (
-                        <div className="flex items-center justify-between gap-3">
-                            <span className="text-whitetext text-[13px] font-medium">Featured</span>
-                            <Switch checked={field.value} onCheckedChange={field.onChange} />
-                        </div>
-                    )}
-                />
-                <Controller
-                    name="isTrending"
-                    control={control}
-                    render={({ field }) => (
-                        <div className="flex items-center justify-between gap-3">
-                            <span className="text-whitetext text-[13px] font-medium">Trending</span>
-                            <Switch checked={field.value} onCheckedChange={field.onChange} />
-                        </div>
-                    )}
-                />
-            </div>
-
-            {isTrending && (
-                <Controller
-                    name="trendDirection"
-                    control={control}
-                    render={({ field }) => (
-                        <CommonSelect
-                            label="Trend Direction"
-                            placeholder="Select direction"
-                            value={field.value}
-                            onChange={field.onChange}
-                            options={TREND_DIRECTION_OPTIONS}
-                            error={errors.trendDirection?.message}
-                        />
-                    )}
-                />
-            )}
+            <Controller
+                name="explicit"
+                control={control}
+                render={({ field }) => (
+                    <div className="flex items-center justify-between py-2 border-t border-b border-white/5">
+                        <span className="text-whitetext text-[13px] font-medium">Explicit Content</span>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </div>
+                )}
+            />
         </>
     )
 }
