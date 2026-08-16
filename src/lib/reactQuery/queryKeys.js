@@ -9,4 +9,8 @@ export const queryKeys = {
     all: ["auth"],
     me: () => [...queryKeys.auth.all, "me"],
   },
+  users: {
+    all: ["users"],
+    list: () => [...queryKeys.users.all, "list"],
+  },
 };

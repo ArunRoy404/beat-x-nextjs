@@ -1,62 +1,54 @@
 "use client"
 
 import React from "react"
-import { useForm, Controller } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
-import { useAdminDashboardUsersStore } from "@/zustandStore/admin/adminStore/adminDashboardUsersStore"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
-import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSelect"
 
 const inviteSchema = z.object({
+    name: z.string().min(1, "Name is required"),
     email: z.string().email("Invalid email address").min(1, "Email is required"),
-    role: z.string().min(1, "Role is required"),
-    plan: z.string().min(1, "Plan is required"),
 })
 
-const InviteUserForm = ({ onSuccess, onCancel }) => {
-    const addUser = useAdminDashboardUsersStore((state) => state.addUser)
-
+const InviteUserForm = ({ onCancel }) => {
     const {
         register,
         handleSubmit,
-        control,
         reset,
         formState: { errors },
     } = useForm({
         resolver: zodResolver(inviteSchema),
         defaultValues: {
+            name: "",
             email: "",
-            role: "",
-            plan: "",
         },
     })
 
-    const onSubmit = (data) => {
-        // Generate a readable name from the email
-        const emailPrefix = data.email.split("@")[0]
-        const generatedName = emailPrefix
-            .split(/[-._]/)
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(" ")
-
-        addUser({
-            name: generatedName,
-            email: data.email,
-            role: data.role,
-            plan: data.plan,
-            status: "Active",
-        })
-        toast.success("User invited successfully!")
+    // No invite/create endpoint exists yet — wire this to a real mutation once one does.
+    const onSubmit = () => {
+        toast.warning("Inviting users isn't connected to an API yet.")
         reset()
-        onSuccess?.()
     }
 
     return (
         <CommonFormContainer onSubmit={handleSubmit(onSubmit)}>
+            {/* Name */}
+            <div className="flex flex-col gap-2 shrink-0">
+                <label className="text-[#A175FF] text-[14px] font-medium font-sans">
+                    Name
+                </label>
+                <CommonInput
+                    placeholder="Full name"
+                    className="rounded-full bg-white/[0.03] border-white/10"
+                    {...register("name")}
+                    error={errors.name?.message}
+                />
+            </div>
+
             {/* Email Address */}
             <div className="flex flex-col gap-2 shrink-0">
                 <label className="text-[#A175FF] text-[14px] font-medium font-sans">
@@ -68,49 +60,6 @@ const InviteUserForm = ({ onSuccess, onCancel }) => {
                     {...register("email")}
                     error={errors.email?.message}
                 />
-            </div>
-
-            {/* Role & Initial Plan Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 shrink-0">
-                {/* Role */}
-                <div className="flex flex-col gap-2 shrink-0">
-                    <label className="text-[#A175FF] text-[14px] font-medium font-sans">
-                        Role
-                    </label>
-                    <Controller
-                        name="role"
-                        control={control}
-                        render={({ field }) => (
-                            <CommonSelect
-                                value={field.value}
-                                onChange={field.onChange}
-                                placeholder="Select Role"
-                                options={["User", "Admin"]}
-                                error={errors.role?.message}
-                            />
-                        )}
-                    />
-                </div>
-
-                {/* Plan */}
-                <div className="flex flex-col gap-2 shrink-0">
-                    <label className="text-[#A175FF] text-[14px] font-medium font-sans">
-                        Initial Plan
-                    </label>
-                    <Controller
-                        name="plan"
-                        control={control}
-                        render={({ field }) => (
-                            <CommonSelect
-                                value={field.value}
-                                onChange={field.onChange}
-                                placeholder="Select plan"
-                                options={["Free", "Premium", "Family", "Student"]}
-                                error={errors.plan?.message}
-                            />
-                        )}
-                    />
-                </div>
             </div>
 
             {/* Footer Buttons */}

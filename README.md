@@ -194,7 +194,7 @@ All application state is managed through **Zustand stores** with mock data initi
 - `adminDashboardAlbumsStore` — Albums list, stats, CRUD + track management
 - `adminDashboardGenreStore` — Genres list, stats, CRUD
 - `adminDashboardAnalyticsStore` — Analytics data and stats
-- `adminDashboardUsersStore` — Users list, stats, CRUD
+- `adminDashboardUsersStore` — Users list UI state (filter/search/pagination); list data comes from `useUsers()` (React Query)
 - `songDetailsAnalyticsStore` — Per-song analytics data
 
 ### Component Hierarchy

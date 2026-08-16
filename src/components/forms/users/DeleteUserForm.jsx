@@ -7,7 +7,6 @@ import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Trash2, Lock } from "lucide-react"
 import { toast } from "sonner"
-import { useAdminDashboardUsersStore } from "@/zustandStore/admin/adminStore/adminDashboardUsersStore"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 
@@ -15,9 +14,7 @@ const deleteSchema = z.object({
     password: z.string().min(1, "Password is required"),
 })
 
-const DeleteUserForm = ({ user, onSuccess, onCancel }) => {
-    const deleteUser = useAdminDashboardUsersStore((state) => state.deleteUser)
-
+const DeleteUserForm = ({ onCancel }) => {
     const {
         register,
         handleSubmit,
@@ -30,15 +27,10 @@ const DeleteUserForm = ({ user, onSuccess, onCancel }) => {
         },
     })
 
-    const onSubmit = (data) => {
-        if (data.password !== "admin") {
-            toast.error("Incorrect password! (Use 'admin' to delete)")
-            return
-        }
-        deleteUser(user.id)
-        toast.success("User deleted successfully!")
+    // No delete endpoint exists yet — wire this to a real mutation once one does.
+    const onSubmit = () => {
+        toast.warning("Deleting users isn't connected to an API yet.")
         reset()
-        onSuccess?.()
     }
 
     return (

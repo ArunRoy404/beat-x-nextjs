@@ -9,7 +9,8 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Mail, MapPin, Calendar, Headphones, Music, Package, Ticket, Pencil, Trash2 } from "lucide-react"
+import { Mail, Calendar, Coins, Music, Mic2, Video, Pencil, Trash2 } from "lucide-react"
+import { format } from "date-fns"
 import CommonAvatar from "@/components/shared/CommonAvatar"
 import CommonCard from "@/components/shared/CommonCard/CommonCard"
 
@@ -18,21 +19,13 @@ const UserDetailsDialog = ({ user, children }) => {
 
     if (!user) return null
 
-    const statusColors = {
-        Active: "text-[#34C759] border-[#34C759]/25 bg-[#34C759]/10",
-        Rejected: "text-[#FF453A] border-[#FF453A]/25 bg-[#FF453A]/10",
-        Pending: "text-[#FFCC00] border-[#FFCC00]/25 bg-[#FFCC00]/10"
-    }
+    const verifiedClass = user.isVerified
+        ? "text-[#34C759] border-[#34C759]/25 bg-[#34C759]/10"
+        : "text-[#FFCC00] border-[#FFCC00]/25 bg-[#FFCC00]/10"
 
-    const planColors = {
-        Premium: "text-[#3ADFFA] border-[#3ADFFA]/25 bg-[#3ADFFA]/10",
-        Family: "text-[#CC97FF] border-[#CC97FF]/25 bg-[#CC97FF]/10",
-        Student: "text-[#E5F97D] border-[#E5F97D]/25 bg-[#E5F97D]/10",
-        Free: "text-white/40 border-white/10 bg-white/5"
-    }
-
-    const statusClass = statusColors[user.status] || statusColors.Pending
-    const planClass = planColors[user.plan] || planColors.Free
+    const providerLabel = user.provider
+        ? user.provider.charAt(0).toUpperCase() + user.provider.slice(1)
+        : "-"
 
     // Get initials for avatar fallback
     const getInitials = (name) => {
@@ -40,7 +33,7 @@ const UserDetailsDialog = ({ user, children }) => {
         return name
             .split(" ")
             .map((n) => n[0])
-            .join("") 
+            .join("")
             .toUpperCase()
             .slice(0, 2)
     }
@@ -78,13 +71,13 @@ const UserDetailsDialog = ({ user, children }) => {
                             <div className="flex flex-col gap-1.5">
                                 <div className="flex items-center flex-wrap gap-2.5">
                                     <span className="text-whitetext text-[18px] font-bold tracking-tight">
-                                        {user.name.toUpperCase()}
+                                        {user.name?.toUpperCase()}
                                     </span>
-                                    <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${planClass}`}>
-                                        {user.plan}
+                                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium border text-light-gray border-white/10 bg-white/5">
+                                        {providerLabel}
                                     </span>
-                                    <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${statusClass}`}>
-                                        {user.status}
+                                    <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${verifiedClass}`}>
+                                        {user.isVerified ? "Verified" : "Unverified"}
                                     </span>
                                 </div>
 
@@ -94,12 +87,8 @@ const UserDetailsDialog = ({ user, children }) => {
                                         {user.email}
                                     </span>
                                     <span className="flex items-center gap-1">
-                                        <MapPin className="w-3.5 h-3.5 shrink-0" />
-                                        {user.location || "Bangladesh"}
-                                    </span>
-                                    <span className="flex items-center gap-1">
                                         <Calendar className="w-3.5 h-3.5 shrink-0" />
-                                        Joined : {user.joined}
+                                        Joined : {user.createdAt ? format(new Date(user.createdAt), "MMM d, yyyy") : "-"}
                                     </span>
                                 </div>
                             </div>
@@ -119,7 +108,7 @@ const UserDetailsDialog = ({ user, children }) => {
                                 size="sm"
                                 className="rounded-lg h-9 border-red-error/20 bg-[#FF453A]/10 text-[#FF453A] hover:bg-[#FF453A]/20 gap-1.5 px-3 font-semibold text-xs cursor-pointer border-0"
                             >
-                                Suspend Artist
+                                Suspend User
                             </Button>
                             <Button
                                 variant="outline"
@@ -133,55 +122,55 @@ const UserDetailsDialog = ({ user, children }) => {
 
                     {/* 4 Stat Cards grid */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {/* Streams Card */}
+                        {/* Coin Balance Card */}
                         <CommonCard className="flex flex-col items-center text-center justify-center gap-2 rounded-[16px]! p-5 bg-[#20201F99]!">
-                            <div className="relative z-10 w-12 h-12 rounded-full bg-[#3ADFFA]/15 border border-[#3ADFFA]/20 text-[#3ADFFA] flex items-center justify-center shrink-0">
-                                <Headphones className="w-5 h-5" />
+                            <div className="relative z-10 w-12 h-12 rounded-full bg-[#E5F97D]/15 border border-[#E5F97D]/20 text-[#E5F97D] flex items-center justify-center shrink-0">
+                                <Coins className="w-5 h-5" />
                             </div>
                             <span className="relative z-10 text-whitetext font-bold text-[24px] leading-tight">
-                                {(user.streams || 0).toLocaleString()}
+                                {(user.coinBalance || 0).toLocaleString()}
                             </span>
                             <span className="relative z-10 text-light-gray/40 text-[12px] font-medium uppercase tracking-wider">
-                                Streams
+                                Coin Balance
                             </span>
                         </CommonCard>
 
-                        {/* Playlist Card */}
+                        {/* Favorite Songs Card */}
                         <CommonCard className="flex flex-col items-center text-center justify-center gap-2 rounded-[16px]! p-5 bg-[#20201F99]!">
-                            <div className="relative z-10 w-12 h-12 rounded-full bg-[#E5F97D]/15 border border-[#E5F97D]/20 text-[#E5F97D] flex items-center justify-center shrink-0">
+                            <div className="relative z-10 w-12 h-12 rounded-full bg-[#3ADFFA]/15 border border-[#3ADFFA]/20 text-[#3ADFFA] flex items-center justify-center shrink-0">
                                 <Music className="w-5 h-5" />
                             </div>
                             <span className="relative z-10 text-whitetext font-bold text-[24px] leading-tight">
-                                {user.playlists || 18}
+                                {(user.favoriteSongs || []).length}
                             </span>
                             <span className="relative z-10 text-light-gray/40 text-[12px] font-medium uppercase tracking-wider">
-                                Playlist
+                                Favorite Songs
                             </span>
                         </CommonCard>
 
-                        {/* Orders Card */}
+                        {/* Favorite Artists Card */}
                         <CommonCard className="flex flex-col items-center text-center justify-center gap-2 rounded-[16px]! p-5 bg-[#20201F99]!">
                             <div className="relative z-10 w-12 h-12 rounded-full bg-[#CC97FF]/15 border border-[#CC97FF]/20 text-[#CC97FF] flex items-center justify-center shrink-0">
-                                <Package className="w-5 h-5" />
+                                <Mic2 className="w-5 h-5" />
                             </div>
                             <span className="relative z-10 text-whitetext font-bold text-[24px] leading-tight">
-                                {user.orders || 18}
+                                {(user.favoriteArtists || []).length}
                             </span>
                             <span className="relative z-10 text-light-gray/40 text-[12px] font-medium uppercase tracking-wider">
-                                Orders
+                                Favorite Artists
                             </span>
                         </CommonCard>
 
-                        {/* Tickets Card */}
+                        {/* Liked Videos Card */}
                         <CommonCard className="flex flex-col items-center text-center justify-center gap-2 rounded-[16px]! p-5 bg-[#20201F99]!">
                             <div className="relative z-10 w-12 h-12 rounded-full bg-[#34C759]/15 border border-[#34C759]/20 text-[#34C759] flex items-center justify-center shrink-0">
-                                <Ticket className="w-5 h-5" />
+                                <Video className="w-5 h-5" />
                             </div>
                             <span className="relative z-10 text-whitetext font-bold text-[24px] leading-tight">
-                                {user.tickets || 18}
+                                {(user.likedVideos || []).length}
                             </span>
                             <span className="relative z-10 text-light-gray/40 text-[12px] font-medium uppercase tracking-wider">
-                                Tickets
+                                Liked Videos
                             </span>
                         </CommonCard>
                     </div>
