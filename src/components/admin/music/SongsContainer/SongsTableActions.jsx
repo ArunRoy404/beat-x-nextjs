@@ -1,30 +1,32 @@
 import React from "react"
-import { Eye, Check, X, Trash2, SquarePen } from "lucide-react"
+import { Eye, Trash2, SquarePen } from "lucide-react"
+import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import EditSongDialog from "@/components/dialogs/admin/music/EditSongDialog"
 import DeleteSongDialog from "@/components/dialogs/admin/music/DeleteSongDialog"
-import SongUnderReviewDialog from "@/components/dialogs/admin/music/SongUnderReviewDialog"
 import SongDetailsDialog from "@/components/dialogs/admin/music/SongDetailsDialog"
+import { useUpdateSongStatus } from "@/hooks/api/admin/songs/useUpdateSongStatus"
 
-const SongsTableActions = ({
-    status,
-    song,
-    onViewDetails,
-    onTakeDown,
-    onRestore,
-    onApprove,
-    onReject,
-    onDelete,
-    className
-}) => {
+const SongsTableActions = ({ status, song, className }) => {
+    const { mutate: updateSongStatus, isPending } = useUpdateSongStatus()
+
+    const handleStatusChange = (nextStatus) => {
+        updateSongStatus(
+            { id: song._id, status: nextStatus },
+            {
+                onSuccess: () => toast.success(nextStatus === "archived" ? "Song taken down." : "Song restored."),
+                onError: (error) => toast.error(error?.message || "Failed to update song status."),
+            }
+        )
+    }
+
     return (
         <div className={cn("flex items-center justify-end gap-3 pr-2", className)}>
-            {/* Conditional status-based actions */}
-            {status === "Published" && (
+            {status === "active" && (
                 <Button
-                    notImplemented
-                    onClick={onTakeDown}
+                    onClick={() => handleStatusChange("archived")}
+                    disabled={isPending}
                     variant="outline"
                     className="text-yellow-warning border border-yellow-warning/20 bg-yellow-warning/10 rounded-full px-3! py-3!"
                 >
@@ -32,10 +34,10 @@ const SongsTableActions = ({
                 </Button>
             )}
 
-            {status === "Take Down" && (
+            {status === "archived" && (
                 <Button
-                    notImplemented
-                    onClick={onRestore}
+                    onClick={() => handleStatusChange("active")}
+                    disabled={isPending}
                     variant="outline"
                     className="text-green-success border border-green-success/20 bg-green-success/10 rounded-full px-3! py-3!"
                 >
@@ -43,55 +45,16 @@ const SongsTableActions = ({
                 </Button>
             )}
 
-            {status === "Under Review" && (
-                <>
-                    <Button
-                        notImplemented
-                        onClick={onApprove}
-                        title="Approve"
-                        size="icon"
-                        variant="outline"
-                        className="text-green-success border border-green-success/20 bg-green-success/10 rounded-full"
-                    >
-                        <Check className="w-3.5 h-3.5 shrink-0" />
-                    </Button>
-                    <Button
-                        notImplemented
-                        onClick={onReject}
-                        title="Reject"
-                        size="icon"
-                        variant="outline"
-                        className="text-red-error border border-red-error/20 bg-red-error/10 rounded-full"
-                    >
-                        <X className="w-3.5 h-3.5 shrink-0" />
-                    </Button>
-                </>
-            )}
-
-            {/* Details circle button */}
-            {status === "Under Review" ? (
-                <SongUnderReviewDialog song={song}>
-                    <Button
-                        title="View Details"
-                        size="icon"
-                        variant="outline"
-                        className="text-secondary border border-secondary/20 bg-secondary/10 rounded-full cursor-pointer"
-                    >
-                        <Eye className="w-3.5 h-3.5 shrink-0" />
-                    </Button>
-                </SongUnderReviewDialog>
-            ) : (
-                <SongDetailsDialog song={song}>
-                    <Button
-                        title="View Details"
-                        size="icon"
-                        variant="outline"
-                        className="text-secondary border border-secondary/20 bg-secondary/10 rounded-full cursor-pointer"
-                    >
-                        <Eye className="w-3.5 h-3.5 shrink-0" />
-                    </Button>
-                </SongDetailsDialog>
-            )}
+            <SongDetailsDialog song={song}>
+                <Button
+                    title="View Details"
+                    size="icon"
+                    variant="outline"
+                    className="text-secondary border border-secondary/20 bg-secondary/10 rounded-full cursor-pointer"
+                >
+                    <Eye className="w-3.5 h-3.5 shrink-0" />
+                </Button>
+            </SongDetailsDialog>
 
             <EditSongDialog song={song}>
                 <Button
@@ -104,8 +67,6 @@ const SongsTableActions = ({
                 </Button>
             </EditSongDialog>
 
-
-            {/* Delete icon */}
             <DeleteSongDialog song={song}>
                 <Button
                     title="Delete Song"

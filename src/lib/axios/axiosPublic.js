@@ -11,6 +11,16 @@ export const axiosPublic = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+axiosPublic.interceptors.request.use((config) => {
+  // Let axios compute the multipart boundary itself instead of sending the
+  // forced "application/json" default from axios.create() above.
+  if (config.data instanceof FormData) {
+    delete config.headers["Content-Type"];
+  }
+
+  return config;
+});
+
 axiosPublic.interceptors.response.use(
   (response) => response,
   (error) => Promise.reject(normalizeAxiosError(error))

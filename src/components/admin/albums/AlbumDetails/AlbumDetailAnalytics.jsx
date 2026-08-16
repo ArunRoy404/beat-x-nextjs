@@ -1,20 +1,20 @@
 "use client"
 
 import React from "react"
-import { useSongDetailsAnalyticsStore } from "@/zustandStore/admin/adminStore/songDetailsAnalyticsStore"
+import { useAlbumDetailsAnalyticsStore } from "@/zustandStore/admin/adminStore/albumDetailsAnalyticsStore"
 import DashboardStats from "@/components/shared/Dashboard/DashboardStats/DashboardStats"
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
 
 const AlbumDetailAnalytics = () => {
-    const songStatsCards = useSongDetailsAnalyticsStore((state) => state.songStatsCards)
-    const songPerformanceData = useSongDetailsAnalyticsStore((state) => state.songPerformanceData)
-    const songPlatformData = useSongDetailsAnalyticsStore((state) => state.songPlatformData)
-    const songCountryData = useSongDetailsAnalyticsStore((state) => state.songCountryData)
+    const albumStatsCards = useAlbumDetailsAnalyticsStore((state) => state.albumStatsCards)
+    const albumPerformanceData = useAlbumDetailsAnalyticsStore((state) => state.albumPerformanceData)
+    const albumPlatformData = useAlbumDetailsAnalyticsStore((state) => state.albumPlatformData)
+    const albumCountryData = useAlbumDetailsAnalyticsStore((state) => state.albumCountryData)
 
     return (
         <div className="p-4 overflow-y-auto flex-1 min-h-0 scrollbar-thin space-y-5">
             {/* Stats Cards */}
-            <DashboardStats statsCards={songStatsCards} className="grid-cols-2! sm:grid-cols-2! lg:grid-cols-2!" />
+            <DashboardStats statsCards={albumStatsCards} className="grid-cols-2! sm:grid-cols-2! lg:grid-cols-2!" />
 
             {/* Performance Chart Card */}
             <div className="relative overflow-hidden rounded-[16px] border border-white/10 p-5 bg-[#0E0E0E]">
@@ -30,7 +30,7 @@ const AlbumDetailAnalytics = () => {
 
                 <div style={{ height: "200px", minHeight: "200px" }} className="w-full z-10 relative">
                     <ResponsiveContainer width="100%" height="100%" minHeight={200} debounce={1000}>
-                        <AreaChart data={songPerformanceData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+                        <AreaChart data={albumPerformanceData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                             <defs>
                                 <linearGradient id="colorAlbumStream" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="5%" stopColor="#3ADFFA" stopOpacity={0.3} />
@@ -96,7 +96,7 @@ const AlbumDetailAnalytics = () => {
                         By Platform
                     </h3>
                     <div className="flex flex-col gap-4 relative z-10">
-                        {songPlatformData.map((plat) => (
+                        {albumPlatformData.map((plat) => (
                             <div key={plat.name} className="flex flex-col gap-1.5">
                                 <div className="flex items-center justify-between text-xs font-medium">
                                     <span className="text-light-gray">{plat.name}</span>
@@ -123,7 +123,7 @@ const AlbumDetailAnalytics = () => {
                         Top Countries
                     </h3>
                     <div className="flex flex-col gap-3 relative z-10">
-                        {songCountryData.map((country) => (
+                        {albumCountryData.map((country) => (
                             <div key={country.name} className="flex items-center justify-between py-1 border-b border-white/5 last:border-0 text-xs font-medium">
                                 <div className="flex items-center gap-2">
                                     <span className="text-sm shrink-0">{country.flag}</span>

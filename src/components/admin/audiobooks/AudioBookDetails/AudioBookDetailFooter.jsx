@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { Trash2, AlertTriangle } from "lucide-react"
+import { Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DialogClose } from "@/components/ui/dialog"
 import DeleteAudioBookDialog from "@/components/dialogs/admin/audiobooks/DeleteAudioBookDialog"
@@ -10,26 +10,14 @@ const AudioBookDetailFooter = ({ book }) => {
     return (
         <div className="p-4 border-t border-white/5 mt-auto shrink-0 bg-card">
             <div className="flex items-center justify-between w-full">
-                <div className="flex items-center gap-3">
-                    {/* Delete trigger */}
-                    <DeleteAudioBookDialog book={book}>
-                        <Button
-                            className="bg-red-error/10 hover:bg-red-error/20 border border-red-error/20 text-red-error font-medium rounded-[10px] px-4 h-10 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
-                        >
-                            <Trash2 className="w-4 h-4" />
-                            Delete Audiobook
-                        </Button>
-                    </DeleteAudioBookDialog>
-
-                    {/* Unpublish placeholder */}
+                <DeleteAudioBookDialog book={book}>
                     <Button
-                        notImplemented
-                        className="bg-yellow-warning/10 hover:bg-yellow-warning/20 border border-yellow-warning/20 text-yellow-warning font-medium rounded-[10px] px-4 h-10 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
+                        className="bg-red-error/10 hover:bg-red-error/20 border border-red-error/20 text-red-error font-medium rounded-[10px] px-4 h-10 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
                     >
-                        <AlertTriangle className="w-4 h-4" />
-                        Unpublish
+                        <Trash2 className="w-4 h-4" />
+                        Delete Audiobook
                     </Button>
-                </div>
+                </DeleteAudioBookDialog>
 
                 <DialogClose asChild>
                     <Button

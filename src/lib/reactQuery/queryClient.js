@@ -14,6 +14,8 @@ export function makeQueryClient() {
       queries: {
         staleTime: STALE_TIME,
         gcTime: STALE_TIME * 2,
+        // Keeps data fresh on its own — no manual revalidate call needed.
+        refetchInterval: STALE_TIME,
         retry: 1,
         refetchOnWindowFocus: false,
       },

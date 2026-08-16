@@ -9,4 +9,23 @@ export const queryKeys = {
     all: ["auth"],
     me: () => [...queryKeys.auth.all, "me"],
   },
+  users: {
+    all: ["users"],
+    list: () => [...queryKeys.users.all, "list"],
+  },
+  genre: {
+    all: ["genre"],
+    list: () => [...queryKeys.genre.all, "list"],
+    search: (name) => [...queryKeys.genre.all, "search", name],
+  },
+  audiobooks: {
+    all: ["audiobooks"],
+    list: (params) => [...queryKeys.audiobooks.all, "list", params],
+    detail: (id) => [...queryKeys.audiobooks.all, "detail", id],
+  },
+  music: {
+    all: ["music"],
+    list: (params) => [...queryKeys.music.all, "list", params],
+    detail: (id) => [...queryKeys.music.all, "detail", id],
+  },
 };

@@ -18,6 +18,16 @@ const CommonSelect = ({
     containerClassName,
     className
 }) => {
+    // Select.Value calls this with the raw value, not the matching item's
+    // rendered label — resolve it ourselves so the trigger never shows a
+    // raw id/value. It's called even before anything is selected.
+    const getDisplayValue = (val) => {
+        if (val === undefined || val === null || val === "") return placeholder
+        const match = options.find((opt) => (typeof opt === "string" ? opt : opt.value) === val)
+        if (!match) return val
+        return typeof match === "string" ? match : match.label
+    }
+
     return (
         <div className={cn("flex flex-col gap-1.5 shrink-0", containerClassName)}>
             {label && (
@@ -34,7 +44,9 @@ const CommonSelect = ({
                         className
                     )}
                 >
-                    <SelectValue placeholder={placeholder} className="placeholder:text-light-gray" />
+                    <SelectValue placeholder={placeholder} className="data-placeholder:text-light-gray">
+                        {(val) => getDisplayValue(val)}
+                    </SelectValue>
                 </SelectTrigger>
                 <SelectContent className="bg-background border border-whitetext/10 rounded-[12px] text-whitetext max-h-[200px] overflow-y-auto">
                     {options.map((opt) => {

@@ -4,4 +4,5 @@ export const env = {
   nextAuthUrl: process.env.NEXTAUTH_URL,
   nextAuthSecret: process.env.NEXTAUTH_SECRET,
   useApiProxy: process.env.NEXT_PUBLIC_USE_API_PROXY !== "false",
+  revalidateSecret: process.env.REVALIDATE_SECRET,
 };

@@ -7,12 +7,16 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import { Spinner } from "@/components/ui/spinner"
+import { useSongDetail } from "@/hooks/api/admin/songs/useSongDetail"
 import SongDetailHeader from "@/components/admin/music/SongsDetails/SongDetailHeader"
-import SongDetailsTabs from "@/components/admin/music/SongsDetails/SongDetailsTabs"
+import SongDetailContent from "@/components/admin/music/SongsDetails/SongDetailContent"
 import SongDetailFooter from "@/components/admin/music/SongsDetails/SongDetailFooter"
 
-const SongDetailsDialog = ({ song, children }) => {
+const SongDetailsDialog = ({ song: summary, children }) => {
     const [open, setOpen] = useState(false)
+    const { data: detail, isLoading } = useSongDetail(open ? summary?._id : undefined)
+    const song = detail || summary
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -26,14 +30,17 @@ const SongDetailsDialog = ({ song, children }) => {
                     Song Details - {song?.title || "Unknown"}
                 </DialogTitle>
 
-                {/* Common Header */}
-                <SongDetailHeader song={song} />
-
-                {/* Switchable Tabs between Details & Analytics */}
-                <SongDetailsTabs song={song} />
-
-                {/* Footer with Delete and Close buttons */}
-                <SongDetailFooter song={song} />
+                {isLoading && !detail ? (
+                    <div className="flex items-center justify-center py-24">
+                        <Spinner className="size-6 text-secondary" />
+                    </div>
+                ) : (
+                    <>
+                        <SongDetailHeader song={song} />
+                        <SongDetailContent song={song} />
+                        <SongDetailFooter song={song} />
+                    </>
+                )}
             </DialogContent>
         </Dialog>
     )

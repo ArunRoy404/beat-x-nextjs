@@ -1,5 +1,6 @@
 import React from "react"
 import { Eye, Trash2 } from "lucide-react"
+import { format } from "date-fns"
 import CommonTableHeader from "@/components/shared/CommonTable/CommonTableHeader"
 import CommonTableCell from "@/components/shared/CommonTable/CommonTableCell"
 import CommonAvatar from "@/components/shared/CommonAvatar"
@@ -29,82 +30,55 @@ export const getUsersColumns = () => [
     }
   },
   {
-    accessorKey: "role",
-    header: () => <CommonTableHeader>Role</CommonTableHeader>,
+    accessorKey: "provider",
+    header: () => <CommonTableHeader>Provider</CommonTableHeader>,
     cell: ({ getValue }) => {
-      const role = getValue()
+      const provider = getValue()
+      const label = provider ? provider.charAt(0).toUpperCase() + provider.slice(1) : "-"
       return (
         <div className="flex">
           <span className="inline-block px-2.5 py-0.5 rounded-full border border-white/10 text-light-gray text-[12px] font-normal select-none">
-            {role}
+            {label}
           </span>
         </div>
       )
     }
   },
   {
-    accessorKey: "plan",
-    header: () => <CommonTableHeader>Plan</CommonTableHeader>,
-    cell: ({ getValue }) => {
-      const plan = getValue()
-      const planColors = {
-        Premium: "text-[#3ADFFA] border-[#3ADFFA]/20 bg-[#3ADFFA]/10",
-        Family: "text-[#CC97FF] border-[#CC97FF]/20 bg-[#CC97FF]/10",
-        Student: "text-[#E5F97D] border-[#E5F97D]/20 bg-[#E5F97D]/10",
-        Free: "text-white/40 border-white/10 bg-white/5"
-      }
-      const colorClass = planColors[plan] || planColors.Free
-      return (
-        <div className="flex">
-          <span className={`inline-block px-2.5 py-0.5 rounded-full border text-[12px] font-normal select-none ${colorClass}`}>
-            {plan}
-          </span>
-        </div>
-      )
-    }
-  },
-  {
-    accessorKey: "streams",
-    header: () => <CommonTableHeader>Streams</CommonTableHeader>,
-    cell: ({ getValue }) => {
-      const val = getValue() || 0
-      let displayVal = "0"
-      if (val >= 1000) {
-        displayVal = `${(val / 1000).toFixed(1).replace(/\.0$/, "")}K`
-      } else {
-        displayVal = val.toString()
-      }
-      return <CommonTableCell>{displayVal}</CommonTableCell>
-    }
-  },
-  {
-    accessorKey: "status",
+    accessorKey: "isVerified",
     header: () => <CommonTableHeader>Status</CommonTableHeader>,
     cell: ({ getValue }) => {
-      const status = getValue()
-      const statusColors = {
-        Active: "text-[#34C759] border-[#34C759]/20 bg-[#34C759]/10",
-        Rejected: "text-[#FF453A] border-[#FF453A]/20 bg-[#FF453A]/10",
-        Pending: "text-[#FFCC00] border-[#FFCC00]/20 bg-[#FFCC00]/10"
-      }
-      const colorClass = statusColors[status] || statusColors.Pending
+      const isVerified = getValue()
+      const colorClass = isVerified
+        ? "text-[#34C759] border-[#34C759]/20 bg-[#34C759]/10"
+        : "text-[#FFCC00] border-[#FFCC00]/20 bg-[#FFCC00]/10"
       return (
         <div className="flex">
           <span className={`inline-block px-2.5 py-0.5 rounded-full border text-[12px] font-normal select-none ${colorClass}`}>
-            {status}
+            {isVerified ? "Verified" : "Unverified"}
           </span>
-        </div> 
+        </div>
       )
     }
   },
   {
-    accessorKey: "joined",
-    header: () => <CommonTableHeader>Joined</CommonTableHeader>,
+    accessorKey: "coinBalance",
+    header: () => <CommonTableHeader>Coin Balance</CommonTableHeader>,
     cell: ({ getValue }) => (
-      <CommonTableCell>
-        {getValue() || "-"}
-      </CommonTableCell>
+      <CommonTableCell>{(getValue() || 0).toLocaleString()}</CommonTableCell>
     )
+  },
+  {
+    accessorKey: "createdAt",
+    header: () => <CommonTableHeader>Joined</CommonTableHeader>,
+    cell: ({ getValue }) => {
+      const value = getValue()
+      return (
+        <CommonTableCell>
+          {value ? format(new Date(value), "MMM d, yyyy") : "-"}
+        </CommonTableCell>
+      )
+    }
   },
   {
     id: "actions",

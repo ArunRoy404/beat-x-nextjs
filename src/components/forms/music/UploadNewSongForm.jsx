@@ -1,187 +1,87 @@
 "use client"
 
-import React from "react"
-import { useForm, Controller } from "react-hook-form"
+import React, { useState } from "react"
+import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { uploadSongSchema, uploadSongDefaultValues } from "@/zodSchema/UploadNewSongZodSchema"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { DialogClose } from "@/components/ui/dialog"
-import { CheckCircle2, Clock, FileText } from "lucide-react"
 import { toast } from "sonner"
-import { useAdminDashboardMusicStore } from "@/zustandStore/admin/adminStore/adminDashboardMusicStore"
+import { Button } from "@/components/ui/button"
+import { DialogClose } from "@/components/ui/dialog"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
-import CommonAudioInput from "@/components/shared/CommonInputs/CommonAudioInput/CommonAudioInput"
-import CommonImageUpload from "@/components/shared/CommonInputs/CommonImageUpload/CommonImageUpload"
-import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
-import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSelect"
-import CommonCalender from "@/components/shared/CommonInputs/CommonInput/CommonCalender"
-import CommonSelectCards from "@/components/shared/CommonInputs/CommonInput/CommonSelectCards"
-import CommonInputContainer from "@/components/shared/CommonInputs/CommonInput/CommonInputContainer"
-
-const GENRES = ["Pop", "Hip Hop", "Electronic", "Rock", "Lofi", "Jazz", "R&B"]
-
-const VISIBILITY_OPTIONS = [
-    { value: "publish", label: "Publish Now", icon: CheckCircle2 },
-    { value: "schedule", label: "Schedule", icon: Clock },
-    { value: "draft", label: "Save as Draft", icon: FileText },
-]
+import { useCreateSong } from "@/hooks/api/admin/songs/useCreateSong"
+import { songSchema } from "./adminSongSchema"
+import { buildSongFormData } from "./buildSongFormData"
+import AdminSongFormFields from "./AdminSongFormFields"
 
 const UploadNewSongForm = ({ onSuccess, onCancel }) => {
-    const addSong = useAdminDashboardMusicStore((state) => state.addSong)
+    const [audio, setAudio] = useState(null)
+    const [audioError, setAudioError] = useState("")
+    const [cover, setCover] = useState(null)
+    const [coverError, setCoverError] = useState("")
+
+    const { mutate: createSong, isPending } = useCreateSong()
 
     const {
         register,
         handleSubmit,
         control,
-        setValue,
+        watch,
         reset,
         formState: { errors },
     } = useForm({
-        resolver: zodResolver(uploadSongSchema),
-        defaultValues: uploadSongDefaultValues,
+        resolver: zodResolver(songSchema),
+        defaultValues: {
+            title: "",
+            artist: "",
+            genre: "",
+            explicit: false,
+            visibility: "publish",
+            scheduledAt: undefined,
+        },
     })
 
     const onSubmit = (data) => {
-        console.log("Submitted Song Data:", data)
-        addSong(data)
-        toast.success("Song uploaded successfully!")
-        reset()
-        onSuccess?.()
-    }
-
-    const onInvalid = (validationErrors) => {
-        const errorKeys = Object.keys(validationErrors)
-        if (errorKeys.length > 0) {
-            toast.error(validationErrors[errorKeys[0]].message)
+        let hasError = false
+        if (!(audio instanceof File)) {
+            setAudioError("Audio file is required")
+            hasError = true
+        } else {
+            setAudioError("")
         }
+        if (!(cover instanceof File)) {
+            setCoverError("Cover image is required")
+            hasError = true
+        } else {
+            setCoverError("")
+        }
+        if (hasError) return
+
+        const formData = buildSongFormData({ ...data, audio, cover })
+
+        createSong(formData, {
+            onSuccess: () => {
+                toast.success("Song uploaded — processing audio now.")
+                reset()
+                setAudio(null)
+                setCover(null)
+                onSuccess?.()
+            },
+            onError: (error) => toast.error(error?.message || "Failed to upload song."),
+        })
     }
 
     return (
-        <CommonFormContainer onSubmit={handleSubmit(onSubmit, onInvalid)}>
-            {/* Audio Dropzone */}
-            <Controller
-                name="audioFile"
+        <CommonFormContainer onSubmit={handleSubmit(onSubmit)}>
+            <AdminSongFormFields
+                register={register}
                 control={control}
-                render={({ field }) => (
-                    <CommonAudioInput
-                        value={field.value}
-                        onChange={(file) => setValue("audioFile", file, { shouldValidate: true })}
-                        error={errors.audioFile?.message}
-                    />
-                )}
-            />
-
-            {/* Cover Art Dropzone */}
-            <Controller
-                name="coverImage"
-                control={control}
-                render={({ field }) => (
-                    <CommonImageUpload
-                        value={field.value}
-                        onChange={(file) => setValue("coverImage", file, { shouldValidate: true })}
-                        error={errors.coverImage?.message}
-                    />
-                )}
-            />
-
-            {/* Song Title Input */}
-            <CommonInput
-                label="Song Title"
-                placeholder="Enter song title..."
-                {...register("songTitle")}
-                error={errors.songTitle?.message}
-            />
-
-            {/* Artist & Album inputs */}
-            <CommonInputContainer>
-                <CommonInput
-                    label="Artist"
-                    placeholder="Artist name"
-                    {...register("artist")}
-                    error={errors.artist?.message}
-                />
-
-                <CommonInput
-                    label="Album"
-                    placeholder="Album name (optional)"
-                    {...register("album")}
-                    error={errors.album?.message}
-                />
-            </CommonInputContainer>
-
-            {/* Genre & Release Date picker */}
-            <CommonInputContainer>
-                <Controller
-                    name="genre"
-                    control={control}
-                    render={({ field }) => (
-                        <CommonSelect
-                            label="Genre"
-                            placeholder="Select genre"
-                            value={field.value}
-                            onChange={field.onChange}
-                            options={GENRES}
-                            error={errors.genre?.message}
-                        />
-                    )}
-                />
-
-                <Controller
-                    name="releaseDate"
-                    control={control}
-                    render={({ field }) => (
-                        <CommonCalender
-                            label="Release Date"
-                            placeholder="Choose Date"
-                            value={field.value}
-                            onChange={field.onChange}
-                            error={errors.releaseDate?.message}
-                        />
-                    )}
-                />
-            </CommonInputContainer>
-
-            {/* Song Description */}
-            <CommonInput
-                label="Song Description"
-                type="textarea"
-                placeholder="Type a short description..."
-                {...register("description")}
-                error={errors.description?.message}
-            />
-
-            {/* Visibility Section */}
-            <Controller
-                name="visibility"
-                control={control}
-                render={({ field }) => (
-                    <CommonSelectCards
-                        label="Visibility"
-                        value={field.value}
-                        onChange={field.onChange}
-                        options={VISIBILITY_OPTIONS}
-                        error={errors.visibility?.message}
-                    />
-                )}
-            />
-
-            {/* Explicit Content Toggle using Shadcn Switch */}
-            <Controller
-                name="isExplicit"
-                control={control}
-                render={({ field }) => (
-                    <div className="flex items-center justify-between py-2 border-t border-b border-whitetext/5 shrink-0">
-                        <span className="text-light-gray text-[16px] not-italic font-medium font-sans">
-                            Explicit Content
-                        </span>
-                        <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            className="data-checked:bg-secondary data-unchecked:bg-light-gray/20"
-                        />
-                    </div>
-                )}
+                errors={errors}
+                watch={watch}
+                audio={audio}
+                onAudioChange={setAudio}
+                audioError={audioError}
+                cover={cover}
+                onCoverChange={setCover}
+                coverError={coverError}
             />
 
             {/* Footer Actions */}
@@ -202,6 +102,7 @@ const UploadNewSongForm = ({ onSuccess, onCancel }) => {
                     variant="gradient"
                     className="flex-1"
                     size="lg"
+                    isLoading={isPending}
                 >
                     Upload Now
                 </Button>
