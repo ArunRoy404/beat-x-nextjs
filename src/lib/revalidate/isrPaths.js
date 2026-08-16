@@ -8,4 +8,5 @@ export const isrPaths = [
   "/admin/dashboard/genre",
   "/admin/dashboard/audiobooks",
   "/admin/dashboard/music",
+  "/admin/dashboard/podcasts",
 ];

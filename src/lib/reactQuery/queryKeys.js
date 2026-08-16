@@ -28,4 +28,17 @@ export const queryKeys = {
     list: (params) => [...queryKeys.music.all, "list", params],
     detail: (id) => [...queryKeys.music.all, "detail", id],
   },
+  podcasts: {
+    all: ["podcasts"],
+    list: (params) => [...queryKeys.podcasts.all, "list", params],
+    detail: (id) => [...queryKeys.podcasts.all, "detail", id],
+  },
+  podcastReviews: {
+    all: ["podcastReviews"],
+    list: (params) => [...queryKeys.podcastReviews.all, "list", params],
+  },
+  scheduler: {
+    all: ["scheduler"],
+    status: () => [...queryKeys.scheduler.all, "status"],
+  },
 };

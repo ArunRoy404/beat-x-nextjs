@@ -5,7 +5,7 @@ const PodcastsCardsContainer = ({ podcasts = [] }) => {
     return (
         <div className="flex flex-col gap-4">
             {podcasts.map((podcast) => (
-                <PodcastsCard key={podcast.id || podcast.title} podcast={podcast} />
+                <PodcastsCard key={podcast._id} podcast={podcast} />
             ))}
         </div>
     )

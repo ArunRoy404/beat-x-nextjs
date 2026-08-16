@@ -1,4 +1,5 @@
 import React from "react"
+import { format } from "date-fns"
 import CommonSongCell from "@/components/shared/CommonTable/CommonSongCell"
 import CommonTableCell from "@/components/shared/CommonTable/CommonTableCell"
 import CommonTableHeader from "@/components/shared/CommonTable/CommonTableHeader"
@@ -6,64 +7,66 @@ import CommonTableTag from "@/components/shared/CommonTable/CommonTableTag"
 import CommonTableStat from "@/components/shared/CommonTable/CommonTableStat"
 import CommonTableStatus from "@/components/shared/CommonTable/CommonTableStatus"
 import PodcastsTableActions from "@/components/admin/podcasts/PodcastsContainer/PodcastsTableActions"
+import { formatDurationMs } from "@/lib/format/formatDuration"
 
 export const getPodcastsColumns = () => [
   {
     accessorKey: "title",
-    header: () => <CommonTableHeader>Podcasts</CommonTableHeader>,
+    header: () => <CommonTableHeader>Podcast</CommonTableHeader>,
     cell: ({ row }) => {
       const podcast = row.original
       return (
         <CommonSongCell
           title={podcast?.title}
-          duration={podcast?.duration}
-          cover={podcast?.cover}
+          duration={formatDurationMs(podcast?.totalDurationMs)}
+          cover={podcast?.coverUrl}
         />
       )
     }
   },
   {
-    accessorKey: "artist",
-    header: () => <CommonTableHeader>Artist</CommonTableHeader>,
+    accessorKey: "ownerId",
+    header: () => <CommonTableHeader>Owner</CommonTableHeader>,
     cell: ({ getValue }) => (
       <CommonTableCell>
-        {getValue() || "-"}
-      </CommonTableCell>
-    )
-  },
-  {
-    accessorKey: "series",
-    header: () => <CommonTableHeader>Series</CommonTableHeader>,
-    cell: ({ getValue }) => (
-      <CommonTableCell>
-        {getValue() || "-"}
+        {getValue()?.name || "-"}
       </CommonTableCell>
     )
   },
   {
     accessorKey: "genre",
-    header: () => <CommonTableHeader>Category</CommonTableHeader>,
+    header: () => <CommonTableHeader>Genre</CommonTableHeader>,
     cell: ({ getValue }) => (
       <CommonTableTag>
-        {getValue()}
+        {getValue()?.name || "-"}
       </CommonTableTag>
     )
   },
   {
-    accessorKey: "streams",
+    accessorKey: "totalEpisodes",
+    header: () => <CommonTableHeader>Episodes</CommonTableHeader>,
+    cell: ({ getValue }) => (
+      <CommonTableStat value={getValue() ?? 0} />
+    )
+  },
+  {
+    accessorKey: "playCount",
     header: () => <CommonTableHeader>Streams</CommonTableHeader>,
     cell: ({ getValue }) => (
       <CommonTableStat value={getValue()} />
     )
   },
   {
-    accessorKey: "released",
+    accessorKey: "publishedAt",
     header: () => <CommonTableHeader>Released</CommonTableHeader>,
-    cell: ({ getValue }) => (
-      <CommonTableCell>
-        {getValue() || "-"}
-      </CommonTableCell>
-    )
+    cell: ({ getValue }) => {
+      const value = getValue()
+      return (
+        <CommonTableCell>
+          {value ? format(new Date(value), "MMM d, yyyy") : "-"}
+        </CommonTableCell>
+      )
+    }
   },
   {
     accessorKey: "status",

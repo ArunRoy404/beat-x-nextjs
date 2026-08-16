@@ -1,30 +1,32 @@
 import React from "react"
-import { Eye, Check, X, Trash2, SquarePen } from "lucide-react"
+import { Eye, Trash2, SquarePen } from "lucide-react"
+import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import EditPodcastDialog from "@/components/dialogs/admin/podcasts/EditPodcastDialog"
 import DeletePodcastDialog from "@/components/dialogs/admin/podcasts/DeletePodcastDialog"
-import PodcastUnderReviewDialog from "@/components/dialogs/admin/podcasts/PodcastUnderReviewDialog"
 import PodcastDetailsDialog from "@/components/dialogs/admin/podcasts/PodcastDetailsDialog"
+import { useUpdatePodcastStatus } from "@/hooks/api/admin/podcasts/useUpdatePodcastStatus"
 
-const PodcastsTableActions = ({
-    status,
-    podcast,
-    onViewDetails,
-    onTakeDown,
-    onRestore,
-    onApprove,
-    onReject,
-    onDelete,
-    className
-}) => {
+const PodcastsTableActions = ({ status, podcast, className }) => {
+    const { mutate: updatePodcastStatus, isPending } = useUpdatePodcastStatus()
+
+    const handleStatusChange = (nextStatus) => {
+        updatePodcastStatus(
+            { id: podcast._id, status: nextStatus },
+            {
+                onSuccess: () => toast.success(nextStatus === "archived" ? "Podcast taken down." : "Podcast restored."),
+                onError: (error) => toast.error(error?.message || "Failed to update podcast status."),
+            }
+        )
+    }
+
     return (
         <div className={cn("flex items-center justify-end gap-3 pr-2", className)}>
-            {/* Conditional status-based actions */}
-            {status === "Published" && (
+            {status === "active" && (
                 <Button
-                    notImplemented
-                    onClick={onTakeDown}
+                    onClick={() => handleStatusChange("archived")}
+                    disabled={isPending}
                     variant="outline"
                     className="text-yellow-warning border border-yellow-warning/20 bg-yellow-warning/10 rounded-full px-3! py-3!"
                 >
@@ -32,10 +34,10 @@ const PodcastsTableActions = ({
                 </Button>
             )}
 
-            {status === "Take Down" && (
+            {status === "archived" && (
                 <Button
-                    notImplemented
-                    onClick={onRestore}
+                    onClick={() => handleStatusChange("active")}
+                    disabled={isPending}
                     variant="outline"
                     className="text-green-success border border-green-success/20 bg-green-success/10 rounded-full px-3! py-3!"
                 >
@@ -43,55 +45,16 @@ const PodcastsTableActions = ({
                 </Button>
             )}
 
-            {status === "Under Review" && (
-                <>
-                    <Button
-                        notImplemented
-                        onClick={onApprove}
-                        title="Approve"
-                        size="icon"
-                        variant="outline"
-                        className="text-green-success border border-green-success/20 bg-green-success/10 rounded-full cursor-pointer"
-                    >
-                        <Check className="w-3.5 h-3.5 shrink-0" />
-                    </Button>
-                    <PodcastUnderReviewDialog podcast={podcast} startWithRejection={true}>
-                        <Button
-                            title="Reject"
-                            size="icon"
-                            variant="outline"
-                            className="text-red-error border border-red-error/20 bg-red-error/10 rounded-full cursor-pointer"
-                        >
-                            <X className="w-3.5 h-3.5 shrink-0" />
-                        </Button>
-                    </PodcastUnderReviewDialog>
-                </>
-            )}
-
-            {/* Details circle button */}
-            {status === "Under Review" ? (
-                <PodcastUnderReviewDialog podcast={podcast}>
-                    <Button
-                        title="View Details"
-                        size="icon"
-                        variant="outline"
-                        className="text-secondary border border-secondary/20 bg-secondary/10 rounded-full cursor-pointer"
-                    >
-                        <Eye className="w-3.5 h-3.5 shrink-0" />
-                    </Button>
-                </PodcastUnderReviewDialog>
-            ) : (
-                <PodcastDetailsDialog podcast={podcast}>
-                    <Button
-                        title="View Details"
-                        size="icon"
-                        variant="outline"
-                        className="text-secondary border border-secondary/20 bg-secondary/10 rounded-full cursor-pointer"
-                    >
-                        <Eye className="w-3.5 h-3.5 shrink-0" />
-                    </Button>
-                </PodcastDetailsDialog>
-            )}
+            <PodcastDetailsDialog podcast={podcast}>
+                <Button
+                    title="View Details"
+                    size="icon"
+                    variant="outline"
+                    className="text-secondary border border-secondary/20 bg-secondary/10 rounded-full cursor-pointer"
+                >
+                    <Eye className="w-3.5 h-3.5 shrink-0" />
+                </Button>
+            </PodcastDetailsDialog>
 
             <EditPodcastDialog podcast={podcast}>
                 <Button
@@ -104,7 +67,6 @@ const PodcastsTableActions = ({
                 </Button>
             </EditPodcastDialog>
 
-            {/* Delete icon */}
             <DeletePodcastDialog podcast={podcast}>
                 <Button
                     title="Delete Podcast"
