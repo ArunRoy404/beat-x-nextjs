@@ -10,28 +10,33 @@ import CommonTableContainer from "@/components/shared/CommonTable/CommonTableCon
 import UploadAudioBookDialog from "@/components/dialogs/admin/audiobooks/UploadAudioBookDialog"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
-import { useAdminDashboardAudioBooksStore } from "@/zustandStore/admin/adminStore/adminDashboardAudioBooksStore"
-import { useAudioBooks, AUDIOBOOKS_PAGE_SIZE } from "@/hooks/api/admin/audiobooks/useAudioBooks"
+import { useUrlListParams } from "@/hooks/useUrlListParams"
+import { useAudioBooks } from "@/hooks/api/admin/audiobooks/useAudioBooks"
+import { AUDIOBOOKS_PAGE_SIZE, buildAudioBooksParams } from "@/hooks/api/admin/audiobooks/audioBooksParams"
 import { useGenres } from "@/hooks/api/admin/genre/useGenres"
 
 const STATUS_TABS = ["All", "Draft", "Active", "Archived"]
 const SEARCH_DEBOUNCE_MS = 300
 
 const AudioBooksContainer = () => {
-  const selectedStatus = useAdminDashboardAudioBooksStore((state) => state.selectedStatus)
-  const setSelectedStatus = useAdminDashboardAudioBooksStore((state) => state.setSelectedStatus)
-  const selectedGenre = useAdminDashboardAudioBooksStore((state) => state.selectedGenre)
-  const setSelectedGenre = useAdminDashboardAudioBooksStore((state) => state.setSelectedGenre)
-  const searchQuery = useAdminDashboardAudioBooksStore((state) => state.searchQuery)
-  const setSearchQuery = useAdminDashboardAudioBooksStore((state) => state.setSearchQuery)
-  const currentPage = useAdminDashboardAudioBooksStore((state) => state.currentPage)
-  const setCurrentPage = useAdminDashboardAudioBooksStore((state) => state.setCurrentPage)
+  const { get, setParams } = useUrlListParams()
 
-  const [debouncedSearch, setDebouncedSearch] = useState("")
+  const selectedStatus = get("status", "all")
+  const selectedGenre = get("genre", "all")
+  const urlSearch = get("q", "")
+  const currentPage = Number(get("page", "1")) || 1
+
+  const [searchInput, setSearchInput] = useState(urlSearch)
+
   useEffect(() => {
-    const timeout = setTimeout(() => setDebouncedSearch(searchQuery.trim()), SEARCH_DEBOUNCE_MS)
+    const timeout = setTimeout(() => {
+      if (searchInput.trim() !== urlSearch) {
+        setParams({ q: searchInput.trim() })
+      }
+    }, SEARCH_DEBOUNCE_MS)
     return () => clearTimeout(timeout)
-  }, [searchQuery])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchInput])
 
   const { data: genres = [] } = useGenres()
   const genreOptions = [
@@ -39,13 +44,12 @@ const AudioBooksContainer = () => {
     ...genres.map((genre) => ({ value: genre._id, label: genre.name })),
   ]
 
-  const params = {
+  const params = buildAudioBooksParams({
+    status: selectedStatus,
+    genre: selectedGenre,
+    q: urlSearch,
     page: currentPage,
-    limit: AUDIOBOOKS_PAGE_SIZE,
-    ...(selectedStatus !== "all" && { status: selectedStatus }),
-    ...(selectedGenre !== "all" && { genre: selectedGenre }),
-    ...(debouncedSearch && { q: debouncedSearch }),
-  }
+  })
 
   const { data, isLoading, isError, error, refetch } = useAudioBooks(params)
   const books = data?.data ?? []
@@ -60,19 +64,19 @@ const AudioBooksContainer = () => {
           <CommonFilter
             tabs={STATUS_TABS}
             activeTab={STATUS_TABS.find((tab) => tab.toLowerCase() === selectedStatus) || "All"}
-            onChange={(tab) => setSelectedStatus(tab.toLowerCase())}
+            onChange={(tab) => setParams({ status: tab.toLowerCase() === "all" ? undefined : tab.toLowerCase() })}
           />
 
           <div className="flex items-center gap-3 w-full md:w-auto shrink-0 flex-wrap">
             <CommonSelect
               value={selectedGenre}
-              onChange={setSelectedGenre}
+              onChange={(genre) => setParams({ genre: genre === "all" ? undefined : genre })}
               options={genreOptions}
               className="w-44 h-8 px-4 text-[12px] border-border bg-transparent"
             />
             <CommonSearch
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search audiobooks..."
               className="flex-1 md:w-72"
             />
@@ -114,7 +118,7 @@ const AudioBooksContainer = () => {
             totalItems={total}
             pageSize={AUDIOBOOKS_PAGE_SIZE}
             totalPages={totalPages}
-            onPageChange={setCurrentPage}
+            onPageChange={(page) => setParams({ page }, { resetPage: false })}
           />
         </>
       )}

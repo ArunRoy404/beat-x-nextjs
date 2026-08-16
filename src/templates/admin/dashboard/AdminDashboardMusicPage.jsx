@@ -3,13 +3,16 @@
 import React from "react"
 import DashboardStats from "@/components/shared/Dashboard/DashboardStats/DashboardStats"
 import SongsContainer from "@/components/admin/music/SongsContainer/SongsContainer"
-import { useSongs, DEFAULT_SONGS_PARAMS } from "@/hooks/api/admin/songs/useSongs"
+import { useSongs } from "@/hooks/api/admin/songs/useSongs"
+import { buildSongsParams } from "@/hooks/api/admin/songs/songsParams"
 
 const AdminDashboardMusicPage = () => {
-  // Only reads the same query the SSR page already prefetched — an extra,
-  // un-prefetched query here would have to fetch client-side after mount
-  // and show a loading state, unlike genre's single-query stats pattern.
-  const { data: allData } = useSongs(DEFAULT_SONGS_PARAMS)
+  // Deliberately the global unfiltered total, not whatever's in the URL —
+  // "Total Songs" should mean all of them, not just the current filter.
+  // Only matches the SSR-prefetched query (zero-spinner) when the URL has no
+  // filters; with filters active this fetches client-side, same as genre's
+  // stats do when its own search is active.
+  const { data: allData } = useSongs(buildSongsParams())
 
   const statsCards = [
     {

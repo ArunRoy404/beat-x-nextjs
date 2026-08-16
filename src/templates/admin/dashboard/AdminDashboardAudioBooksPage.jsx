@@ -3,13 +3,16 @@
 import React from "react"
 import DashboardStats from "@/components/shared/Dashboard/DashboardStats/DashboardStats"
 import AudioBooksContainer from "@/components/admin/audiobooks/AudioBooksContainer"
-import { useAudioBooks, DEFAULT_AUDIOBOOKS_PARAMS } from "@/hooks/api/admin/audiobooks/useAudioBooks"
+import { useAudioBooks } from "@/hooks/api/admin/audiobooks/useAudioBooks"
+import { buildAudioBooksParams } from "@/hooks/api/admin/audiobooks/audioBooksParams"
 
 const AdminDashboardAudioBooksPage = () => {
-  // Only reads the same query the SSR page already prefetched — an extra,
-  // un-prefetched query here would have to fetch client-side after mount
-  // and show a loading state, unlike genre's single-query stats pattern.
-  const { data: allData } = useAudioBooks(DEFAULT_AUDIOBOOKS_PARAMS)
+  // Deliberately the global unfiltered total, not whatever's in the URL —
+  // "Total Audiobooks" should mean all of them, not just the current filter.
+  // Only matches the SSR-prefetched query (zero-spinner) when the URL has no
+  // filters; with filters active this fetches client-side, same as genre's
+  // stats do when its own search is active.
+  const { data: allData } = useAudioBooks(buildAudioBooksParams())
 
   const statsCards = [
     {

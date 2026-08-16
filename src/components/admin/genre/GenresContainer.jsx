@@ -10,7 +10,7 @@ import CommonTableContainer from "@/components/shared/CommonTable/CommonTableCon
 import AddGenreDialog from "@/components/dialogs/admin/genre/AddGenreDialog"
 import EditGenreDialog from "@/components/dialogs/admin/genre/EditGenreDialog"
 import DeleteGenreDialog from "@/components/dialogs/admin/genre/DeleteGenreDialog"
-import { useAdminDashboardGenreStore } from "@/zustandStore/admin/adminStore/adminDashboardGenreStore"
+import { useUrlListParams } from "@/hooks/useUrlListParams"
 import { useGenres } from "@/hooks/api/admin/genre/useGenres"
 import { useSearchGenres } from "@/hooks/api/admin/genre/useSearchGenres"
 import { Tag, Pencil, Trash2 } from "lucide-react"
@@ -20,19 +20,24 @@ import { Spinner } from "@/components/ui/spinner"
 const SEARCH_DEBOUNCE_MS = 300
 
 const GenresContainer = () => {
-  const searchQuery = useAdminDashboardGenreStore((state) => state.searchQuery)
-  const setSearchQuery = useAdminDashboardGenreStore((state) => state.setSearchQuery)
+  const { get, setParams } = useUrlListParams()
+  const urlSearch = get("q", "")
 
-  const [debouncedSearch, setDebouncedSearch] = useState("")
+  const [searchInput, setSearchInput] = useState(urlSearch)
   useEffect(() => {
-    const timeout = setTimeout(() => setDebouncedSearch(searchQuery.trim()), SEARCH_DEBOUNCE_MS)
+    const timeout = setTimeout(() => {
+      if (searchInput.trim() !== urlSearch) {
+        setParams({ q: searchInput.trim() })
+      }
+    }, SEARCH_DEBOUNCE_MS)
     return () => clearTimeout(timeout)
-  }, [searchQuery])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchInput])
 
-  const isSearching = debouncedSearch.length > 0
+  const isSearching = urlSearch.length > 0
 
   const listQuery = useGenres()
-  const searchResultQuery = useSearchGenres(debouncedSearch)
+  const searchResultQuery = useSearchGenres(urlSearch)
 
   const { data: genresList = [], isLoading, isError, error, refetch } = isSearching
     ? searchResultQuery
@@ -46,8 +51,8 @@ const GenresContainer = () => {
         <>
           <div className="flex items-center gap-3 w-full md:w-auto shrink-0">
             <CommonSearch
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search genres..."
               className="flex-1 md:w-72"
             />

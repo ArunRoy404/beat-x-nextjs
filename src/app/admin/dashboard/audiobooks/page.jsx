@@ -2,7 +2,7 @@ import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 import { getQueryClient } from "@/lib/reactQuery/getQueryClient";
 import { queryKeys } from "@/lib/reactQuery/queryKeys";
 import { getAudioBooksRequest } from "@/services/admin/audioBooksServices";
-import { DEFAULT_AUDIOBOOKS_PARAMS } from "@/hooks/api/admin/audiobooks/useAudioBooks";
+import { buildAudioBooksParams } from "@/hooks/api/admin/audiobooks/audioBooksParams";
 import { env } from "@/config/env";
 import AdminDashboardAudioBooksPage from "@/templates/admin/dashboard/AdminDashboardAudioBooksPage";
 
@@ -11,12 +11,15 @@ import AdminDashboardAudioBooksPage from "@/templates/admin/dashboard/AdminDashb
 // Kept for pages that stop depending on the session and can go fully static.
 export const revalidate = env.revalidateTime;
 
-const page = async () => {
+const page = async ({ searchParams }) => {
+  const rawParams = await searchParams;
+  const params = buildAudioBooksParams(rawParams);
+
   const queryClient = getQueryClient();
 
   await queryClient.prefetchQuery({
-    queryKey: queryKeys.audiobooks.list(DEFAULT_AUDIOBOOKS_PARAMS),
-    queryFn: () => getAudioBooksRequest(DEFAULT_AUDIOBOOKS_PARAMS),
+    queryKey: queryKeys.audiobooks.list(params),
+    queryFn: () => getAudioBooksRequest(params),
   });
 
   return (

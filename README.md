@@ -190,12 +190,11 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ### State Management (Zustand)
 All application state is managed through **Zustand stores** with mock data initialization:
 - `adminDashboardOverviewStore` — Dashboard greeting, stats, charts, activity
-- `adminDashboardMusicStore` — Songs list UI state (status/genre/search/pagination); list data comes from `useSongs()` (React Query)
 - `adminDashboardAlbumsStore` — Albums list, stats, CRUD + track management
-- `adminDashboardGenreStore` — Genres list UI state (search/pagination); list data comes from `useGenres()`/`useSearchGenres()` (React Query)
 - `adminDashboardAnalyticsStore` — Analytics data and stats
 - `adminDashboardUsersStore` — Users list UI state (filter/search/pagination); list data comes from `useUsers()` (React Query)
-- `songDetailsAnalyticsStore` — Per-song analytics data
+
+Songs, genre, and audiobooks no longer have dedicated UI-state stores — their filter/search/pagination state lives in the URL query string (see `useUrlListParams`) so it's shareable/bookmarkable and the SSR page can prefetch the exact matching page; list data itself comes from `useSongs()`/`useGenres()`/`useAudioBooks()` (React Query).
 
 ### Component Hierarchy
 ```
