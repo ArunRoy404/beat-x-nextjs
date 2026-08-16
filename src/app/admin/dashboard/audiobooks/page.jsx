@@ -3,13 +3,13 @@ import { getQueryClient } from "@/lib/reactQuery/getQueryClient";
 import { queryKeys } from "@/lib/reactQuery/queryKeys";
 import { getAudioBooksRequest } from "@/services/admin/audioBooksServices";
 import { buildAudioBooksParams } from "@/hooks/api/admin/audiobooks/audioBooksParams";
-import { env } from "@/config/env";
 import AdminDashboardAudioBooksPage from "@/templates/admin/dashboard/AdminDashboardAudioBooksPage";
 
-// No-op on this route: getAudioBooksRequest reads the admin's session (cookies),
-// which forces Next.js into fully dynamic rendering regardless of this value.
-// Kept for pages that stop depending on the session and can go fully static.
-export const revalidate = env.revalidateTime;
+// No `export const revalidate` here on purpose: getAudioBooksRequest reads
+// the admin's session (cookies), which already forces Next.js into fully
+// dynamic rendering — a `revalidate` value would be a no-op, and Next's
+// segment config validator requires it to be a static literal anyway (not
+// the env-derived `env.revalidateTime`), which fails the production build.
 
 const page = async ({ searchParams }) => {
   const rawParams = await searchParams;
