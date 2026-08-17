@@ -7,7 +7,6 @@ import CommonSearch from "@/components/shared/CommonSearch/CommonSearch"
 import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSelect"
 import CommonPagination from "@/components/shared/CommonPagination/CommonPagination"
 import CommonTableContainer from "@/components/shared/CommonTable/CommonTableContainer"
-import UploadAudioBookDialog from "@/components/dialogs/admin/audiobooks/UploadAudioBookDialog"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { useUrlListParams } from "@/hooks/useUrlListParams"
@@ -80,7 +79,6 @@ const AudioBooksContainer = () => {
               placeholder="Search audiobooks..."
               className="flex-1 md:w-72"
             />
-            <UploadAudioBookDialog />
           </div>
         </>
       }

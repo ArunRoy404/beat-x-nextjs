@@ -3,75 +3,80 @@
 import React from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { Button } from "@/components/ui/button"
-import { DialogClose } from "@/components/ui/dialog"
-import { CheckCircle, Clock, FileText } from "lucide-react"
 import { toast } from "sonner"
-import { useAdminDashboardAlbumsStore } from "@/zustandStore/admin/adminStore/adminDashboardAlbumsStore"
+import { CheckCircle2, Clock, FileText } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Switch } from "@/components/ui/switch"
+import { DialogClose } from "@/components/ui/dialog"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
 import CommonImageUpload from "@/components/shared/CommonInputs/CommonImageUpload/CommonImageUpload"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSelect"
+import CommonCalender from "@/components/shared/CommonInputs/CommonInput/CommonCalender"
 import CommonSelectCards from "@/components/shared/CommonInputs/CommonInput/CommonSelectCards"
-
-const GENRES = ["Pop", "Hip Hop", "Electronic", "Rock", "Lofi", "Jazz", "R&B"]
+import CommonInputContainer from "@/components/shared/CommonInputs/CommonInput/CommonInputContainer"
+import { useGenres } from "@/hooks/api/admin/genre/useGenres"
+import { useCreateAlbum } from "@/hooks/api/admin/albums/useCreateAlbum"
+import { createAlbumSchema } from "./adminAlbumSchema"
 
 const VISIBILITY_OPTIONS = [
-    { value: "publish", label: "Publish Now", icon: CheckCircle },
+    { value: "publish", label: "Publish Now", icon: CheckCircle2 },
     { value: "schedule", label: "Schedule", icon: Clock },
     { value: "draft", label: "Save as Draft", icon: FileText },
 ]
 
-const albumSchema = z.object({
-    coverImage: z.any().optional(),
-    name: z.string().min(1, "Album Title is required"),
-    genre: z.string().min(1, "Genre is required"),
-    description: z.string().optional(),
-    visibility: z.enum(["publish", "schedule", "draft"]),
-})
-
 const CreateAlbumForm = ({ onSuccess, onCancel }) => {
-    const addAlbum = useAdminDashboardAlbumsStore((state) => state.addAlbum)
+    const { data: genres = [] } = useGenres()
+    const genreOptions = genres.map((genre) => ({ value: genre._id, label: genre.name }))
+
+    const { mutate: createAlbum, isPending } = useCreateAlbum()
 
     const {
         register,
         handleSubmit,
         control,
+        watch,
         setValue,
         reset,
         formState: { errors },
     } = useForm({
-        resolver: zodResolver(albumSchema),
+        resolver: zodResolver(createAlbumSchema),
         defaultValues: {
             coverImage: null,
-            name: "",
+            title: "",
+            artist: "",
             genre: "",
-            description: "",
+            explicit: false,
             visibility: "publish",
+            scheduledAt: undefined,
         },
     })
 
+    const visibility = watch("visibility")
+
     const onSubmit = (data) => {
-        // Map visibility option to status
-        const statusMap = {
-            publish: "Published",
-            schedule: "Scheduled",
-            draft: "Under Review"
+        const formData = new FormData()
+        formData.append("title", data.title)
+        formData.append("artist", data.artist)
+        formData.append("genre", data.genre)
+        formData.append("explicit", String(data.explicit))
+
+        const status = data.visibility === "publish" ? "active" : data.visibility === "schedule" ? "scheduled" : "draft"
+        formData.append("status", status)
+        if (data.visibility === "schedule" && data.scheduledAt) {
+            formData.append("scheduledAt", data.scheduledAt.toISOString())
         }
 
-        addAlbum({
-            name: data.name,
-            artist: "Tahsin", // Admin default creator
-            genre: data.genre,
-            status: statusMap[data.visibility] || "Under Review",
-            description: data.description,
-            // If file was uploaded, use mock URL or create object URL
-            avatar: data.coverImage ? URL.createObjectURL(data.coverImage) : "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&q=80&w=150"
+        if (data.coverImage instanceof File) formData.append("cover", data.coverImage)
+
+        createAlbum(formData, {
+            onSuccess: () => {
+                toast.success("Album created successfully!")
+                reset()
+                onSuccess?.()
+            },
+            onError: (error) => toast.error(error?.message || "Failed to create album."),
         })
-        toast.success("Album created successfully!")
-        reset()
-        onSuccess?.()
     }
 
     const onInvalid = (validationErrors) => {
@@ -92,6 +97,8 @@ const CreateAlbumForm = ({ onSuccess, onCancel }) => {
                         value={field.value}
                         onChange={(file) => setValue("coverImage", file, { shouldValidate: true })}
                         error={errors.coverImage?.message}
+                        title="Upload cover art"
+                        subtitle="JPEG / PNG / WebP · Max 5MB"
                     />
                 )}
             />
@@ -99,37 +106,35 @@ const CreateAlbumForm = ({ onSuccess, onCancel }) => {
             {/* Album Title */}
             <CommonInput
                 label="Album Title"
-                placeholder="e.g. Asha"
-                {...register("name")}
-                error={errors.name?.message}
+                placeholder="e.g. Cyber-Neon Dreams"
+                {...register("title")}
+                error={errors.title?.message}
             />
 
-            {/* Genre */}
-            <Controller
-                name="genre"
-                control={control}
-                render={({ field }) => (
-                    <CommonSelect
-                        label="Genre"
-                        placeholder="Select genre"
-                        value={field.value}
-                        onChange={field.onChange}
-                        options={GENRES}
-                        error={errors.genre?.message}
-                    />
-                )}
-            />
+            <CommonInputContainer>
+                <CommonInput
+                    label="Artist"
+                    placeholder="Artist name"
+                    {...register("artist")}
+                    error={errors.artist?.message}
+                />
+                <Controller
+                    name="genre"
+                    control={control}
+                    render={({ field }) => (
+                        <CommonSelect
+                            label="Genre"
+                            placeholder="Select genre"
+                            value={field.value}
+                            onChange={field.onChange}
+                            options={genreOptions}
+                            error={errors.genre?.message}
+                        />
+                    )}
+                />
+            </CommonInputContainer>
 
-            {/* Description */}
-            <CommonInput
-                label="Description"
-                type="textarea"
-                placeholder="Type a short description..."
-                {...register("description")}
-                error={errors.description?.message}
-            />
-
-            {/* Visibility Section */}
+            {/* Visibility Options */}
             <Controller
                 name="visibility"
                 control={control}
@@ -141,6 +146,34 @@ const CreateAlbumForm = ({ onSuccess, onCancel }) => {
                         options={VISIBILITY_OPTIONS}
                         error={errors.visibility?.message}
                     />
+                )}
+            />
+
+            {visibility === "schedule" && (
+                <Controller
+                    name="scheduledAt"
+                    control={control}
+                    render={({ field }) => (
+                        <CommonCalender
+                            label="Scheduled Date"
+                            placeholder="Choose Date"
+                            value={field.value}
+                            onChange={field.onChange}
+                            error={errors.scheduledAt?.message}
+                        />
+                    )}
+                />
+            )}
+
+            {/* Explicit Content Toggle */}
+            <Controller
+                name="explicit"
+                control={control}
+                render={({ field }) => (
+                    <div className="flex items-center justify-between py-2 border-t border-b border-white/5">
+                        <span className="text-whitetext text-[13px] font-medium">Explicit Content</span>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </div>
                 )}
             />
 
@@ -162,6 +195,7 @@ const CreateAlbumForm = ({ onSuccess, onCancel }) => {
                     variant="gradient"
                     className="flex-1"
                     size="lg"
+                    isLoading={isPending}
                 >
                     Create Album
                 </Button>

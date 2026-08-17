@@ -50,6 +50,11 @@ const CommonTableStatus = ({ status, className }) => {
           Archived
         </span>
       )}
+      {status === "scheduled" && (
+        <span className="border border-[#CC97FF]/20 bg-[#CC97FF]/10 text-[#CC97FF] text-[12px] font-normal px-2.5 py-0.5 rounded-full select-none capitalize">
+          Scheduled
+        </span>
+      )}
     </div>
   )
 }

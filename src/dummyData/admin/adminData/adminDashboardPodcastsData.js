@@ -1,38 +1,6 @@
-export const podcastsStatsCards = [
-  {
-    id: 1,
-    title: "Total Podcasts",
-    value: "60K",
-    icon: "Radio",
-    iconColor: "#3ADFFA",
-    iconBg: "rgba(58, 223, 250, 0.15)"
-  },
-  {
-    id: 2,
-    title: "Published",
-    value: "33K",
-    icon: "CheckCircle",
-    iconColor: "#34C759",
-    iconBg: "rgba(52, 199, 89, 0.15)"
-  },
-  {
-    id: 3,
-    title: "Awaiting Review",
-    value: "2",
-    icon: "Clock",
-    iconColor: "#FFAE00",
-    iconBg: "rgba(254, 174, 0, 0.15)"
-  },
-  {
-    id: 4,
-    title: "Total Streams",
-    value: "22.6M",
-    icon: "Headphones",
-    iconColor: "#CC97FF",
-    iconBg: "rgba(204, 151, 255, 0.15)"
-  }
-]
-
+// Only used to seed the still-dummy "Upload New Podcast" flow
+// (useAdminDashboardPodcastsStore) — the real podcast list now comes from
+// usePodcasts()/PodcastsContainer.
 export const podcastsList = [
   {
     id: 1,

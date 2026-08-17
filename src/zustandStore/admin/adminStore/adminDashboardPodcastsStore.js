@@ -1,11 +1,10 @@
 import { create } from "zustand"
-import {
-  podcastsStatsCards,
-  podcastsList
-} from "@/dummyData/admin/adminData/adminDashboardPodcastsData"
+import { podcastsList } from "@/dummyData/admin/adminData/adminDashboardPodcastsData"
 
+// Only the Create (Upload New Podcast) flow is still dummy-backed — List,
+// Update and Delete now go through the real Admin — Podcasts (Moderation)
+// API and read from usePodcasts()/PodcastsContainer instead of this store.
 export const useAdminDashboardPodcastsStore = create((set) => ({
-  podcastsStatsCards: podcastsStatsCards,
   podcastsList: podcastsList,
   addPodcast: (newPodcast) => set((state) => ({
     podcastsList: [
@@ -38,41 +37,4 @@ export const useAdminDashboardPodcastsStore = create((set) => ({
       ...state.podcastsList
     ]
   })),
-  updatePodcast: (id, updatedPodcast) => set((state) => ({
-    podcastsList: state.podcastsList.map((pod) => {
-      if (pod.id === id) {
-        return {
-          ...pod,
-          title: updatedPodcast.episodeTitle,
-          artist: updatedPodcast.artist,
-          series: updatedPodcast.seriesName || "Single",
-          genre: updatedPodcast.category,
-          released: updatedPodcast.releaseDate
-            ? (updatedPodcast.releaseDate instanceof Date
-              ? updatedPodcast.releaseDate.toISOString().split('T')[0]
-              : updatedPodcast.releaseDate)
-            : "-",
-          status: updatedPodcast.visibility === "publish"
-            ? "Published"
-            : updatedPodcast.visibility === "schedule"
-              ? "Scheduled"
-              : "Draft",
-          cover: updatedPodcast.coverImage && typeof updatedPodcast.coverImage === "object"
-            ? URL.createObjectURL(updatedPodcast.coverImage)
-            : (updatedPodcast.coverImage || pod.cover),
-          isExplicit: updatedPodcast.isExplicit,
-          description: updatedPodcast.description,
-          season: updatedPodcast.season,
-          episode: updatedPodcast.episodeNumber,
-          audioFile: updatedPodcast.audioFile && typeof updatedPodcast.audioFile === "object"
-            ? { name: updatedPodcast.audioFile.name, size: "230MB", format: "MP3" }
-            : (updatedPodcast.audioFile || pod.audioFile)
-        }
-      }
-      return pod
-    })
-  })),
-  deletePodcast: (id) => set((state) => ({
-    podcastsList: state.podcastsList.filter((pod) => pod.id !== id)
-  }))
 }))

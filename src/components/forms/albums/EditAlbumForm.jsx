@@ -1,136 +1,143 @@
 "use client"
 
-import React from "react"
+import React, { useState } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { Button } from "@/components/ui/button"
-import { DialogClose } from "@/components/ui/dialog"
-import { CheckCircle, Clock, FileText } from "lucide-react"
 import { toast } from "sonner"
-import { useAdminDashboardAlbumsStore } from "@/zustandStore/admin/adminStore/adminDashboardAlbumsStore"
+import { CheckCircle2, Clock, FileText } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Switch } from "@/components/ui/switch"
+import { DialogClose } from "@/components/ui/dialog"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
 import CommonImageUpload from "@/components/shared/CommonInputs/CommonImageUpload/CommonImageUpload"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSelect"
+import CommonCalender from "@/components/shared/CommonInputs/CommonInput/CommonCalender"
 import CommonSelectCards from "@/components/shared/CommonInputs/CommonInput/CommonSelectCards"
-
-const GENRES = ["Pop", "Hip Hop", "Electronic", "Rock", "Lofi", "Jazz", "R&B"]
+import CommonInputContainer from "@/components/shared/CommonInputs/CommonInput/CommonInputContainer"
+import { useGenres } from "@/hooks/api/admin/genre/useGenres"
+import { useUpdateAlbum } from "@/hooks/api/admin/albums/useUpdateAlbum"
+import { useReplaceAlbumCover } from "@/hooks/api/admin/albums/useReplaceAlbumCover"
+import { editAlbumSchema } from "./adminAlbumSchema"
 
 const VISIBILITY_OPTIONS = [
-    { value: "publish", label: "Publish Now", icon: CheckCircle },
+    { value: "publish", label: "Publish Now", icon: CheckCircle2 },
     { value: "schedule", label: "Schedule", icon: Clock },
     { value: "draft", label: "Save as Draft", icon: FileText },
 ]
 
-const albumSchema = z.object({
-    coverImage: z.any().optional(),
-    name: z.string().min(1, "Album Title is required"),
-    genre: z.string().min(1, "Genre is required"),
-    description: z.string().optional(),
-    visibility: z.enum(["publish", "schedule", "draft"]),
-})
+const getDefaultVisibility = (album) => {
+    if (album?.status === "active") return "publish"
+    if (album?.status === "scheduled") return "schedule"
+    return "draft"
+}
 
 const EditAlbumForm = ({ album, onSuccess, onCancel }) => {
-    const updateAlbum = useAdminDashboardAlbumsStore((state) => state.updateAlbum)
+    const { data: genres = [] } = useGenres()
+    const genreOptions = genres.map((genre) => ({ value: genre._id, label: genre.name }))
+
+    const [cover, setCover] = useState(album?.coverUrl || null)
+
+    const { mutateAsync: updateAlbum, isPending: isUpdating } = useUpdateAlbum()
+    const { mutateAsync: replaceCover, isPending: isReplacingCover } = useReplaceAlbumCover()
+    const isPending = isUpdating || isReplacingCover
 
     const {
         register,
         handleSubmit,
         control,
-        setValue,
+        watch,
         formState: { errors },
     } = useForm({
-        resolver: zodResolver(albumSchema),
+        resolver: zodResolver(editAlbumSchema),
         defaultValues: {
-            coverImage: album?.avatar || null,
-            name: album?.name || "",
-            genre: album?.genre || "",
-            description: album?.description || "",
-            visibility: album?.status === "Published"
-                ? "publish"
-                : album?.status === "Scheduled"
-                  ? "schedule"
-                  : "draft",
+            coverImage: null,
+            title: album?.title || "",
+            artist: album?.artist || "",
+            genre: album?.genre?._id || (typeof album?.genre === "string" ? album.genre : ""),
+            explicit: album?.explicit || false,
+            visibility: getDefaultVisibility(album),
+            scheduledAt: album?.scheduledAt ? new Date(album.scheduledAt) : undefined,
+            isFeatured: album?.isFeatured || false,
         },
     })
 
-    const onSubmit = (data) => {
-        const statusMap = {
-            publish: "Published",
-            schedule: "Scheduled",
-            draft: "Under Review"
+    const visibility = watch("visibility")
+
+    const onSubmit = async (data) => {
+        const body = {
+            title: data.title,
+            artist: data.artist,
+            genre: data.genre,
+            explicit: data.explicit,
+            isFeatured: data.isFeatured,
         }
 
-        updateAlbum({
-            ...album,
-            name: data.name,
-            genre: data.genre,
-            status: statusMap[data.visibility] || album.status,
-            description: data.description,
-            // Update cover if new image file was selected
-            avatar: data.coverImage instanceof File ? URL.createObjectURL(data.coverImage) : data.coverImage
-        })
-        toast.success("Album details updated successfully!")
-        onSuccess?.()
-    }
+        // Editing shouldn't silently un-archive a taken-down album —
+        // that's what the dedicated Restore action is for.
+        body.status = album?.status === "archived" ? "archived" : (data.visibility === "publish" ? "active" : data.visibility === "schedule" ? "scheduled" : "draft")
+        if (data.visibility === "schedule" && data.scheduledAt) {
+            body.scheduledAt = data.scheduledAt.toISOString()
+        }
 
-    const onInvalid = (validationErrors) => {
-        const errorKeys = Object.keys(validationErrors)
-        if (errorKeys.length > 0) {
-            toast.error(validationErrors[errorKeys[0]].message)
+        try {
+            await updateAlbum({ id: album._id, body })
+
+            if (cover instanceof File) {
+                const coverFormData = new FormData()
+                coverFormData.append("file", cover)
+                await replaceCover({ id: album._id, formData: coverFormData })
+            }
+
+            toast.success("Album updated successfully!")
+            onSuccess?.()
+        } catch (error) {
+            toast.error(error?.message || "Failed to update album.")
         }
     }
 
     return (
-        <CommonFormContainer onSubmit={handleSubmit(onSubmit, onInvalid)}>
+        <CommonFormContainer onSubmit={handleSubmit(onSubmit)}>
             {/* Cover Art Dropzone */}
-            <Controller
-                name="coverImage"
-                control={control}
-                render={({ field }) => (
-                    <CommonImageUpload
-                        value={field.value}
-                        onChange={(file) => setValue("coverImage", file, { shouldValidate: true })}
-                        error={errors.coverImage?.message}
-                    />
-                )}
+            <CommonImageUpload
+                value={cover}
+                onChange={setCover}
+                title="Upload cover art"
+                subtitle="JPEG / PNG / WebP · Max 5MB"
             />
 
             {/* Album Title */}
             <CommonInput
                 label="Album Title"
-                placeholder="e.g. Asha"
-                {...register("name")}
-                error={errors.name?.message}
+                placeholder="e.g. Cyber-Neon Dreams"
+                {...register("title")}
+                error={errors.title?.message}
             />
 
-            {/* Genre */}
-            <Controller
-                name="genre"
-                control={control}
-                render={({ field }) => (
-                    <CommonSelect
-                        label="Genre"
-                        placeholder="Select genre"
-                        value={field.value}
-                        onChange={field.onChange}
-                        options={GENRES}
-                        error={errors.genre?.message}
-                    />
-                )}
-            />
+            <CommonInputContainer>
+                <CommonInput
+                    label="Artist"
+                    placeholder="Artist name"
+                    {...register("artist")}
+                    error={errors.artist?.message}
+                />
+                <Controller
+                    name="genre"
+                    control={control}
+                    render={({ field }) => (
+                        <CommonSelect
+                            label="Genre"
+                            placeholder="Select genre"
+                            value={field.value}
+                            onChange={field.onChange}
+                            options={genreOptions}
+                            error={errors.genre?.message}
+                        />
+                    )}
+                />
+            </CommonInputContainer>
 
-            {/* Description */}
-            <CommonInput
-                label="Description"
-                type="textarea"
-                placeholder="Type a short description..."
-                {...register("description")}
-                error={errors.description?.message}
-            />
-
-            {/* Visibility Section */}
+            {/* Visibility Options */}
             <Controller
                 name="visibility"
                 control={control}
@@ -142,6 +149,46 @@ const EditAlbumForm = ({ album, onSuccess, onCancel }) => {
                         options={VISIBILITY_OPTIONS}
                         error={errors.visibility?.message}
                     />
+                )}
+            />
+
+            {visibility === "schedule" && (
+                <Controller
+                    name="scheduledAt"
+                    control={control}
+                    render={({ field }) => (
+                        <CommonCalender
+                            label="Scheduled Date"
+                            placeholder="Choose Date"
+                            value={field.value}
+                            onChange={field.onChange}
+                            error={errors.scheduledAt?.message}
+                        />
+                    )}
+                />
+            )}
+
+            {/* Explicit Content Toggle */}
+            <Controller
+                name="explicit"
+                control={control}
+                render={({ field }) => (
+                    <div className="flex items-center justify-between py-2 border-t border-white/5">
+                        <span className="text-whitetext text-[13px] font-medium">Explicit Content</span>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </div>
+                )}
+            />
+
+            {/* Featured Toggle */}
+            <Controller
+                name="isFeatured"
+                control={control}
+                render={({ field }) => (
+                    <div className="flex items-center justify-between py-2 border-t border-b border-white/5">
+                        <span className="text-whitetext text-[13px] font-medium">Featured</span>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </div>
                 )}
             />
 
@@ -163,6 +210,7 @@ const EditAlbumForm = ({ album, onSuccess, onCancel }) => {
                     variant="gradient"
                     className="flex-1"
                     size="lg"
+                    isLoading={isPending}
                 >
                     Save Changes
                 </Button>

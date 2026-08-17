@@ -3,24 +3,18 @@
 import React from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { editPodcastSchema } from "@/zodSchema/UploadNewPodcastZodSchema"
+import { toast } from "sonner"
+import { CheckCircle2, Clock, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { DialogClose } from "@/components/ui/dialog"
-import { CheckCircle2, Clock, FileText } from "lucide-react"
-import { toast } from "sonner"
-import { useAdminDashboardPodcastsStore } from "@/zustandStore/admin/adminStore/adminDashboardPodcastsStore"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
-import CommonAudioInput from "@/components/shared/CommonInputs/CommonAudioInput/CommonAudioInput"
-import CommonImageUpload from "@/components/shared/CommonInputs/CommonImageUpload/CommonImageUpload"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSelect"
 import CommonCalender from "@/components/shared/CommonInputs/CommonInput/CommonCalender"
 import CommonSelectCards from "@/components/shared/CommonInputs/CommonInput/CommonSelectCards"
-import CommonInputContainer from "@/components/shared/CommonInputs/CommonInput/CommonInputContainer"
-
-const HOSTS = ["Arif Hossain", "Tahsin Ahmed", "Jishan", "Fahim", "Nabila"]
-const CATEGORIES = ["Technology", "Business", "Health", "History", "Entertainment", "POP"]
+import { useUpdatePodcast } from "@/hooks/api/admin/podcasts/useUpdatePodcast"
+import { podcastModerationSchema } from "./adminPodcastSchema"
 
 const VISIBILITY_OPTIONS = [
     { value: "publish", label: "Publish Now", icon: CheckCircle2 },
@@ -28,169 +22,76 @@ const VISIBILITY_OPTIONS = [
     { value: "draft", label: "Save as Draft", icon: FileText },
 ]
 
+const TREND_DIRECTION_OPTIONS = [
+    { value: "up", label: "Up" },
+    { value: "down", label: "Down" },
+    { value: "stable", label: "Stable" },
+]
+
+const getDefaultVisibility = (podcast) => {
+    if (podcast?.status === "active") return "publish"
+    if (podcast?.status === "scheduled") return "schedule"
+    return "draft"
+}
+
 const EditPodcastForm = ({ podcast, onSuccess, onCancel }) => {
-    const updatePodcast = useAdminDashboardPodcastsStore((state) => state.updatePodcast)
+    const { mutate: updatePodcast, isPending } = useUpdatePodcast()
 
     const {
         register,
         handleSubmit,
         control,
-        setValue,
+        watch,
         formState: { errors },
     } = useForm({
-        resolver: zodResolver(editPodcastSchema),
+        resolver: zodResolver(podcastModerationSchema),
         defaultValues: {
-            audioFile: podcast?.audioFile || "Audio file",
-            coverImage: podcast?.cover || null,
-            episodeTitle: podcast?.title || "",
-            artist: podcast?.artist || "Arif Hossain",
-            seriesName: podcast?.series || "",
-            category: podcast?.genre || "",
-            season: podcast?.season || "",
-            episodeNumber: podcast?.episode || "",
-            releaseDate: podcast?.released && podcast.released !== "-" ? new Date(podcast.released) : null,
             description: podcast?.description || "",
-            visibility: podcast?.status === "Published" 
-                ? "publish" 
-                : podcast?.status === "Scheduled" 
-                  ? "schedule" 
-                  : "draft",
-            isExplicit: podcast?.isExplicit || false,
+            visibility: getDefaultVisibility(podcast),
+            scheduledAt: podcast?.scheduledAt ? new Date(podcast.scheduledAt) : undefined,
+            isFeatured: podcast?.isFeatured || false,
+            isTrending: podcast?.isTrending || false,
+            trendDirection: podcast?.trendDirection || "stable",
         },
     })
 
-    const onSubmit = (data) => {
-        console.log("Updated Podcast Data:", data)
-        updatePodcast(podcast.id, data)
-        toast.success("Podcast updated successfully!")
-        onSuccess?.()
-    }
+    const visibility = watch("visibility")
+    const isTrending = watch("isTrending")
 
-    const onInvalid = (validationErrors) => {
-        const errorKeys = Object.keys(validationErrors)
-        if (errorKeys.length > 0) {
-            toast.error(validationErrors[errorKeys[0]].message)
+    const onSubmit = (data) => {
+        const body = {
+            description: data.description,
+            isFeatured: data.isFeatured,
+            isTrending: data.isTrending,
+            trendDirection: data.trendDirection,
         }
+
+        // Editing shouldn't silently un-archive a taken-down podcast —
+        // that's what the dedicated Restore action is for.
+        body.status = podcast?.status === "archived" ? "archived" : (data.visibility === "publish" ? "active" : "draft")
+        if (data.visibility === "schedule" && data.scheduledAt) {
+            body.scheduledAt = data.scheduledAt.toISOString()
+        }
+
+        updatePodcast(
+            { id: podcast._id, body },
+            {
+                onSuccess: () => {
+                    toast.success("Podcast updated successfully!")
+                    onSuccess?.()
+                },
+                onError: (error) => toast.error(error?.message || "Failed to update podcast."),
+            }
+        )
     }
 
     return (
-        <CommonFormContainer onSubmit={handleSubmit(onSubmit, onInvalid)}>
-            {/* Audio File Dropzone */}
-            <Controller
-                name="audioFile"
-                control={control}
-                render={({ field }) => (
-                    <CommonAudioInput
-                        value={field.value}
-                        onChange={(file) => setValue("audioFile", file, { shouldValidate: true })}
-                        error={errors.audioFile?.message}
-                        title="Drop your audio file here"
-                        subtitle="MP3, WAV · Max 500MB"
-                    />
-                )}
-            />
-
-            {/* Cover Art Dropzone */}
-            <Controller
-                name="coverImage"
-                control={control}
-                render={({ field }) => (
-                    <CommonImageUpload
-                        value={field.value}
-                        onChange={(file) => setValue("coverImage", file, { shouldValidate: true })}
-                        error={errors.coverImage?.message}
-                        title="Upload cover art"
-                        subtitle="Upload cover art · min 1400×1400px"
-                    />
-                )}
-            />
-
-            {/* Episode Title */}
-            <CommonInput
-                label="Episode Title"
-                placeholder="Enter episode title..."
-                {...register("episodeTitle")}
-                error={errors.episodeTitle?.message}
-            />
-
-            {/* Host Select */}
-            <Controller
-                name="artist"
-                control={control}
-                render={({ field }) => (
-                    <CommonSelect
-                        label="Artist/Host"
-                        placeholder="Choose Host"
-                        value={field.value}
-                        onChange={field.onChange}
-                        options={HOSTS}
-                        error={errors.artist?.message}
-                    />
-                )}
-            />
-
-            {/* Series Name & Category */}
-            <CommonInputContainer>
-                <CommonInput
-                    label="Series Name"
-                    placeholder="e.g. Tech Weekly BD"
-                    {...register("seriesName")}
-                    error={errors.seriesName?.message}
-                />
-
-                <Controller
-                    name="category"
-                    control={control}
-                    render={({ field }) => (
-                        <CommonSelect
-                            label="Category"
-                            placeholder="Select category"
-                            value={field.value}
-                            onChange={field.onChange}
-                            options={CATEGORIES}
-                            error={errors.category?.message}
-                        />
-                    )}
-                />
-            </CommonInputContainer>
-
-            {/* Season & Episode # */}
-            <CommonInputContainer>
-                <CommonInput
-                    label="Season"
-                    placeholder="e.g. 1"
-                    {...register("season")}
-                    error={errors.season?.message}
-                />
-
-                <CommonInput
-                    label="Episode #"
-                    placeholder="e.g. 14"
-                    {...register("episodeNumber")}
-                    error={errors.episodeNumber?.message}
-                />
-            </CommonInputContainer>
-
-            {/* Release Date */}
-            <Controller
-                name="releaseDate"
-                control={control}
-                render={({ field }) => (
-                    <CommonCalender
-                        label="Release Date"
-                        placeholder="Choose Date"
-                        value={field.value}
-                        onChange={field.onChange}
-                        error={errors.releaseDate?.message}
-                    />
-                )}
-            />
-
+        <CommonFormContainer onSubmit={handleSubmit(onSubmit)}>
             {/* Description */}
             <CommonInput
                 label="Description"
                 type="textarea"
-                placeholder="Episode description / show notes..."
+                placeholder="Podcast description..."
                 {...register("description")}
                 error={errors.description?.message}
             />
@@ -210,23 +111,61 @@ const EditPodcastForm = ({ podcast, onSuccess, onCancel }) => {
                 )}
             />
 
-            {/* Explicit Content Toggle */}
+            {visibility === "schedule" && (
+                <Controller
+                    name="scheduledAt"
+                    control={control}
+                    render={({ field }) => (
+                        <CommonCalender
+                            label="Scheduled Date"
+                            placeholder="Choose Date"
+                            value={field.value}
+                            onChange={field.onChange}
+                            error={errors.scheduledAt?.message}
+                        />
+                    )}
+                />
+            )}
+
+            {/* Featured Toggle */}
             <Controller
-                name="isExplicit"
+                name="isFeatured"
                 control={control}
                 render={({ field }) => (
-                    <div className="flex items-center justify-between py-2 border-t border-b border-whitetext/5 shrink-0">
-                        <span className="text-light-gray text-[16px] not-italic font-medium font-sans">
-                            Explicit Content
-                        </span>
-                        <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            className="data-checked:bg-secondary data-unchecked:bg-light-gray/20"
-                        />
+                    <div className="flex items-center justify-between py-2 border-t border-white/5">
+                        <span className="text-whitetext text-[13px] font-medium">Featured</span>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
                     </div>
                 )}
             />
+
+            {/* Trending Toggle */}
+            <Controller
+                name="isTrending"
+                control={control}
+                render={({ field }) => (
+                    <div className="flex items-center justify-between py-2 border-t border-b border-white/5">
+                        <span className="text-whitetext text-[13px] font-medium">Trending</span>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </div>
+                )}
+            />
+
+            {isTrending && (
+                <Controller
+                    name="trendDirection"
+                    control={control}
+                    render={({ field }) => (
+                        <CommonSelect
+                            label="Trend Direction"
+                            value={field.value}
+                            onChange={field.onChange}
+                            options={TREND_DIRECTION_OPTIONS}
+                            error={errors.trendDirection?.message}
+                        />
+                    )}
+                />
+            )}
 
             {/* Footer Actions */}
             <div className="flex items-center gap-4 mt-2 shrink-0">
@@ -246,6 +185,7 @@ const EditPodcastForm = ({ podcast, onSuccess, onCancel }) => {
                     variant="gradient"
                     className="flex-1"
                     size="lg"
+                    isLoading={isPending}
                 >
                     Save Changes
                 </Button>
