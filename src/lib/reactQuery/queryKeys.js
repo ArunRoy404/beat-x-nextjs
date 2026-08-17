@@ -41,4 +41,9 @@ export const queryKeys = {
     all: ["scheduler"],
     status: () => [...queryKeys.scheduler.all, "status"],
   },
+  albums: {
+    all: ["albums"],
+    list: (params) => [...queryKeys.albums.all, "list", params],
+    detail: (id) => [...queryKeys.albums.all, "detail", id],
+  },
 };
