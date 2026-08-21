@@ -1,9 +1,35 @@
 import { userHomeAssets } from "./userHomeAssets"
 
-export const heroContent = {
-  badges: ["TRENDING NOW", "NEW RELEASE"],
-  artwork: userHomeAssets.photos.heroCyberDreams,
-}
+export const heroContent = [
+  {
+    id: "hero-1",
+    title: "Cyber Dreams",
+    subtitle: "By Fahim Islam",
+    badges: ["TRENDING NOW", "NEW RELEASE"],
+    artwork: userHomeAssets.photos.heroCyberDreams,
+  },
+  {
+    id: "hero-2",
+    title: "Bhalo Thake Mon",
+    subtitle: "By Fahim Islam",
+    badges: ["FEATURED MIX", "POPULAR NOW"],
+    artwork: userHomeAssets.photos.mixOverlay1,
+  },
+  {
+    id: "hero-3",
+    title: "Ami Tor Mayay",
+    subtitle: "By Mahtim Sakib",
+    badges: ["RECOMMENDED", "TOP GENRE"],
+    artwork: userHomeAssets.photos.mixOverlay2,
+  },
+  {
+    id: "hero-4",
+    title: "Sonic Playground",
+    subtitle: "By BeatX Curation",
+    badges: ["CURATED FOR YOU", "NEW ATMOSPHERE"],
+    artwork: userHomeAssets.photos.mixOverlay3,
+  }
+]
 
 export const mixes = [
   { id: "mix-1", title: "Bhalo Thake Mon", subtitle: "By Fahim Islam", art: userHomeAssets.photos.mixOverlay1 },

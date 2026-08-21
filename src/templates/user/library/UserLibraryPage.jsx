@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { LayoutGrid, List } from "lucide-react"
+import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import CommonMediaCard from "@/components/shared/CommonMediaCard"
 import LikedSongsHero from "@/components/user/library/LikedSongsHero"
@@ -11,6 +12,51 @@ import TopArtistItem from "@/components/user/library/TopArtistItem"
 import RecentAlbumRow from "@/components/user/library/RecentAlbumRow"
 import { useUserLibraryStore } from "@/zustandStore/user/userStore/userLibraryStore"
 
+const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.12,
+            delayChildren: 0.05
+        }
+    }
+}
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 24 },
+    show: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.65,
+            ease: [0.16, 1, 0.3, 1]
+        }
+    }
+}
+
+const listContainerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.05
+        }
+    }
+}
+
+const listItemVariants = {
+    hidden: { opacity: 0, y: 12 },
+    show: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.4,
+            ease: [0.16, 1, 0.3, 1]
+        }
+    }
+}
+
 const UserLibraryPage = () => {
     const playlists = useUserLibraryStore((state) => state.playlists)
     const topArtists = useUserLibraryStore((state) => state.topArtists)
@@ -18,16 +64,27 @@ const UserLibraryPage = () => {
     const [albumView, setAlbumView] = useState("list")
 
     return (
-        <div className="flex w-full flex-col gap-6 py-6">
+        <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            className="flex w-full flex-col gap-6 py-6"
+        >
             <div className="flex w-full flex-col gap-6 lg:flex-row">
-                <LikedSongsHero />
+                <motion.div variants={itemVariants} className="flex min-w-0 flex-1">
+                    <LikedSongsHero />
+                </motion.div>
                 <div className="flex w-full flex-col gap-6 lg:w-88 lg:shrink-0">
-                    <SonicReplayCard />
-                    <DiscoveryPrismCard />
+                    <motion.div variants={itemVariants}>
+                        <SonicReplayCard />
+                    </motion.div>
+                    <motion.div variants={itemVariants}>
+                        <DiscoveryPrismCard />
+                    </motion.div>
                 </div>
             </div>
 
-            <section className="flex w-full flex-col gap-4">
+            <motion.section variants={itemVariants} className="flex w-full flex-col gap-4">
                 <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between">
                         <h2 className="text-2xl text-whitetext sm:text-[32px]">Playlists</h2>
@@ -37,37 +94,50 @@ const UserLibraryPage = () => {
                     </div>
                     <p className="text-base text-light-gray">Curations for every atmosphere</p>
                 </div>
-                <div className="flex w-full flex-wrap gap-6">
+                <motion.div 
+                    variants={listContainerVariants}
+                    className="flex w-full flex-wrap gap-6"
+                >
                     {playlists.map((playlist) => (
-                        <CommonMediaCard
-                            key={playlist.id}
-                            art={playlist.art}
-                            title={playlist.title}
-                            subtitle={playlist.subtitle}
-                            className="w-40 flex-1 basis-40"
-                            imgClassName="h-40"
-                            shadow
-                        />
+                        <motion.div 
+                            key={playlist.id} 
+                            variants={listItemVariants}
+                            className="w-40 flex-1 basis-40 flex"
+                        >
+                            <CommonMediaCard
+                                art={playlist.art}
+                                title={playlist.title}
+                                subtitle={playlist.subtitle}
+                                className="w-full"
+                                imgClassName="h-40"
+                                shadow
+                            />
+                        </motion.div>
                     ))}
-                </div>
-            </section>
+                </motion.div>
+            </motion.section>
 
             <div className="flex w-full flex-col gap-12 xl:flex-row">
-                <section className="flex w-full flex-col gap-4 xl:w-87 xl:shrink-0">
+                <motion.section variants={itemVariants} className="flex w-full flex-col gap-4 xl:w-87 xl:shrink-0">
                     <div className="flex items-center justify-between">
                         <h2 className="text-2xl font-semibold text-whitetext">Top Artists</h2>
                         <button type="button" className="cursor-pointer text-base text-secondary">
                             See More
                         </button>
                     </div>
-                    <div className="flex flex-col gap-4">
+                    <motion.div 
+                        variants={listContainerVariants}
+                        className="flex flex-col gap-4"
+                    >
                         {topArtists.map((artist) => (
-                            <TopArtistItem key={artist.id} artist={artist} />
+                            <motion.div key={artist.id} variants={listItemVariants}>
+                                <TopArtistItem artist={artist} />
+                            </motion.div>
                         ))}
-                    </div>
-                </section>
+                    </motion.div>
+                </motion.section>
 
-                <section className="flex min-w-0 flex-1 flex-col gap-4">
+                <motion.section variants={itemVariants} className="flex min-w-0 flex-1 flex-col gap-4">
                     <div className="flex items-center justify-between">
                         <h2 className="text-2xl font-semibold text-whitetext">Recent Albums</h2>
                         <div className="flex items-center gap-2">
@@ -98,14 +168,19 @@ const UserLibraryPage = () => {
                         <span className="flex-1 text-center">RELEASED</span>
                         <span className="flex-1 text-center">TRACKS</span>
                     </div>
-                    <div className="flex flex-col gap-4">
+                    <motion.div 
+                        variants={listContainerVariants}
+                        className="flex flex-col gap-4"
+                    >
                         {recentAlbums.map((album) => (
-                            <RecentAlbumRow key={album.id} album={album} />
+                            <motion.div key={album.id} variants={listItemVariants}>
+                                <RecentAlbumRow album={album} />
+                            </motion.div>
                         ))}
-                    </div>
-                </section>
+                    </motion.div>
+                </motion.section>
             </div>
-        </div>
+        </motion.div>
     )
 }
 
