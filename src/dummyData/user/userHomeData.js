@@ -38,6 +38,12 @@ export const mixes = [
   { id: "mix-4", title: "Tor Lagiya", subtitle: "By Samz Vai", art: userHomeAssets.photos.mixOverlay4 },
   { id: "mix-5", title: "Rewired Mix", subtitle: "By Circuit Theory", art: userHomeAssets.photos.albumArt2 },
   { id: "mix-6", title: "Deadline Curation", subtitle: "By BeatX Curation", art: userHomeAssets.photos.albumArt4 },
+  { id: "mix-7", title: "Bhalo Thake Mon", subtitle: "By Fahim Islam", art: userHomeAssets.photos.mixOverlay1 },
+  { id: "mix-8", title: "Ami Tor Mayay", subtitle: "By Mahtim Sakib", art: userHomeAssets.photos.mixOverlay2 },
+  { id: "mix-9", title: "O Meye", subtitle: "By Jisan Khan Shuvo", art: userHomeAssets.photos.mixOverlay3 },
+  { id: "mix-10", title: "Tor Lagiya", subtitle: "By Samz Vai", art: userHomeAssets.photos.mixOverlay4 },
+  { id: "mix-11", title: "Rewired Mix", subtitle: "By Circuit Theory", art: userHomeAssets.photos.albumArt2 },
+  { id: "mix-12", title: "Deadline Curation", subtitle: "By BeatX Curation", art: userHomeAssets.photos.albumArt4 },
 ]
 
 export const newReleases = [
