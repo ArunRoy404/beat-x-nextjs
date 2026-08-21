@@ -112,6 +112,9 @@
   --sidebar-tint: rgba(204, 151, 255, 0.1);
   --user-nav-active-bg: rgba(58, 223, 250, 0.2);
   --release-item-bg: rgba(14, 14, 14, 0.8);
+  --explore-hero-overlay-gradient: linear-gradient(90deg, rgba(14, 14, 14, 0.74) 0%, rgba(14, 14, 14, 0.74) 50%, rgba(14, 14, 14, 0) 100%);
+  --live-badge-bg: #FF6666;
+  --liked-hero-gradient: linear-gradient(124.44deg, rgba(88, 232, 255, 0.19) 1.99%, rgba(211, 164, 255, 0.19) 90.45%);
 
   /* Standard Theme Mapping (Mapped to custom) */
   --background: #0E0E0E;
