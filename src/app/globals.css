@@ -1,3 +1,4 @@
+@import url("https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -9,6 +10,8 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-space-grotesk), var(--font-sans);
   --font-space-grotesk: var(--font-space-grotesk);
+  --font-switzer: var(--font-switzer);
+  --font-outfit: var(--font-outfit);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -50,6 +53,8 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-trending-badge-bg: var(--trending-badge-bg);
+  --color-trending-badge-text: var(--trending-badge-text);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -92,6 +97,24 @@
   --verified-badge-glow: 0 0 24px 0 rgba(255, 215, 0, 0.30);
   --auth-card-bg: rgba(38, 38, 38, 0.48);
   --auth-card-border: rgba(72, 72, 71, 0.30);
+  --font-switzer: "Switzer", var(--font-sans);
+  --glass-panel-bg: rgba(38, 38, 38, 0.40);
+  --glass-panel-border: rgba(72, 72, 71, 0.10);
+  --player-bar-bg: rgba(38, 38, 38, 0.60);
+  --now-playing-glow: 0px 0px 20px 0px rgba(204, 151, 255, 0.15);
+  --play-button-glow: 0px 0px 10px rgba(58, 223, 250, 0.25);
+  --gradient-purple-lime: linear-gradient(45deg, #CC97FF 0%, #E7FFC4 100%);
+  --trending-badge-bg: #E7FFC4;
+  --trending-badge-text: #3A5F00;
+  --hero-overlay-gradient: linear-gradient(to top, rgba(14, 14, 14, 0.88) 0%, rgba(14, 14, 14, 0.4) 50%, rgba(14, 14, 14, 0) 100%);
+  --sidebar-glow-purple: rgba(204, 151, 255, 0.15);
+  --sidebar-glow-cyan: rgba(58, 223, 250, 0.1);
+  --sidebar-tint: rgba(204, 151, 255, 0.1);
+  --user-nav-active-bg: rgba(58, 223, 250, 0.2);
+  --release-item-bg: rgba(14, 14, 14, 0.8);
+  --explore-hero-overlay-gradient: linear-gradient(90deg, rgba(14, 14, 14, 0.74) 0%, rgba(14, 14, 14, 0.74) 50%, rgba(14, 14, 14, 0) 100%);
+  --live-badge-bg: #FF6666;
+  --liked-hero-gradient: linear-gradient(124.44deg, rgba(88, 232, 255, 0.19) 1.99%, rgba(211, 164, 255, 0.19) 90.45%);
 
   /* Standard Theme Mapping (Mapped to custom) */
   --background: #0E0E0E;
