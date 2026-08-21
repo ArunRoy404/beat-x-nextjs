@@ -1,4 +1,4 @@
-import { Space_Grotesk } from "next/font/google";
+import { Space_Grotesk, Outfit } from "next/font/google";
 import { getServerSession } from "next-auth/next";
 import "./globals.css";
 import ProviderContainer from "@/Providers/ProviderContainer";
@@ -6,6 +6,11 @@ import { authOptions } from "@/lib/auth/authOptions";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
+  subsets: ["latin"],
+});
+
+const outfit = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin"],
 });
 
@@ -20,7 +25,7 @@ export default async function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} h-full antialiased`}
+      className={`${spaceGrotesk.variable} ${outfit.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <ProviderContainer session={session}>
