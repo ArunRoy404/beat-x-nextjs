@@ -26,9 +26,9 @@ const UserDashboardLayout = ({ children }) => {
                 footer={<SubscriptionSidebarFooter />}
             />
 
-            <SidebarInset className="bg-transparent font-switzer">
+            <SidebarInset className="min-w-0 bg-transparent font-switzer">
                 <UserNavbar />
-                <div className="relative min-h-0 flex-1 overflow-y-auto px-6 pb-28">{children}</div>
+                <div className="relative min-h-0 min-w-0 flex-1 overflow-y-auto px-6 pb-28">{children}</div>
                 <FloatingPlayerBar />
             </SidebarInset>
         </SidebarProvider>
