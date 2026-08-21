@@ -33,9 +33,11 @@ export const heroContent = [
 
 export const mixes = [
   { id: "mix-1", title: "Bhalo Thake Mon", subtitle: "By Fahim Islam", art: userHomeAssets.photos.mixOverlay1 },
-  { id: "mix-2", title: "Ami Tor Mayay", subtitle: "By Mahtim Sakib, Deadline Music", art: userHomeAssets.photos.mixOverlay2 },
-  { id: "mix-3", title: "O Meye", subtitle: "By Jisan Khan Shuvo, Deadline Music", art: userHomeAssets.photos.mixOverlay3 },
-  { id: "mix-4", title: "Tor Lagiya", subtitle: "By Samz vai, Deadline Music", art: userHomeAssets.photos.mixOverlay4 },
+  { id: "mix-2", title: "Ami Tor Mayay", subtitle: "By Mahtim Sakib", art: userHomeAssets.photos.mixOverlay2 },
+  { id: "mix-3", title: "O Meye", subtitle: "By Jisan Khan Shuvo", art: userHomeAssets.photos.mixOverlay3 },
+  { id: "mix-4", title: "Tor Lagiya", subtitle: "By Samz Vai", art: userHomeAssets.photos.mixOverlay4 },
+  { id: "mix-5", title: "Rewired Mix", subtitle: "By Circuit Theory", art: userHomeAssets.photos.albumArt2 },
+  { id: "mix-6", title: "Deadline Curation", subtitle: "By BeatX Curation", art: userHomeAssets.photos.albumArt4 },
 ]
 
 export const newReleases = [

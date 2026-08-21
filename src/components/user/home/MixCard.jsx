@@ -6,7 +6,7 @@ const MixCard = ({ mix }) => {
             art={mix.art}
             title={mix.title}
             subtitle={mix.subtitle}
-            className="flex-1 basis-40"
+            className="w-full flex-1"
             imgClassName="h-40 sm:h-56 md:h-64"
         />
     )

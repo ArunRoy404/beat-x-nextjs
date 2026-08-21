@@ -15,13 +15,32 @@ export const genreFilters = [
   "Jazz",
 ]
 
-export const exploreHero = {
-  badge: "TRENDING GENRE",
-  titleLine1: "RETRO",
-  titleLine2: "SYNTHWAVE",
-  description: "The pulse of the 80s reimagined for the future. Dive into the neon-soaked sounds of modern synthesis.",
-  artwork: userExploreAssets.hero,
-}
+export const exploreHero = [
+  {
+    id: "explore-hero-1",
+    badge: "TRENDING GENRE",
+    titleLine1: "RETRO",
+    titleLine2: "SYNTHWAVE",
+    description: "The pulse of the 80s reimagined for the future. Dive into the neon-soaked sounds of modern synthesis.",
+    artwork: userExploreAssets.hero,
+  },
+  {
+    id: "explore-hero-2",
+    badge: "VIRAL CLUSTER",
+    titleLine1: "CYBER",
+    titleLine2: "POP",
+    description: "Futuristic pop with glitchy beats and holographic melodies. The current trendsetters' favorite cluster.",
+    artwork: userExploreAssets.genres.cyberPop,
+  },
+  {
+    id: "explore-hero-3",
+    badge: "AMBIENT ZONE",
+    titleLine1: "LO-FI",
+    titleLine2: "FUTURE",
+    description: "Chill beats, futuristic synthesizers, and relaxed soundscapes. Perfect background music for late-night vibes.",
+    artwork: userExploreAssets.genres.loFiFuture,
+  }
+]
 
 export const genres = [
   { id: "synthwave", title: "Synthwave", subtitle: "8.4M Monthly Listeners", art: userExploreAssets.genres.synthwave },
