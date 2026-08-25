@@ -80,7 +80,7 @@ const CommonDashboardSidebar = ({ data, title, footer, ...props }) => {
 
                                 <div className="flex flex-col gap-0.5 transition-all duration-300">
                                     {group.items && group.items.map((item, itemIdx) => {
-                                        const isActive = pathname === item.url;
+                                        const isActive = item.url === "/" ? pathname === "/" : pathname.startsWith(item.url);
                                         // Dynamic Icon resolve
                                         const IconComponent = Icons[item.iconName] || Icons.GridViewIcon;
 

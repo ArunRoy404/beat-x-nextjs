@@ -55,6 +55,9 @@
   --color-card: var(--card);
   --color-trending-badge-bg: var(--trending-badge-bg);
   --color-trending-badge-text: var(--trending-badge-text);
+  --color-live-badge-bg: var(--live-badge-bg);
+  --color-live-badge-text: var(--live-badge-text);
+  --color-tag-chip-bg: var(--tag-chip-bg);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -113,8 +116,11 @@
   --user-nav-active-bg: rgba(58, 223, 250, 0.2);
   --release-item-bg: rgba(14, 14, 14, 0.8);
   --explore-hero-overlay-gradient: linear-gradient(90deg, rgba(14, 14, 14, 0.74) 0%, rgba(14, 14, 14, 0.74) 50%, rgba(14, 14, 14, 0) 100%);
-  --live-badge-bg: #FF6666;
+  --live-badge-bg: #FF6E84;
+  --live-badge-text: #490013;
   --liked-hero-gradient: linear-gradient(124.44deg, rgba(88, 232, 255, 0.19) 1.99%, rgba(211, 164, 255, 0.19) 90.45%);
+  --media-duration-badge-bg: rgba(0, 0, 0, 0.6);
+  --tag-chip-bg: #262626;
 
   /* Standard Theme Mapping (Mapped to custom) */
   --background: #0E0E0E;
