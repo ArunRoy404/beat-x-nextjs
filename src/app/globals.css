@@ -71,6 +71,10 @@
   --color-live-badge-bg: var(--live-badge-bg);
   --color-live-badge-text: var(--live-badge-text);
   --color-tag-chip-bg: var(--tag-chip-bg);
+  --color-field-border-light: var(--field-border-light);
+  --color-table-header-text: var(--table-header-text);
+  --color-table-header-border: var(--table-header-border);
+  --color-bright-cyan: var(--bright-cyan);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -134,6 +138,10 @@
   --liked-hero-gradient: linear-gradient(124.44deg, rgba(88, 232, 255, 0.19) 1.99%, rgba(211, 164, 255, 0.19) 90.45%);
   --media-duration-badge-bg: rgba(0, 0, 0, 0.6);
   --tag-chip-bg: #262626;
+  --field-border-light: #E6E6E6;
+  --table-header-text: #F5F2ED;
+  --table-header-border: #6B6560;
+  --bright-cyan: #66F7FF;
 
   /* Standard Theme Mapping (Mapped to custom) */
   --background: #0E0E0E;
