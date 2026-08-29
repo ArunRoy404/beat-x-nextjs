@@ -7,7 +7,7 @@ export const adminDashboardNavigation = {
         { 
           title: "Dashboard", 
           navbarTitle: "Music Management",
-          url: "/admin/dashboard", 
+          url: "/admin/dashboard/overview",
           iconName: "GridViewIcon",
           subtitle: "Manage all platform music — upload, review, approve"
         },

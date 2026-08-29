@@ -3,6 +3,7 @@ import { getToken } from "next-auth/jwt";
 
 const ADMIN_LOGIN_PATH = "/admin/login";
 const ADMIN_DASHBOARD_PATH = "/admin/dashboard";
+const ADMIN_DASHBOARD_HOME_PATH = "/admin/dashboard/overview";
 
 const ADMIN_AUTH_PAGES = [
   "/admin/login",
@@ -32,7 +33,7 @@ export async function proxy(request) {
   }
 
   if (ADMIN_AUTH_PAGES.some((page) => pathname.startsWith(page)) && isAdmin) {
-    return redirectNoStore(new URL(ADMIN_DASHBOARD_PATH, request.url));
+    return redirectNoStore(new URL(ADMIN_DASHBOARD_HOME_PATH, request.url));
   }
 
   return NextResponse.next();
