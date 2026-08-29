@@ -1,18 +1,7 @@
-import { Space_Grotesk, Outfit } from "next/font/google";
 import { getServerSession } from "next-auth/next";
 import "./globals.css";
 import ProviderContainer from "@/Providers/ProviderContainer";
 import { authOptions } from "@/lib/auth/authOptions";
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin"],
-});
-
-const outfit = Outfit({
-  variable: "--font-outfit",
-  subsets: ["latin"],
-});
 
 export const metadata = {
   title: "Create Next App",
@@ -23,10 +12,7 @@ export default async function RootLayout({ children }) {
   const session = await getServerSession(authOptions);
 
   return (
-    <html
-      lang="en"
-      className={`${spaceGrotesk.variable} ${outfit.variable} h-full antialiased`}
-    >
+    <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
         <ProviderContainer session={session}>
           {children}

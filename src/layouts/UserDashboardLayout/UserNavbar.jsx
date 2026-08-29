@@ -38,7 +38,7 @@ const UserNavbar = () => {
                 >
                     <Bell className="size-6 text-whitetext" />
                     {profile.notificationCount > 0 && (
-                        <span className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-red-error text-[10px] text-whitetext font-outfit">
+                        <span className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-red-error text-[10px] text-whitetext font-switzer">
                             {profile.notificationCount}
                         </span>
                     )}
@@ -50,7 +50,7 @@ const UserNavbar = () => {
                 >
                     <CommonAvatar src={profile.avatar} alt={profile.name} className="size-9" />
                     <span className="hidden flex-col items-start sm:flex">
-                        <span className="font-outfit text-xs text-whitetext">{profile.name}</span>
+                        <span className="font-switzer text-xs text-whitetext">{profile.name}</span>
                         {profile.isPremium && (
                             <span className="flex items-center gap-1 text-xs text-secondary">
                                 <Gem className="size-3" />
