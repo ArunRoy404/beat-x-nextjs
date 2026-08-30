@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import GenreFilterBar from "@/components/user/explore/GenreFilterBar"
 import GenreHeroBanner from "@/components/user/explore/GenreHeroBanner"
 import GenreCard from "@/components/user/explore/GenreCard"
+import ArtistsSection from "@/components/user/explore/ArtistsSection"
 import RecentSearchesPanel from "@/components/user/explore/RecentSearchesPanel"
 import LiveSessionsPanel from "@/components/user/explore/LiveSessionsPanel"
 import { useUserExploreStore } from "@/zustandStore/user/userStore/userExploreStore"
@@ -95,7 +96,7 @@ const UserExplorePage = () => {
                         ))}
                     </motion.div>
                 </motion.section>
-                
+
                 <div className="flex w-full flex-col gap-6 lg:w-88 lg:shrink-0">
                     <motion.div variants={itemVariants}>
                         <RecentSearchesPanel />
@@ -105,6 +106,10 @@ const UserExplorePage = () => {
                     </motion.div>
                 </div>
             </div>
+
+            <motion.div variants={itemVariants}>
+                <ArtistsSection />
+            </motion.div>
         </motion.div>
     )
 }
