@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { Bell, ChevronDown, Download, Gem } from "lucide-react"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import CommonSearch from "@/components/shared/CommonSearch/CommonSearch"
@@ -32,8 +33,8 @@ const UserNavbar = () => {
                     Download App
                 </button>
 
-                <button
-                    type="button"
+                <Link
+                    href="/notifications"
                     className="relative flex size-11 shrink-0 items-center justify-center rounded-[8px] bg-dark-accent"
                 >
                     <Bell className="size-6 text-whitetext" />
@@ -42,7 +43,7 @@ const UserNavbar = () => {
                             {profile.notificationCount}
                         </span>
                     )}
-                </button>
+                </Link>
 
                 <button
                     type="button"

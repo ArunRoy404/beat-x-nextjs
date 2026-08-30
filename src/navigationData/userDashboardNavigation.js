@@ -7,6 +7,7 @@ export const userDashboardNavigation = {
         { title: "Home", url: "/", iconName: "HomeIcon" },
         { title: "Explore", url: "/explore", iconName: "SearchNormalIcon" },
         { title: "Trending", url: "/trending", iconName: "TrendingIcon" },
+        { title: "Notifications", url: "/notifications", iconName: "NotificationIcon" },
       ],
     },
     {
