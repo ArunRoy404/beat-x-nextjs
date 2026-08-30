@@ -2,9 +2,9 @@ import React from "react"
 import Image from "next/image"
 
 const PROVIDERS = [
-    { id: "apple", label: "Continue with Apple", icon: "/icons/auth/social-apple.png", width: 32, height: 40 },
-    { id: "google", label: "Continue with Google", icon: "/icons/auth/social-google.png", width: 39, height: 40 },
-    { id: "facebook", label: "Continue with Facebook", icon: "/icons/auth/social-facebook.svg", width: 40, height: 40 },
+    { id: "apple", label: "Continue with Apple", icon: "/icons/auth/social-apple-logo.png", width: 32, height: 40 },
+    { id: "google", label: "Continue with Google", icon: "/icons/auth/social-google-logo.png", width: 39, height: 40 },
+    { id: "facebook", label: "Continue with Facebook", icon: "/icons/auth/social-facebook-logo.svg", width: 40, height: 40 },
 ]
 
 const AuthSocialLogins = ({ label = "OR SIGN UP WITH" }) => {
