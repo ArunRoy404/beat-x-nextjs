@@ -8,10 +8,12 @@ const AVATARS = [
     "/auth/images/social-proof-avatar-3.jpg",
 ]
 
-const AuthSocialProof = ({ tagline = "Refracting sound with listeners worldwide.", countLabel = "+12k" }) => {
+const AuthSocialProof = ({ heading, tagline = "Refracting sound with listeners worldwide.", countLabel = "+12k" }) => {
     return (
         <div className="flex w-full flex-col items-center justify-center gap-6">
             <Logo />
+
+            {heading && <div className="text-center">{heading}</div>}
 
             <div className="flex w-full flex-col items-center gap-4">
                 <div className="flex items-center">
