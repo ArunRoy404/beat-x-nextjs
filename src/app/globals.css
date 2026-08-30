@@ -75,6 +75,7 @@
   --color-table-header-text: var(--table-header-text);
   --color-table-header-border: var(--table-header-border);
   --color-bright-cyan: var(--bright-cyan);
+  --color-auth-wide-inner-border: var(--auth-wide-inner-border);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -117,6 +118,11 @@
   --verified-badge-glow: 0 0 24px 0 rgba(255, 215, 0, 0.30);
   --auth-card-bg: rgba(38, 38, 38, 0.48);
   --auth-card-border: rgba(72, 72, 71, 0.30);
+  --auth-wide-outer-bg: rgba(38, 38, 38, 0.05);
+  --auth-wide-outer-border: rgba(72, 72, 71, 0.15);
+  --auth-wide-inner-bg: rgba(38, 38, 38, 0.02);
+  --auth-wide-inner-border: #484847;
+  --otp-input-bg: rgba(38, 38, 38, 0.5);
   --font-switzer: "Switzer", ui-sans-serif, system-ui, sans-serif;
   --glass-panel-bg: rgba(38, 38, 38, 0.40);
   --glass-panel-border: rgba(72, 72, 71, 0.10);
