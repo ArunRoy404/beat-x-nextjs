@@ -11,6 +11,7 @@ const CommonCalender = ({
     label,
     error,
     containerClassName,
+    labelClassName,
     className
 }) => {
     const [showCalendar, setShowCalendar] = useState(false)
@@ -23,7 +24,7 @@ const CommonCalender = ({
     return (
         <div className={cn("flex flex-col gap-1.5 relative shrink-0", containerClassName)}>
             {label && (
-                <label className="text-primary text-[16px] not-italic font-normal font-sans">
+                <label className={cn("text-primary text-[16px] not-italic font-normal font-sans", labelClassName)}>
                     {label}
                 </label>
             )}
@@ -48,12 +49,12 @@ const CommonCalender = ({
                         className="fixed inset-0 z-40"
                         onClick={() => setShowCalendar(false)}
                     />
-                    <div className="absolute bottom-full right-0 mb-2 sm:top-full sm:bottom-auto sm:mt-2 z-50 rounded-[16px] border border-whitetext/10 bg-background p-3 shadow-xl">
+                    <div className="absolute bottom-full right-0 z-50 mb-2 animate-in fade-in zoom-in-95 rounded-[16px] border border-whitetext/10 bg-dark-accent p-3 shadow-xl duration-150 sm:top-full sm:bottom-auto sm:mt-2 sm:mb-0">
                         <Calendar
                             mode="single"
                             selected={value}
                             onSelect={handleSelect}
-                            className="rounded-[12px] bg-background text-whitetext"
+                            className="bg-dark-accent text-whitetext [--cell-size:36px]"
                         />
                     </div>
                 </>
