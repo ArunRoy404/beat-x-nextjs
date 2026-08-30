@@ -17,10 +17,12 @@ const CommonOtpInput = ({ length = 6, value, onChange, error, className, rootCla
                 {Array.from({ length }).map((_, index) => (
                     <OTPField.Input
                         key={index}
+                        style={{ animationDelay: `${index * 70}ms` }}
                         className={cn(
                             "w-11 h-12 sm:w-12 sm:h-14 rounded-[12px] border border-light-gray/20 bg-light-gray/10 text-whitetext text-[18px] font-semibold text-center outline-none transition-all",
-                            "data-focused:border-secondary/60 data-focused:ring-2 data-focused:ring-secondary/20",
+                            "data-focused:border-secondary/60 data-focused:ring-2 data-focused:ring-secondary/20 data-focused:scale-105",
                             "data-filled:border-secondary/40",
+                            "animate-in fade-in zoom-in-75 fill-mode-backwards duration-400 ease-out",
                             error ? "border-red-500/50" : "",
                             inputClassName
                         )}
