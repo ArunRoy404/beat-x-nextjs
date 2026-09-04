@@ -6,6 +6,7 @@ import { Heart, ListMusic, Maximize2, Mic2, Repeat, Shuffle, SkipBack, SkipForwa
 import { cn } from "@/lib/utils"
 import GradientPlayButton from "@/components/shared/GradientPlayButton"
 import { useUserPlayerStore } from "@/zustandStore/user/userStore/userPlayerStore"
+import { useVolumeStore } from "@/zustandStore/audio/useVolumeStore"
 
 const SEEK_SECONDS = 10
 
@@ -19,13 +20,12 @@ const formatTime = (seconds) => {
 
 const FloatingPlayerBar = () => {
     const { title, artist, artwork, src, liked, toggleLiked } = useUserPlayerStore()
+    const { volume, isMuted, setVolume, toggleMute } = useVolumeStore()
     const audioRef = useRef(null)
 
     const [isPlaying, setIsPlaying] = useState(false)
     const [currentTime, setCurrentTime] = useState(0)
     const [duration, setDuration] = useState(0)
-    const [volume, setVolume] = useState(0.7)
-    const [muted, setMuted] = useState(false)
     const [repeat, setRepeat] = useState(false)
 
     useEffect(() => {
@@ -39,12 +39,8 @@ const FloatingPlayerBar = () => {
     }, [])
 
     useEffect(() => {
-        if (audioRef.current) audioRef.current.volume = volume
-    }, [volume])
-
-    useEffect(() => {
-        if (audioRef.current) audioRef.current.muted = muted
-    }, [muted])
+        if (audioRef.current) audioRef.current.volume = isMuted ? 0 : volume
+    }, [volume, isMuted])
 
     useEffect(() => {
         if (audioRef.current) audioRef.current.loop = repeat
@@ -73,7 +69,6 @@ const FloatingPlayerBar = () => {
     const handleVolumeChange = (e) => {
         const value = Number(e.target.value)
         setVolume(value)
-        setMuted(value === 0)
     }
 
     const progress = duration ? currentTime / duration : 0
@@ -165,8 +160,8 @@ const FloatingPlayerBar = () => {
                     <ListMusic className="size-4" />
                 </button>
                 <div className="flex items-center gap-2">
-                    <button type="button" onClick={() => setMuted((prev) => !prev)} aria-label={muted ? "Unmute" : "Mute"}>
-                        {muted || volume === 0 ? (
+                    <button type="button" onClick={toggleMute} aria-label={isMuted ? "Unmute" : "Mute"}>
+                        {isMuted || volume === 0 ? (
                             <VolumeX className="size-4 text-light-gray" />
                         ) : (
                             <Volume2 className="size-4 text-light-gray" />
@@ -174,14 +169,14 @@ const FloatingPlayerBar = () => {
                     </button>
                     <div className="relative h-1 w-20">
                         <div className="absolute inset-0 overflow-hidden rounded-full bg-dark-gray">
-                            <div className="h-full rounded-full bg-light-gray" style={{ width: `${(muted ? 0 : volume) * 100}%` }} />
+                            <div className="h-full rounded-full bg-light-gray" style={{ width: `${(isMuted ? 0 : volume) * 100}%` }} />
                         </div>
                         <input
                             type="range"
                             min={0}
                             max={1}
                             step={0.01}
-                            value={muted ? 0 : volume}
+                            value={isMuted ? 0 : volume}
                             onChange={handleVolumeChange}
                             className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                             aria-label="Volume"
