@@ -1,14 +1,16 @@
 "use client"
 
 import React, { useState } from "react"
-import { Play as PlayIcon, Pencil, Trash2, Check, X } from "lucide-react"
+import { Play as PlayIcon, Pause as PauseIcon, Pencil, Trash2, Check, X } from "lucide-react"
 import { toast } from "sonner"
 import { formatDurationMs } from "@/lib/format/formatDuration"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import { useUpdateChapter } from "@/hooks/api/admin/audiobooks/useUpdateChapter"
 import { useDeleteChapter } from "@/hooks/api/admin/audiobooks/useDeleteChapter"
+import { useGlobalMediaPlayerStore } from "@/zustandStore/media/useGlobalMediaPlayerStore"
+import { getSongAudioUrl, resolveMediaUrl } from "@/lib/format/resolveMediaUrl"
 
-const ChapterRow = ({ audiobookId, chapter, index }) => {
+const ChapterRow = ({ audiobookId, book, chapter, index }) => {
     const [isEditing, setIsEditing] = useState(false)
     const [confirmingDelete, setConfirmingDelete] = useState(false)
     const [title, setTitle] = useState(chapter.title || "")
@@ -16,6 +18,38 @@ const ChapterRow = ({ audiobookId, chapter, index }) => {
 
     const { mutate: updateChapter, isPending: isUpdating } = useUpdateChapter()
     const { mutate: deleteChapter, isPending: isDeleting } = useDeleteChapter()
+
+    const {
+        id: activeId,
+        isPlaying: isGlobalPlaying,
+        playMedia,
+        togglePlay: toggleGlobalPlay,
+    } = useGlobalMediaPlayerStore()
+
+    const audioSrc = getSongAudioUrl(chapter) || (chapter?.hlsMasterUrl ? resolveMediaUrl(chapter.hlsMasterUrl) : "")
+    const isThisChapterActive = activeId === (chapter?._id || audioSrc)
+    const isPlaying = isThisChapterActive && isGlobalPlaying
+
+    const handlePlayChapter = () => {
+        if (!audioSrc) {
+            toast.error("Chapter audio stream is currently unavailable or still processing.")
+            return
+        }
+
+        if (isThisChapterActive) {
+            toggleGlobalPlay()
+        } else {
+            playMedia({
+                id: chapter?._id || audioSrc,
+                mediaType: "audio",
+                src: audioSrc,
+                title: chapter?.title ? `Ch. ${chapter.chapterNumber || index + 1}: ${chapter.title}` : "Audiobook Chapter",
+                artist: book?.title || "Audiobook",
+                coverUrl: book?.coverUrl,
+                durationMs: chapter?.durationMs || 0,
+            })
+        }
+    }
 
     const handleSave = () => {
         const formData = new FormData()
@@ -74,9 +108,19 @@ const ChapterRow = ({ audiobookId, chapter, index }) => {
 
     return (
         <div className="flex p-4 items-center gap-4 align-stretch rounded-[16px] border border-[#6B6B6B] bg-[#20201F]">
-            <div className="w-8 h-8 rounded-full border border-[#ADAAAA] bg-[#20201F] flex items-center justify-center text-white shrink-0">
-                <PlayIcon className="w-3.5 h-3.5 fill-white ml-0.5" />
-            </div>
+            <button
+                type="button"
+                onClick={handlePlayChapter}
+                disabled={!audioSrc}
+                className="w-9 h-9 rounded-full bg-secondary text-black flex items-center justify-center shrink-0 hover:scale-105 active:scale-95 transition-all disabled:opacity-30 cursor-pointer shadow-md shadow-secondary/20"
+                title={isPlaying ? "Pause Chapter" : "Play Chapter"}
+            >
+                {isPlaying ? (
+                    <PauseIcon className="w-4 h-4 fill-current" />
+                ) : (
+                    <PlayIcon className="w-4 h-4 fill-current ml-0.5" />
+                )}
+            </button>
 
             <div className="flex flex-col min-w-0 flex-1">
                 <span className="text-[#ADAAAA] text-[12px] font-semibold leading-none mb-1">
