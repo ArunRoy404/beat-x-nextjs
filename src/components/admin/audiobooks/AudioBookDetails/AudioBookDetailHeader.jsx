@@ -1,6 +1,12 @@
+"use client"
+
 import React from "react"
 import Image from "next/image"
+import { Play, Pause } from "lucide-react"
 import { formatDurationMs } from "@/lib/format/formatDuration"
+import { useGlobalMediaPlayerStore } from "@/zustandStore/media/useGlobalMediaPlayerStore"
+import { getSongAudioUrl, resolveMediaUrl } from "@/lib/format/resolveMediaUrl"
+import { toast } from "sonner"
 
 const STATUS_COLORS = {
     active: "bg-green-success/15 text-green-success border-green-success/20",
@@ -11,14 +17,47 @@ const STATUS_COLORS = {
 const AudioBookDetailHeader = ({ book, chapters = [] }) => {
     const statusClass = STATUS_COLORS[book?.status] || STATUS_COLORS.draft
 
+    const {
+        id: activeId,
+        isPlaying: isGlobalPlaying,
+        playMedia,
+        togglePlay: toggleGlobalPlay,
+    } = useGlobalMediaPlayerStore()
+
+    const firstChapter = chapters?.[0]
+    const audioSrc = firstChapter ? (getSongAudioUrl(firstChapter) || (firstChapter?.hlsMasterUrl ? resolveMediaUrl(firstChapter.hlsMasterUrl) : "")) : ""
+    const isThisActive = activeId === (firstChapter?._id || audioSrc)
+    const isPlaying = isThisActive && isGlobalPlaying
+
+    const handlePlayFirst = () => {
+        if (!firstChapter || !audioSrc) {
+            toast.error("No playable chapter audio available for this audiobook yet.")
+            return
+        }
+
+        if (isThisActive) {
+            toggleGlobalPlay()
+        } else {
+            playMedia({
+                id: firstChapter?._id || audioSrc,
+                mediaType: "audio",
+                src: audioSrc,
+                title: firstChapter?.title ? `Ch. ${firstChapter.chapterNumber || 1}: ${firstChapter.title}` : book?.title || "Audiobook",
+                artist: book?.title || "Audiobook",
+                coverUrl: book?.coverUrl,
+                durationMs: firstChapter?.durationMs || book?.totalDurationMs || 0,
+            })
+        }
+    }
+
     return (
         <div
             className="p-4 border-b border-white/5 flex items-start justify-between gap-4 shrink-0 relative"
             style={{ background: "var(--modal-header-bg)" }}
         >
             <div className="flex items-start gap-4 w-full">
-                {/* Cover Thumbnail */}
-                <div className="w-[80px] h-[80px] rounded-[16px] bg-white/5 border border-white/10 flex items-center justify-center text-secondary shrink-0 overflow-hidden relative">
+                {/* Cover Thumbnail with Play Button Overlay */}
+                <div className="w-[80px] h-[80px] rounded-[16px] bg-white/5 border border-white/10 flex items-center justify-center text-secondary shrink-0 overflow-hidden relative group">
                     {book?.coverUrl && (
                         <Image
                             src={book.coverUrl}
@@ -27,6 +66,22 @@ const AudioBookDetailHeader = ({ book, chapters = [] }) => {
                             sizes="80px"
                             className="object-cover"
                         />
+                    )}
+                    {firstChapter && audioSrc && (
+                        <button
+                            type="button"
+                            onClick={handlePlayFirst}
+                            className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                            title={isPlaying ? "Pause Audiobook" : "Play Audiobook"}
+                        >
+                            <div className="w-8 h-8 rounded-full bg-secondary text-black flex items-center justify-center shadow-lg">
+                                {isPlaying ? (
+                                    <Pause className="w-4 h-4 fill-current" />
+                                ) : (
+                                    <Play className="w-4 h-4 fill-current ml-0.5" />
+                                )}
+                            </div>
+                        </button>
                     )}
                 </div>
 

@@ -14,7 +14,7 @@ const ChapterRow = ({ audiobookId, book, chapter, index }) => {
     const [isEditing, setIsEditing] = useState(false)
     const [confirmingDelete, setConfirmingDelete] = useState(false)
     const [title, setTitle] = useState(chapter.title || "")
-    const [chapterNumber, setChapterNumber] = useState(chapter.chapterNumber ?? index + 1)
+    const [newAudioFile, setNewAudioFile] = useState(null)
 
     const { mutate: updateChapter, isPending: isUpdating } = useUpdateChapter()
     const { mutate: deleteChapter, isPending: isDeleting } = useDeleteChapter()
@@ -52,18 +52,26 @@ const ChapterRow = ({ audiobookId, book, chapter, index }) => {
     }
 
     const handleSave = () => {
+        if (!title.trim()) {
+            toast.error("Chapter title cannot be empty.")
+            return
+        }
+
         const formData = new FormData()
-        formData.append("title", title)
-        formData.append("chapterNumber", String(chapterNumber))
+        formData.append("title", title.trim())
+        if (newAudioFile) {
+            formData.append("audio", newAudioFile)
+        }
 
         updateChapter(
             { audiobookId, chapterId: chapter._id, formData },
             {
                 onSuccess: () => {
-                    toast.success("Chapter updated!")
+                    toast.success("Chapter updated successfully!")
                     setIsEditing(false)
+                    setNewAudioFile(null)
                 },
-                onError: (error) => toast.error(error?.message || "Failed to update chapter."),
+                onError: (error) => toast.error(error?.response?.data?.message || error?.message || "Failed to update chapter."),
             }
         )
     }
@@ -72,24 +80,42 @@ const ChapterRow = ({ audiobookId, book, chapter, index }) => {
         deleteChapter(
             { audiobookId, chapterId: chapter._id },
             {
-                onSuccess: () => toast.success("Chapter deleted."),
-                onError: (error) => toast.error(error?.message || "Failed to delete chapter."),
+                onSuccess: () => toast.success("Chapter deleted successfully."),
+                onError: (error) => toast.error(error?.response?.data?.message || error?.message || "Failed to delete chapter."),
             }
         )
     }
 
     if (isEditing) {
         return (
-            <div className="flex flex-col gap-2 p-4 rounded-[16px] border border-secondary/30 bg-[#20201F]">
-                <div className="grid grid-cols-[80px_1fr] gap-2">
-                    <CommonInput type="number" value={chapterNumber} onChange={(e) => setChapterNumber(e.target.value)} />
-                    <CommonInput value={title} onChange={(e) => setTitle(e.target.value)} />
+            <div className="flex flex-col gap-3 p-4 rounded-[16px] border border-secondary/30 bg-[#20201F]">
+                <div className="flex flex-col gap-2">
+                    <label className="text-[12px] text-light-gray font-medium">Chapter Title</label>
+                    <CommonInput value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Chapter 1: The Beginning" />
                 </div>
-                <div className="flex items-center gap-2 justify-end">
+
+                <div className="flex flex-col gap-1.5">
+                    <label className="text-[12px] text-light-gray font-medium">Replace Audio (Optional)</label>
+                    <input
+                        type="file"
+                        accept="audio/mp3,audio/mp4,audio/aac,audio/ogg,audio/wav,audio/*"
+                        onChange={(e) => setNewAudioFile(e.target.files?.[0] || null)}
+                        className="text-xs text-light-gray file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-medium file:bg-secondary/10 file:text-secondary hover:file:bg-secondary/20 cursor-pointer"
+                    />
+                    {newAudioFile && (
+                        <span className="text-[11px] text-secondary font-mono">Selected: {newAudioFile.name}</span>
+                    )}
+                </div>
+
+                <div className="flex items-center gap-2 justify-end mt-1">
                     <button
                         type="button"
-                        onClick={() => setIsEditing(false)}
-                        className="text-light-gray text-xs px-3 py-1.5 rounded-full border border-white/10 cursor-pointer"
+                        onClick={() => {
+                            setIsEditing(false)
+                            setNewAudioFile(null)
+                            setTitle(chapter.title || "")
+                        }}
+                        className="text-light-gray text-xs px-3.5 py-1.5 rounded-full border border-white/10 hover:bg-white/5 cursor-pointer transition-colors"
                     >
                         Cancel
                     </button>
@@ -97,9 +123,9 @@ const ChapterRow = ({ audiobookId, book, chapter, index }) => {
                         type="button"
                         onClick={handleSave}
                         disabled={isUpdating}
-                        className="text-secondary text-xs px-3 py-1.5 rounded-full border border-secondary/20 bg-secondary/10 cursor-pointer disabled:opacity-50"
+                        className="text-black bg-secondary hover:bg-secondary/90 font-medium text-xs px-4 py-1.5 rounded-full cursor-pointer disabled:opacity-50 transition-colors"
                     >
-                        {isUpdating ? "Saving..." : "Save"}
+                        {isUpdating ? "Saving..." : "Save Changes"}
                     </button>
                 </div>
             </div>
@@ -107,7 +133,7 @@ const ChapterRow = ({ audiobookId, book, chapter, index }) => {
     }
 
     return (
-        <div className="flex p-4 items-center gap-4 align-stretch rounded-[16px] border border-[#6B6B6B] bg-[#20201F]">
+        <div className="flex p-4 items-center gap-4 align-stretch rounded-[16px] border border-white/10 bg-[#20201F] hover:border-secondary/30 transition-all">
             <button
                 type="button"
                 onClick={handlePlayChapter}
@@ -130,7 +156,7 @@ const ChapterRow = ({ audiobookId, book, chapter, index }) => {
                     {chapter.title}
                 </span>
                 {chapter.transcodeStatus && !["ready", "done"].includes(chapter.transcodeStatus) && (
-                    <span className="text-yellow-warning text-[11px] mt-0.5 capitalize">{chapter.transcodeStatus}</span>
+                    <span className="text-yellow-warning text-[11px] mt-0.5 capitalize">Status: {chapter.transcodeStatus}</span>
                 )}
             </div>
 
@@ -145,7 +171,7 @@ const ChapterRow = ({ audiobookId, book, chapter, index }) => {
                         onClick={handleDelete}
                         disabled={isDeleting}
                         title="Confirm delete"
-                        className="w-7 h-7 rounded-full flex items-center justify-center border border-red-error/20 bg-red-error/10 text-red-error cursor-pointer disabled:opacity-50"
+                        className="w-7 h-7 rounded-full flex items-center justify-center border border-red-error/20 bg-red-error/10 text-red-error hover:bg-red-error/20 cursor-pointer disabled:opacity-50"
                     >
                         <Check className="w-3.5 h-3.5" />
                     </button>
@@ -153,7 +179,7 @@ const ChapterRow = ({ audiobookId, book, chapter, index }) => {
                         type="button"
                         onClick={() => setConfirmingDelete(false)}
                         title="Cancel"
-                        className="w-7 h-7 rounded-full flex items-center justify-center border border-white/10 bg-white/5 text-light-gray cursor-pointer"
+                        className="w-7 h-7 rounded-full flex items-center justify-center border border-white/10 bg-white/5 text-light-gray hover:bg-white/10 cursor-pointer"
                     >
                         <X className="w-3.5 h-3.5" />
                     </button>
@@ -164,7 +190,7 @@ const ChapterRow = ({ audiobookId, book, chapter, index }) => {
                         type="button"
                         onClick={() => setIsEditing(true)}
                         title="Edit chapter"
-                        className="w-7 h-7 rounded-full flex items-center justify-center border border-secondary/20 bg-secondary/10 text-secondary cursor-pointer"
+                        className="w-7 h-7 rounded-full flex items-center justify-center border border-secondary/20 bg-secondary/10 text-secondary hover:bg-secondary/20 cursor-pointer"
                     >
                         <Pencil className="w-3.5 h-3.5" />
                     </button>
@@ -172,7 +198,7 @@ const ChapterRow = ({ audiobookId, book, chapter, index }) => {
                         type="button"
                         onClick={() => setConfirmingDelete(true)}
                         title="Delete chapter"
-                        className="w-7 h-7 rounded-full flex items-center justify-center border border-red-error/20 bg-red-error/10 text-red-error cursor-pointer"
+                        className="w-7 h-7 rounded-full flex items-center justify-center border border-red-error/20 bg-red-error/10 text-red-error hover:bg-red-error/20 cursor-pointer"
                     >
                         <Trash2 className="w-3.5 h-3.5" />
                     </button>

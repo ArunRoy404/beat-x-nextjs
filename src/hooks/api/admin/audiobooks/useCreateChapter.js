@@ -17,7 +17,10 @@ export function useCreateChapter() {
   return useMutation({
     mutationFn: createChapterRequest,
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.audiobooks.detail(variables.audiobookId) })
+      queryClient.invalidateQueries({ queryKey: queryKeys.audiobooks.all })
+      if (variables?.audiobookId) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.audiobooks.detail(variables.audiobookId) })
+      }
     },
   })
 }
