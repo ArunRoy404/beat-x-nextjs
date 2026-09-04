@@ -31,7 +31,7 @@ const SongsCard = ({ song }) => {
 
                 <div className="flex flex-col gap-1">
                     <span className="text-light-whitetext text-[12px] font-normal uppercase tracking-wider">Genre</span>
-                    <CommonTableTag>{song?.genre?.name || "-"}</CommonTableTag>
+                    <CommonTableTag>{song?.genre?.name || (typeof song?.genre === "string" ? song?.genre : "-")}</CommonTableTag>
                 </div>
 
                 <div className="flex flex-col gap-1">
