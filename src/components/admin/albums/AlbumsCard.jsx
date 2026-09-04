@@ -31,7 +31,7 @@ const AlbumsCard = ({ album }) => {
 
                 <div className="flex flex-col gap-1">
                     <span className="text-light-whitetext text-[12px] font-normal uppercase tracking-wider">Genre</span>
-                    <CommonTableTag>{album?.genre?.name || "-"}</CommonTableTag>
+                    <CommonTableTag>{album?.genre?.name || (typeof album?.genre === "string" ? album?.genre : "-")}</CommonTableTag>
                 </div>
 
                 <div className="flex flex-col gap-1">

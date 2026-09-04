@@ -1,9 +1,12 @@
 import { axiosPrivate } from "@/lib/axios/axiosPrivate";
 
 export async function getAlbumsRequest({ status, genre, q, page = 1, limit = 20 } = {}) {
-  const res = await axiosPrivate.get("/admin/albums", {
-    params: { status, genre, q, page, limit },
-  });
+  const params = { page, limit };
+  if (status && status !== "all") params.status = status;
+  if (genre && genre !== "all") params.genre = genre;
+  if (q && q.trim()) params.q = q.trim();
+
+  const res = await axiosPrivate.get("/admin/albums", { params });
   return res.data.data;
 }
 
