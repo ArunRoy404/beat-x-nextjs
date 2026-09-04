@@ -16,7 +16,7 @@ import { useSongs } from "@/hooks/api/admin/songs/useSongs"
 import { SONGS_PAGE_SIZE, buildSongsParams } from "@/hooks/api/admin/songs/songsParams"
 import { useGenres } from "@/hooks/api/admin/genre/useGenres"
 
-const STATUS_TABS = ["All", "Draft", "Active", "Archived"]
+const STATUS_TABS = ["All", "Draft", "Pending", "Active", "Archived"]
 const SEARCH_DEBOUNCE_MS = 300
 
 const SongsContainer = () => {

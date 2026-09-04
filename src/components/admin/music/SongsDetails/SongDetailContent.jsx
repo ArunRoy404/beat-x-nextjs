@@ -9,6 +9,9 @@ import { formatDurationMs } from "@/lib/format/formatDuration";
 import { useVolumeStore } from "@/zustandStore/audio/useVolumeStore";
 import { useGlobalMediaPlayerStore } from "@/zustandStore/media/useGlobalMediaPlayerStore";
 
+import { getSongAudioUrl, getSongCoverUrl } from "@/lib/format/resolveMediaUrl";
+import { toast } from "sonner";
+
 const formatTime = (seconds) => {
   if (!seconds || isNaN(seconds)) return "0:00";
   const mins = Math.floor(seconds / 60);
@@ -31,14 +34,19 @@ const SongDetailContent = ({ song }) => {
   // Global Zustand volume store persisted in localStorage
   const { volume, isMuted, setVolume, toggleMute } = useVolumeStore();
 
-  const audioSrc = song?.hlsMasterUrl || song?.audioKey;
+  const audioSrc = getSongAudioUrl(song);
+  const coverUrl = getSongCoverUrl(song);
+
   const isThisSongActive = activeId === (song?._id || audioSrc);
   const isPlaying = isThisSongActive && isGlobalPlaying;
   const currentTime = isThisSongActive ? globalCurrentTime : 0;
   const duration = isThisSongActive ? globalDuration : (song?.durationMs ? song.durationMs / 1000 : 0);
 
   const togglePlay = () => {
-    if (!audioSrc) return;
+    if (!audioSrc) {
+      toast.error("Audio stream is currently unavailable or still processing.");
+      return;
+    }
     if (isThisSongActive) {
       toggleGlobalPlay();
     } else {
@@ -48,7 +56,7 @@ const SongDetailContent = ({ song }) => {
         src: audioSrc,
         title: song?.title || "Audio Stream",
         artist: song?.artist || "BeatX Media",
-        coverUrl: song?.coverUrl || "",
+        coverUrl: coverUrl,
         durationMs: song?.durationMs || 0,
       });
     }
@@ -238,7 +246,6 @@ const SongDetailContent = ({ song }) => {
           value={song?.isTrending ? `Yes (${song?.trendDirection || "stable"})` : "No"}
         />
         <CommonInfoBox label="Featured" value={song?.isFeatured ? "Yes" : "No"} />
-        <CommonInfoBox label="Transcode Status" value={song?.transcodeStatus || "-"} />
         <CommonInfoBox label="Owner ID" value={song?.ownerId || "-"} />
         <CommonInfoBox
           label="Reviewed At"

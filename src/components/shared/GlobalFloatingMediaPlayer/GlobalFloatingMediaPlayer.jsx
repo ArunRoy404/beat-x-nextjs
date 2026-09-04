@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import { useGlobalMediaPlayerStore } from "@/zustandStore/media/useGlobalMediaPlayerStore";
 import { useVolumeStore } from "@/zustandStore/audio/useVolumeStore";
+import { resolveMediaUrl } from "@/lib/format/resolveMediaUrl";
+import { toast } from "sonner";
 
 const formatTime = (seconds) => {
   if (!seconds || isNaN(seconds)) return "0:00";
@@ -34,10 +36,10 @@ const GlobalFloatingMediaPlayer = () => {
     isMinimized,
     isPlaying,
     mediaType,
-    src,
+    src: rawSrc,
     title,
     artist,
-    coverUrl,
+    coverUrl: rawCoverUrl,
     currentTime,
     duration,
     togglePlay,
@@ -47,6 +49,9 @@ const GlobalFloatingMediaPlayer = () => {
     toggleMinimize,
     closePlayer,
   } = useGlobalMediaPlayerStore();
+
+  const src = resolveMediaUrl(rawSrc);
+  const coverUrl = resolveMediaUrl(rawCoverUrl);
 
   const { volume, isMuted, setVolume, toggleMute } = useVolumeStore();
 
@@ -80,6 +85,11 @@ const GlobalFloatingMediaPlayer = () => {
         .catch((err) => {
           console.warn("Global media playback error:", err);
           pauseMedia();
+          if (err?.name === "NotSupportedError") {
+            toast.error("Audio stream source is unavailable or still processing on backend.");
+          } else {
+            toast.error("Playback error. Please check media source.");
+          }
         });
     } else {
       el.pause();
@@ -170,6 +180,10 @@ const GlobalFloatingMediaPlayer = () => {
               onCanPlay={applyVolume}
               onPlay={applyVolume}
               onEnded={() => pauseMedia()}
+              onError={() => {
+                pauseMedia();
+                toast.error("Video stream source failed to load.");
+              }}
               className={isMinimized ? "hidden" : "w-full h-44 object-cover bg-black"}
               playsInline
             />
@@ -182,6 +196,10 @@ const GlobalFloatingMediaPlayer = () => {
               onCanPlay={applyVolume}
               onPlay={applyVolume}
               onEnded={() => pauseMedia()}
+              onError={() => {
+                pauseMedia();
+                toast.error("Audio stream source is unavailable or still processing.");
+              }}
               className="hidden"
             />
           )}
