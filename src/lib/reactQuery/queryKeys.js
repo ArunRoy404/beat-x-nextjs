@@ -15,7 +15,7 @@ export const queryKeys = {
   },
   genre: {
     all: ["genre"],
-    list: () => [...queryKeys.genre.all, "list"],
+    list: (params) => [...queryKeys.genre.all, "list", params],
     search: (name) => [...queryKeys.genre.all, "search", name],
   },
   audiobooks: {
