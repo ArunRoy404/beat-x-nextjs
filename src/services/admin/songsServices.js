@@ -41,5 +41,5 @@ export async function updateSongStatusRequest({ id, status }) {
 
 export async function deleteSongRequest({ id }) {
   const res = await axiosPrivate.delete(`/admin/songs/${id}`);
-  return res.data.data;
+  return res.data?.data ?? res.data ?? true;
 }
