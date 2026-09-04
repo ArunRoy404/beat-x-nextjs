@@ -40,3 +40,14 @@ export async function deleteVideoRequest({ id }) {
   const res = await axiosPrivate.delete(`/admin/videos/${id}`);
   return res.data.data;
 }
+
+export async function approveVideoRequest({ id }) {
+  const res = await axiosPrivate.patch(`/admin/videos/${id}/approve`);
+  return res.data.data;
+}
+
+export async function rejectVideoRequest({ id, reason }) {
+  const res = await axiosPrivate.patch(`/admin/videos/${id}/reject`, { reason });
+  return res.data.data;
+}
+
