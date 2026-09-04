@@ -53,7 +53,7 @@ const SongsContainer = () => {
   })
 
   const { data, isLoading, isError, error, refetch } = useSongs(params)
-  const songs = data?.data ?? []
+  const songs = data?.song ?? data?.songs ?? data?.data ?? []
   const total = data?.total ?? 0
   const totalPages = Math.ceil(total / SONGS_PAGE_SIZE) || 1
 
