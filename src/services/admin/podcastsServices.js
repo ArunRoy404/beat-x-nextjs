@@ -22,7 +22,17 @@ export async function updatePodcastStatusRequest({ id, status }) {
   return res.data.data;
 }
 
+export async function approvePodcastRequest({ id }) {
+  const res = await axiosPrivate.patch(`/admin/podcasts/${id}/approve`);
+  return res.data?.data ?? res.data ?? true;
+}
+
+export async function rejectPodcastRequest({ id, reason }) {
+  const res = await axiosPrivate.patch(`/admin/podcasts/${id}/reject`, { reason });
+  return res.data?.data ?? res.data ?? true;
+}
+
 export async function deletePodcastRequest({ id }) {
   const res = await axiosPrivate.delete(`/admin/podcasts/${id}`);
-  return res.data.data;
+  return res.data?.data ?? res.data ?? true;
 }
