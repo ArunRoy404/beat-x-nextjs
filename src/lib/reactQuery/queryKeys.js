@@ -46,4 +46,8 @@ export const queryKeys = {
     list: (params) => [...queryKeys.albums.all, "list", params],
     detail: (id) => [...queryKeys.albums.all, "detail", id],
   },
+  dashboard: {
+    all: ["dashboard"],
+    overview: () => [...queryKeys.dashboard.all, "overview"],
+  },
 };

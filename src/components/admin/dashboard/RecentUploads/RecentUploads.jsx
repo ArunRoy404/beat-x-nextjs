@@ -13,7 +13,7 @@ const RecentUploads = ({ uploads }) => {
       {/* List */}
       <div className="flex-1 flex flex-col gap-2 z-10 relative overflow-y-auto pr-1">
         {(uploads || []).slice(0, 5).map((item, index) => (
-          <RecentUploadCard key={item?.id || index} item={item} index={index} />
+          <RecentUploadCard key={item?._id || item?.number || index} item={item} index={index} />
         ))}
       </div>
     </CommonCard>
