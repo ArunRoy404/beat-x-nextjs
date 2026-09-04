@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import Image from "next/image";
 import { format } from "date-fns";
 import { Play, Pause, Music, RotateCcw, RotateCw, Volume2, Volume1, VolumeX } from "lucide-react";
-import { toast } from "sonner";
 import CommonInfoBox from "@/components/shared/CommonInfoBox/CommonInfoBox";
 import { formatDurationMs } from "@/lib/format/formatDuration";
 import { useVolumeStore } from "@/zustandStore/audio/useVolumeStore";
+import { useGlobalMediaPlayerStore } from "@/zustandStore/media/useGlobalMediaPlayerStore";
 
 const formatTime = (seconds) => {
   if (!seconds || isNaN(seconds)) return "0:00";
@@ -17,68 +17,58 @@ const formatTime = (seconds) => {
 };
 
 const SongDetailContent = ({ song }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
+  // Global Zustand media player store
+  const {
+    id: activeId,
+    isPlaying: isGlobalPlaying,
+    currentTime: globalCurrentTime,
+    duration: globalDuration,
+    playMedia,
+    togglePlay: toggleGlobalPlay,
+    seekTo,
+  } = useGlobalMediaPlayerStore();
 
   // Global Zustand volume store persisted in localStorage
   const { volume, isMuted, setVolume, toggleMute } = useVolumeStore();
-  const audioRef = useRef(null);
 
   const audioSrc = song?.hlsMasterUrl || song?.audioKey;
-
-  // Sync initial duration from song prop
-  useEffect(() => {
-    if (song?.durationMs) {
-      setDuration(song.durationMs / 1000);
-    }
-  }, [song?.durationMs]);
-
-  // Keep native audio element volume synced with Zustand global store
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = isMuted ? 0 : volume;
-    }
-  }, [volume, isMuted]);
+  const isThisSongActive = activeId === (song?._id || audioSrc);
+  const isPlaying = isThisSongActive && isGlobalPlaying;
+  const currentTime = isThisSongActive ? globalCurrentTime : 0;
+  const duration = isThisSongActive ? globalDuration : (song?.durationMs ? song.durationMs / 1000 : 0);
 
   const togglePlay = () => {
-    if (!audioRef.current || !audioSrc) return;
-    if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
+    if (!audioSrc) return;
+    if (isThisSongActive) {
+      toggleGlobalPlay();
     } else {
-      audioRef.current.volume = isMuted ? 0 : volume;
-      audioRef.current
-        .play()
-        .then(() => setIsPlaying(true))
-        .catch((err) => {
-          console.error("Audio playback error:", err);
-          toast.error("Unable to play audio stream.");
-        });
+      playMedia({
+        id: song?._id || audioSrc,
+        mediaType: "audio",
+        src: audioSrc,
+        title: song?.title || "Audio Stream",
+        artist: song?.artist || "BeatX Media",
+        coverUrl: song?.coverUrl || "",
+        durationMs: song?.durationMs || 0,
+      });
     }
   };
 
   const handleRewind = () => {
-    if (!audioRef.current) return;
-    const newTime = Math.max(audioRef.current.currentTime - 10, 0);
-    audioRef.current.currentTime = newTime;
-    setCurrentTime(newTime);
+    if (!isThisSongActive) return;
+    seekTo(Math.max(currentTime - 10, 0));
   };
 
   const handleForward = () => {
-    if (!audioRef.current) return;
-    const totalDuration = duration || audioRef.current.duration || 0;
-    const newTime = Math.min(audioRef.current.currentTime + 10, totalDuration);
-    audioRef.current.currentTime = newTime;
-    setCurrentTime(newTime);
+    if (!isThisSongActive) return;
+    seekTo(Math.min(currentTime + 10, duration));
   };
 
   const handleSeek = (e) => {
     const newTime = parseFloat(e.target.value);
-    if (audioRef.current) {
-      audioRef.current.currentTime = newTime;
+    if (isThisSongActive) {
+      seekTo(newTime);
     }
-    setCurrentTime(newTime);
   };
 
   const handleVolumeChange = (e) => {
@@ -104,35 +94,9 @@ const SongDetailContent = ({ song }) => {
           </span>
 
           <div className="border border-dashed border-secondary/30 bg-secondary/5 rounded-[16px] p-3 flex flex-col items-center justify-center text-center flex-1 relative overflow-hidden gap-2.5">
-            {/* Hidden HTML5 Audio Element */}
-            {audioSrc && (
-              <audio
-                ref={audioRef}
-                src={audioSrc}
-                onTimeUpdate={() => {
-                  if (audioRef.current) {
-                    setCurrentTime(audioRef.current.currentTime);
-                  }
-                }}
-                onLoadedMetadata={() => {
-                  if (audioRef.current?.duration) {
-                    setDuration(audioRef.current.duration);
-                  }
-                  if (audioRef.current) {
-                    audioRef.current.volume = isMuted ? 0 : volume;
-                  }
-                }}
-                onEnded={() => {
-                  setIsPlaying(false);
-                  setCurrentTime(0);
-                }}
-                className="hidden"
-              />
-            )}
-
             {/* Icon & Track Info */}
             <div className="flex flex-col items-center gap-0.5">
-              <Music className="w-5 h-5 text-secondary animate-pulse" />
+              <Music className={`w-5 h-5 text-secondary ${isPlaying ? "animate-pulse" : ""}`} />
               <span className="text-[12px] sm:text-[13px] font-medium text-whitetext truncate max-w-[180px] sm:max-w-[220px]">
                 Audio file {song?.title ? `(${song.title})` : ""}
               </span>
@@ -149,7 +113,7 @@ const SongDetailContent = ({ song }) => {
                 <button
                   type="button"
                   onClick={handleRewind}
-                  disabled={!audioSrc}
+                  disabled={!audioSrc || !isThisSongActive}
                   className="text-light-gray hover:text-secondary active:scale-90 transition-all disabled:opacity-30 cursor-pointer p-1"
                   title="Rewind 10 seconds"
                 >
@@ -161,7 +125,7 @@ const SongDetailContent = ({ song }) => {
                   onClick={togglePlay}
                   disabled={!audioSrc}
                   className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-secondary text-black flex items-center justify-center shrink-0 hover:scale-105 active:scale-95 transition-all disabled:opacity-40 cursor-pointer shadow-md shadow-secondary/20"
-                  title={isPlaying ? "Pause" : "Play"}
+                  title={isPlaying ? "Pause" : "Play globally"}
                 >
                   {isPlaying ? (
                     <Pause className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" />
@@ -173,7 +137,7 @@ const SongDetailContent = ({ song }) => {
                 <button
                   type="button"
                   onClick={handleForward}
-                  disabled={!audioSrc}
+                  disabled={!audioSrc || !isThisSongActive}
                   className="text-light-gray hover:text-secondary active:scale-90 transition-all disabled:opacity-30 cursor-pointer p-1"
                   title="Forward 10 seconds"
                 >
@@ -220,7 +184,7 @@ const SongDetailContent = ({ song }) => {
                   step={0.1}
                   value={currentTime}
                   onChange={handleSeek}
-                  disabled={!audioSrc}
+                  disabled={!audioSrc || !isThisSongActive}
                   className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-secondary focus:outline-none"
                 />
               </div>
