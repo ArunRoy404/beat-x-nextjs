@@ -55,7 +55,8 @@ const SongsContainer = () => {
   const { data, isLoading, isError, error, refetch } = useSongs(params)
   const songs = data?.song ?? data?.songs ?? data?.data ?? []
   const total = data?.total ?? 0
-  const totalPages = Math.ceil(total / SONGS_PAGE_SIZE) || 1
+  const limit = data?.limit ?? SONGS_PAGE_SIZE
+  const totalPages = Math.ceil(total / limit) || 1
 
   const columns = getSongsColumns()
 
@@ -117,7 +118,7 @@ const SongsContainer = () => {
           <CommonPagination
             currentPage={currentPage}
             totalItems={total}
-            pageSize={SONGS_PAGE_SIZE}
+            pageSize={limit}
             totalPages={totalPages}
             onPageChange={(page) => setParams({ page }, { resetPage: false })}
           />

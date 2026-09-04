@@ -3,7 +3,7 @@
 // it out of useSongs.js (which is "use client") matters: any export from a
 // "use client" file becomes client-only, and a Server Component can't call
 // it directly.
-export const SONGS_PAGE_SIZE = 10
+export const SONGS_PAGE_SIZE = 20
 
 /**
  * Resolves raw URL search params (from the browser's useSearchParams() or
@@ -13,14 +13,15 @@ export const SONGS_PAGE_SIZE = 10
  * match, whatever filters/page are in the URL.
  */
 export function buildSongsParams(raw = {}) {
-  const status = raw.status
-  const genre = raw.genre
-  const q = raw.q
-  const page = Number(raw.page) || 1
+  const status = raw?.status
+  const genre = raw?.genre
+  const q = raw?.q
+  const page = Number(raw?.page) || 1
+  const limit = Number(raw?.limit) || SONGS_PAGE_SIZE
 
   return {
     page,
-    limit: SONGS_PAGE_SIZE,
+    limit,
     ...(status && status !== "all" && { status }),
     ...(genre && genre !== "all" && { genre }),
     ...(q && { q }),

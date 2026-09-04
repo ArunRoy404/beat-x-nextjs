@@ -31,6 +31,8 @@ You are an expert full-stack TypeScript/React developer working on BeatX.
 - No fabricated data: never render a guessed/hardcoded fallback (`|| "Bangladesh"`, `|| 18`, `|| "Local"`, etc.) for a field the API left empty or missing. Show the real value, or a plain empty-state marker (`"-"`, an empty list, a "No data" message) — never a value that looks like real data but isn't.
 - No client-side filter/search/sort/pagination once a module is API-backed: these must be sent as API params/query/body from the hook. If the given endpoint/Postman collection doesn't document a param for it yet, leave the control (search box, filter tabs, pagination) visible and wired to its own local UI state, but don't fake the behavior with local `.filter()`/`.slice()` — it stays visually present but non-functional until the endpoint actually supports it.
 - Keep it minimal: no speculative props, unused state, or dead branches for capabilities the current API doesn't support yet.
+- Preserving UI design blocks missing backend data (STRICT RULE): If a design block/component is present in the UI layout but the API response does not contain data or fields for it yet, DO NOT delete or remove the component code. Comment out the component in the component/template file for future integration when the backend API supports it.
+
 
 ## Figma → Code Workflow
 - Building a new screen from Figma is the default now (not screenshots): call `get_metadata` to locate/confirm the target node, then — after loading the mandatory `figma-design-to-code` skill (`skill://figma/figma-design-to-code/SKILL.md` if not offered as a slash skill) — call `get_design_context` on that node before writing any code.
