@@ -5,6 +5,9 @@
  */
 export function getSafeCallbackUrl(callbackUrl, fallback) {
   if (callbackUrl && callbackUrl.startsWith("/") && !callbackUrl.startsWith("//")) {
+    if (callbackUrl === "/admin/dashboard" || callbackUrl === "/admin/dashboard/") {
+      return "/admin/dashboard/overview";
+    }
     return callbackUrl;
   }
   return fallback;

@@ -99,7 +99,7 @@ const ArtistPersonalInfoPage = () => {
                             name="dateOfBirth"
                             control={control}
                             render={({ field }) => (
-                                <CommonCalender
+                                <CommonCalender 
                                     label="Date of Birth"
                                     labelClassName={labelClassName}
                                     className={inputClassName}

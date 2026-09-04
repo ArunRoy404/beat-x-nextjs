@@ -28,7 +28,11 @@ export async function proxy(request) {
 
   if (pathname.startsWith(ADMIN_DASHBOARD_PATH) && !isAdmin) {
     const loginUrl = new URL(ADMIN_LOGIN_PATH, request.url);
-    loginUrl.searchParams.set("callbackUrl", `${pathname}${request.nextUrl.search}`);
+    const targetPath =
+      pathname === ADMIN_DASHBOARD_PATH || pathname === `${ADMIN_DASHBOARD_PATH}/`
+        ? ADMIN_DASHBOARD_HOME_PATH
+        : pathname;
+    loginUrl.searchParams.set("callbackUrl", `${targetPath}${request.nextUrl.search}`);
     return redirectNoStore(loginUrl);
   }
 
