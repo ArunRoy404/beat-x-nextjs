@@ -39,8 +39,7 @@ const GrowthOverview = ({ data }) => {
               fontSize={12}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(val) => `${val}k`}
-              ticks={[0, 40, 80, 120, 160]}
+              tickFormatter={(val) => (val >= 1000 ? `${(val / 1000).toFixed(1)}k` : val)}
               dx={-5}
             />
             {/* Right Y Axis for Followers */}
@@ -51,8 +50,7 @@ const GrowthOverview = ({ data }) => {
               fontSize={12}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(val) => `${val}k`}
-              ticks={[0, 65, 130, 195, 260]}
+              tickFormatter={(val) => (val >= 1000 ? `${(val / 1000).toFixed(1)}k` : val)}
               dx={5}
             />
             <Tooltip
@@ -63,7 +61,7 @@ const GrowthOverview = ({ data }) => {
                       <p className="text-light-gray font-medium">{payload[0].payload.name}</p>
                       {payload.map((p, idx) => (
                         <p key={idx} style={{ color: p.color }} className="font-semibold">
-                          {p.name}: {p.value}k
+                          {p.name}: {p.value >= 1000 ? `${(p.value / 1000).toFixed(1)}k` : p.value}
                         </p>
                       ))}
                     </div>

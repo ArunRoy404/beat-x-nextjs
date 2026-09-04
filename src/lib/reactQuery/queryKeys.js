@@ -50,4 +50,8 @@ export const queryKeys = {
     all: ["dashboard"],
     overview: () => [...queryKeys.dashboard.all, "overview"],
   },
+  analytics: {
+    all: ["analytics"],
+    detail: (params) => [...queryKeys.analytics.all, "detail", params],
+  },
 };
