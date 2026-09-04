@@ -31,8 +31,18 @@ const AdminSongFormFields = ({
     onCoverChange,
     coverError,
 }) => {
-    const { data: genres = [] } = useGenres()
-    const genreOptions = genres.map((genre) => ({ value: genre._id, label: genre.name }))
+    const genresQuery = useGenres()
+    const genresData = genresQuery?.data
+    const genresList =
+        genresData?.genre ??
+        genresData?.genres ??
+        genresData?.data ??
+        (Array.isArray(genresData) ? genresData : [])
+
+    const genreOptions = genresList.map((genre) => ({
+        value: genre?._id || genre?.id,
+        label: genre?.name || "Unnamed Genre",
+    }))
 
     const visibility = watch("visibility")
 
