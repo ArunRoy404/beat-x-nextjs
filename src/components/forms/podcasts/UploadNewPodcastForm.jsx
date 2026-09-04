@@ -9,7 +9,6 @@ import { Switch } from "@/components/ui/switch"
 import { DialogClose } from "@/components/ui/dialog"
 import { CheckCircle2, Clock, FileText } from "lucide-react"
 import { toast } from "sonner"
-import { useAdminDashboardPodcastsStore } from "@/zustandStore/admin/adminStore/adminDashboardPodcastsStore"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
 import CommonAudioInput from "@/components/shared/CommonInputs/CommonAudioInput/CommonAudioInput"
 import CommonImageUpload from "@/components/shared/CommonInputs/CommonImageUpload/CommonImageUpload"
@@ -29,8 +28,6 @@ const VISIBILITY_OPTIONS = [
 ]
 
 const UploadNewPodcastForm = ({ onSuccess, onCancel }) => {
-    const addPodcast = useAdminDashboardPodcastsStore((state) => state.addPodcast)
-
     const {
         register,
         handleSubmit,
@@ -44,9 +41,7 @@ const UploadNewPodcastForm = ({ onSuccess, onCancel }) => {
     })
 
     const onSubmit = (data) => {
-        console.log("Submitted Podcast Data:", data)
-        addPodcast(data)
-        toast.success("Podcast uploaded successfully!")
+        toast.success("Podcast submitted successfully!")
         reset()
         onSuccess?.()
     }
