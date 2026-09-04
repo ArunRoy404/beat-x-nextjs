@@ -50,6 +50,11 @@ export const queryKeys = {
     all: ["dashboard"],
     overview: () => [...queryKeys.dashboard.all, "overview"],
   },
+  videos: {
+    all: ["videos"],
+    list: (params) => [...queryKeys.videos.all, "list", params],
+    detail: (id) => [...queryKeys.videos.all, "detail", id],
+  },
   analytics: {
     all: ["analytics"],
     detail: (params) => [...queryKeys.analytics.all, "detail", params],

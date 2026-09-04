@@ -1,56 +1,72 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import VideoCard from "./VideoCard"
 import CommonFilter from "@/components/shared/commonFilter/commonFilter"
 import CommonSearch from "@/components/shared/CommonSearch/CommonSearch"
+import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSelect"
 import CommonPagination from "@/components/shared/CommonPagination/CommonPagination"
 import CommonTableContainer from "@/components/shared/CommonTable/CommonTableContainer"
-import { useAdminDashboardVideosStore } from "@/zustandStore/admin/adminStore/adminDashboardVideosStore"
+import { Button } from "@/components/ui/button"
+import { Spinner } from "@/components/ui/spinner"
+import { useUrlListParams } from "@/hooks/useUrlListParams"
+import { useVideos } from "@/hooks/api/admin/videos/useVideos"
+import { buildVideosParams } from "@/hooks/api/admin/videos/videosParams"
+import { useGenres } from "@/hooks/api/admin/genre/useGenres"
+
+const STATUS_TABS = ["All", "Active", "Draft", "Archived"]
+const SEARCH_DEBOUNCE_MS = 300
+const VIDEOS_PAGE_SIZE = 20
 
 const VideosContainer = () => {
-  const videos = useAdminDashboardVideosStore((state) => state.videosList)
-  
-  const [selectedStatusFilter, setSelectedStatusFilter] = useState("All")
-  const [searchQuery, setSearchQuery] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const pageSize = 6
+  const { get, setParams } = useUrlListParams()
 
-  // Filter list
-  const filteredVideos = videos.filter((video) => {
-    // Status Filter
-    if (selectedStatusFilter !== "All") {
-      if (video.status.toLowerCase() !== selectedStatusFilter.toLowerCase()) {
-        return false
+  const selectedStatus = get("status", "all")
+  const selectedGenre = get("genre", "all")
+  const urlSearch = get("q", "")
+  const currentPage = Number(get("page", "1")) || 1
+
+  const [searchInput, setSearchInput] = useState(urlSearch)
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (searchInput.trim() !== urlSearch) {
+        setParams({ q: searchInput.trim() })
       }
-    }
-    
-    // Search Query
-    if (searchQuery.trim() !== "") {
-      const q = searchQuery.toLowerCase()
-      if (
-        !video.title.toLowerCase().includes(q) &&
-        !video.artist.toLowerCase().includes(q) &&
-        !video.genre.toLowerCase().includes(q)
-      ) {
-        return false
-      }
-    }
-    return true
+    }, SEARCH_DEBOUNCE_MS)
+    return () => clearTimeout(timeout)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchInput])
+
+  const genresQuery = useGenres()
+  const genresData = genresQuery?.data
+  const genresList =
+    genresData?.genre ??
+    genresData?.genres ??
+    genresData?.data ??
+    (Array.isArray(genresData) ? genresData : [])
+
+  const genreOptions = [
+    { value: "all", label: "All Genres" },
+    ...genresList.map((genre) => ({
+      value: genre?._id || genre?.id,
+      label: genre?.name || "Unnamed Genre",
+    })),
+  ]
+
+  const params = buildVideosParams({
+    status: selectedStatus,
+    genre: selectedGenre,
+    q: urlSearch,
+    page: currentPage,
+    limit: VIDEOS_PAGE_SIZE,
   })
 
-  // Pagination calculations
-  const totalItems = filteredVideos.length
-  const totalPages = Math.ceil(totalItems / pageSize) || 1
-  const paginatedVideos = filteredVideos.slice((currentPage - 1) * pageSize, currentPage * pageSize)
-
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page)
-    }
-  }
-
-  const tabs = ["All", "Published", "Draft"]
+  const { data, isLoading, isError, error, refetch } = useVideos(params)
+  const videos = data?.data ?? []
+  const total = data?.total ?? 0
+  const limit = data?.limit ?? VIDEOS_PAGE_SIZE
+  const totalPages = Math.ceil(total / limit) || 1
 
   return (
     <CommonTableContainer
@@ -58,51 +74,65 @@ const VideosContainer = () => {
         <>
           {/* Tab pills */}
           <CommonFilter
-            tabs={tabs}
-            activeTab={selectedStatusFilter}
-            onChange={(tab) => {
-              setSelectedStatusFilter(tab)
-              setCurrentPage(1)
-            }}
+            tabs={STATUS_TABS}
+            activeTab={STATUS_TABS.find((tab) => tab.toLowerCase() === selectedStatus) || "All"}
+            onChange={(tab) => setParams({ status: tab.toLowerCase() === "all" ? undefined : tab.toLowerCase() })}
           />
 
-          {/* Search Input */}
-          <div className="flex items-center gap-3 w-full md:w-auto shrink-0">
+          <div className="flex items-center gap-3 w-full md:w-auto shrink-0 flex-wrap">
+            <CommonSelect
+              value={selectedGenre}
+              onChange={(genre) => setParams({ genre: genre === "all" ? undefined : genre })}
+              options={genreOptions}
+              className="w-44 h-8 px-4 text-[12px] border-border bg-transparent"
+            />
             <CommonSearch
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value)
-                setCurrentPage(1)
-              }}
-              placeholder="Search ....."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="Search videos..."
               className="flex-1 md:w-72"
             />
           </div>
         </>
       }
     >
-      {/* Cards Responsive Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10 w-full">
-        {paginatedVideos.map((video) => (
-          <div key={video.id} className="flex h-full">
-            <VideoCard video={video} />
+      {isLoading ? (
+        <div className="flex items-center justify-center py-16">
+          <Spinner className="size-6 text-secondary" />
+        </div>
+      ) : isError ? (
+        <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
+          <span className="text-red-error text-sm">{error?.message || "Failed to load videos."}</span>
+          <Button variant="outline" size="sm" onClick={() => refetch()}>
+            Retry
+          </Button>
+        </div>
+      ) : (
+        <>
+          {/* Cards Responsive Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10 w-full">
+            {videos.map((video) => (
+              <div key={video._id} className="flex h-full">
+                <VideoCard video={video} />
+              </div>
+            ))}
+            {videos.length === 0 && (
+              <div className="col-span-full py-20 text-center text-muted-foreground bg-white/[0.02] border border-white/5 rounded-[24px]">
+                No videos found.
+              </div>
+            )}
           </div>
-        ))}
-        {paginatedVideos.length === 0 && (
-          <div className="col-span-full py-20 text-center text-muted-foreground bg-white/[0.02] border border-white/5 rounded-[24px]">
-            No videos found.
-          </div>
-        )}
-      </div>
 
-      {/* Pagination Bar */}
-      <CommonPagination
-        currentPage={currentPage}
-        totalItems={totalItems}
-        pageSize={pageSize}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-      />
+          {/* Pagination Bar */}
+          <CommonPagination
+            currentPage={currentPage}
+            totalItems={total}
+            pageSize={limit}
+            totalPages={totalPages}
+            onPageChange={(page) => setParams({ page }, { resetPage: false })}
+          />
+        </>
+      )}
     </CommonTableContainer>
   )
 }

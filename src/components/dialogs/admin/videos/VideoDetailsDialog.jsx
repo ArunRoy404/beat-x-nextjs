@@ -7,12 +7,16 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import { Spinner } from "@/components/ui/spinner"
+import { useVideoDetail } from "@/hooks/api/admin/videos/useVideoDetail"
 import VideoDetailHeader from "@/components/admin/videos/VideoDetails/VideoDetailHeader"
 import VideoDetailsTabs from "@/components/admin/videos/VideoDetails/VideoDetailsTabs"
 import VideoDetailFooter from "@/components/admin/videos/VideoDetails/VideoDetailFooter"
 
-const VideoDetailsDialog = ({ video, children }) => {
+const VideoDetailsDialog = ({ video: summary, children }) => {
     const [open, setOpen] = useState(false)
+    const { data: detail, isLoading } = useVideoDetail(open ? summary?._id : undefined)
+    const video = detail || summary
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -25,14 +29,22 @@ const VideoDetailsDialog = ({ video, children }) => {
                     Video Details - {video?.title || "Unknown"}
                 </DialogTitle>
 
-                {/* Video Header & Player */}
-                <VideoDetailHeader video={video} />
+                {isLoading && !detail ? (
+                    <div className="flex items-center justify-center py-20">
+                        <Spinner className="size-6 text-secondary" />
+                    </div>
+                ) : (
+                    <>
+                        {/* Video Header & Player */}
+                        <VideoDetailHeader video={video} />
 
-                {/* Details / Analytics Tabs */}
-                <VideoDetailsTabs video={video} />
+                        {/* Details / Analytics Tabs */}
+                        <VideoDetailsTabs video={video} />
 
-                {/* Action Buttons Footer */}
-                <VideoDetailFooter video={video} />
+                        {/* Action Buttons Footer */}
+                        <VideoDetailFooter video={video} />
+                    </>
+                )}
             </DialogContent>
         </Dialog>
     )

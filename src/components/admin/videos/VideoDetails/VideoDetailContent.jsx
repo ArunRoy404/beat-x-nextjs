@@ -1,27 +1,33 @@
 "use client"
 
 import React from "react"
+import { format } from "date-fns"
 import InfoBox from "./InfoBox"
+import { formatDurationMs } from "@/lib/format/formatDuration"
 
 const VideoDetailContent = ({ video }) => {
+    const ownerName = video?.ownerId?.name || video?.artist || "Admin"
+    const genreName = video?.genre?.name || (typeof video?.genre === "string" ? video.genre : "-")
+    const formattedDate = video?.publishedAt ? format(new Date(video.publishedAt), "MMM d, yyyy") : "-"
+
     return (
         /* Scrollable Body Content */
         <div className="p-4 flex flex-col gap-5 overflow-y-auto flex-1 min-h-0 scrollbar-thin">
             <div className="grid grid-cols-2 gap-4">
                 
                 {/* Info Boxes */}
-                <InfoBox label="Author" value={video?.artist || "Unknown Artist"} />
-                <InfoBox label="Genre" value={video?.genre || "Pop"} />
-                <InfoBox label="Release Date" value={video?.released || "-"} />
-                <InfoBox label="Resolution" value={video?.resolution || "1080p"} />
-                <InfoBox label="Total Duration" value={video?.duration || "-"} />
-                <InfoBox label="Featured" value={video?.isPremium ? "Yes" : "No"} />
+                <InfoBox label="Uploader / Artist" value={ownerName} />
+                <InfoBox label="Genre" value={genreName} />
+                <InfoBox label="Published Date" value={formattedDate} />
+                <InfoBox label="Transcode Status" value={video?.transcodeStatus || "ready"} />
+                <InfoBox label="Total Duration" value={formatDurationMs(video?.durationMs)} />
+                <InfoBox label="Featured" value={video?.isFeatured ? "Yes" : "No"} />
 
-                {/* Synopsis (Full Width) */}
+                {/* Description / Synopsis (Full Width) */}
                 <div className="col-span-2 border border-white/10 bg-white/5 rounded-[16px] p-3 px-4 flex flex-col gap-1.5 w-full">
-                    <span className="text-[12px] text-dark-gray font-normal not-italic uppercase tracking-wider">Synopsis</span>
+                    <span className="text-[12px] text-dark-gray font-normal not-italic uppercase tracking-wider">Description</span>
                     <span className="text-[13px] text-whitetext/90 leading-relaxed font-normal">
-                        {video?.synopsis || `No description provided for "${video?.title}". This video is created by ${video?.artist}.`}
+                        {video?.description || video?.synopsis || "-"}
                     </span>
                 </div>
             </div>
