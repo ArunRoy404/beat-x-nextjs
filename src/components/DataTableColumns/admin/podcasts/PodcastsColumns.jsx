@@ -36,9 +36,9 @@ export const getPodcastsColumns = () => [
   {
     accessorKey: "genre",
     header: () => <CommonTableHeader>Genre</CommonTableHeader>,
-    cell: ({ getValue }) => (
+    cell: ({ getValue, row }) => (
       <CommonTableTag>
-        {getValue()?.name || "-"}
+        {row.original?.category?.name || getValue()?.name || "-"}
       </CommonTableTag>
     )
   },
