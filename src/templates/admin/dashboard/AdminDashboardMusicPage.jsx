@@ -6,9 +6,23 @@ import UploadNewSong from "@/components/admin/music/UploadNewSong";
 import SongsContainer from "@/components/admin/music/SongsContainer/SongsContainer";
 import { useSongs } from "@/hooks/api/admin/songs/useSongs";
 import { buildSongsParams } from "@/hooks/api/admin/songs/songsParams";
+import { useUrlListParams } from "@/hooks/useUrlListParams";
 
 const AdminDashboardMusicPage = () => {
-  const { data: allData } = useSongs(buildSongsParams());
+  const { get } = useUrlListParams();
+  const selectedStatus = get("status", "all");
+  const selectedGenre = get("genre", "all");
+  const urlSearch = get("q", "");
+  const currentPage = Number(get("page", "1")) || 1;
+
+  const params = buildSongsParams({
+    status: selectedStatus,
+    genre: selectedGenre,
+    q: urlSearch,
+    page: currentPage,
+  });
+
+  const { data: allData } = useSongs(params);
 
   const statsCards = useMemo(() => {
     return [
