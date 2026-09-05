@@ -8,3 +8,9 @@ export async function getUsersRequest(params) {
   const res = await axiosPrivate.get("/users", { params });
   return res?.data?.data ?? res?.data;
 }
+
+export async function getProfileRequest() {
+  const res = await axiosPrivate.get("/users/me");
+  return res?.data?.data ?? res?.data;
+}
+

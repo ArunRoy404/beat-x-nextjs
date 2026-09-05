@@ -8,9 +8,11 @@ export const queryKeys = {
   auth: {
     all: ["auth"],
     me: () => [...queryKeys.auth.all, "me"],
+    loginHistory: () => [...queryKeys.auth.all, "loginHistory"],
   },
   users: {
     all: ["users"],
+    profile: () => [...queryKeys.users.all, "profile"],
     list: (params) => [...queryKeys.users.all, "list", params],
   },
   genre: {
