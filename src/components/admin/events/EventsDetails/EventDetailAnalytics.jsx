@@ -5,11 +5,52 @@ import { useEventDetailsAnalyticsStore } from "@/zustandStore/admin/adminStore/e
 import DashboardStats from "@/components/shared/Dashboard/DashboardStats/DashboardStats"
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
 
-const EventDetailAnalytics = () => {
-    const eventStatsCards = useEventDetailsAnalyticsStore((state) => state.eventStatsCards)
+const EventDetailAnalytics = ({ event, analytics }) => {
+    const storeStatsCards = useEventDetailsAnalyticsStore((state) => state.eventStatsCards)
     const eventPerformanceData = useEventDetailsAnalyticsStore((state) => state.eventPerformanceData)
     const eventPlatformData = useEventDetailsAnalyticsStore((state) => state.eventPlatformData)
     const eventCountryData = useEventDetailsAnalyticsStore((state) => state.eventCountryData)
+
+    const eventStatsCards = analytics
+        ? [
+            {
+                id: 1,
+                title: "Tickets Sold",
+                value: String(analytics?.ticketsSold ?? 0),
+                icon: "Ticket",
+                iconColor: "#3ADFFA",
+                iconBg: "rgba(58, 223, 250, 0.15)",
+            },
+            {
+                id: 2,
+                title: "Total Revenue",
+                value: `৳${analytics?.revenue ?? 0}`,
+                icon: "Wallet",
+                iconColor: "#34C759",
+                iconBg: "rgba(52, 199, 89, 0.15)",
+            },
+            {
+                id: 3,
+                title: "Avg Daily Sales",
+                value: String(analytics?.avgDaily ?? 0),
+                icon: "TrendingUp",
+                iconColor: "#CC97FF",
+                iconBg: "rgba(204, 151, 255, 0.15)",
+            },
+            {
+                id: 4,
+                title: "Tickets Remaining",
+                value: String(analytics?.ticketsRemaining ?? 0),
+                icon: "Clock",
+                iconColor: "#FFAE00",
+                iconBg: "rgba(254, 174, 0, 0.15)",
+            },
+        ]
+        : storeStatsCards
+
+    const performanceData = analytics?.salesTrend?.length ? analytics.salesTrend : eventPerformanceData
+    const platformData = analytics?.byPlatform?.length ? analytics.byPlatform : eventPlatformData
+    const countryData = analytics?.byCountry?.length ? analytics.byCountry : eventCountryData
 
     return (
         <div className="p-4 overflow-y-auto flex-1 min-h-0 scrollbar-thin space-y-5">
@@ -30,7 +71,7 @@ const EventDetailAnalytics = () => {
 
                 <div style={{ height: "200px", minHeight: "200px" }} className="w-full z-10 relative">
                     <ResponsiveContainer width="100%" height="100%" minHeight={200} debounce={1000}>
-                        <AreaChart data={eventPerformanceData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+                        <AreaChart data={performanceData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                             <defs>
                                 <linearGradient id="colorEventSales" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="5%" stopColor="#3ADFFA" stopOpacity={0.3} />
@@ -96,8 +137,8 @@ const EventDetailAnalytics = () => {
                         By Platform
                     </h3>
                     <div className="flex flex-col gap-4 relative z-10">
-                        {eventPlatformData.map((plat) => (
-                            <div key={plat.name} className="flex flex-col gap-1.5">
+                        {platformData.map((plat, idx) => (
+                            <div key={plat.name || idx} className="flex flex-col gap-1.5">
                                 <div className="flex items-center justify-between text-xs font-medium">
                                     <span className="text-light-gray">{plat.name}</span>
                                     <span className="text-whitetext">{plat.value}%</span>
@@ -105,7 +146,7 @@ const EventDetailAnalytics = () => {
                                 <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
                                     <div
                                         className="h-full rounded-full transition-all duration-500"
-                                        style={{ width: `${plat.value}%`, backgroundColor: plat.color }}
+                                        style={{ width: `${plat.value}%`, backgroundColor: plat.color || "#3ADFFA" }}
                                     />
                                 </div>
                             </div>
@@ -123,10 +164,10 @@ const EventDetailAnalytics = () => {
                         Top Countries
                     </h3>
                     <div className="flex flex-col gap-3 relative z-10">
-                        {eventCountryData.map((country) => (
-                            <div key={country.name} className="flex items-center justify-between py-1 border-b border-white/5 last:border-0 text-xs font-medium">
+                        {countryData.map((country, idx) => (
+                            <div key={country.name || idx} className="flex items-center justify-between py-1 border-b border-white/5 last:border-0 text-xs font-medium">
                                 <div className="flex items-center gap-2">
-                                    <span className="text-sm shrink-0">{country.flag}</span>
+                                    <span className="text-sm shrink-0">{country.flag || "🌐"}</span>
                                     <span className="text-light-gray">{country.name}</span>
                                 </div>
                                 <span className="text-whitetext">{country.value}%</span>
