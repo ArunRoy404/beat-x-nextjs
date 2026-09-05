@@ -65,6 +65,7 @@ const CommonInput = React.forwardRef(({
                     <Input
                         ref={ref}
                         type={inputType}
+                        step={props.step ?? (type === "number" ? "any" : undefined)}
                         placeholder={placeholder}
                         className={cn(
                             "h-[52px] rounded-full",

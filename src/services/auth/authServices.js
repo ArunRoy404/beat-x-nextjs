@@ -45,3 +45,9 @@ export async function logoutRequest() {
   const res = await axiosPrivate.post("/auth/logout");
   return res.data.data;
 }
+
+export async function getLoginHistoryRequest() {
+  const res = await axiosPrivate.get("/auth/login-history");
+  return res?.data?.data ?? res?.data;
+}
+

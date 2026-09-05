@@ -1,0 +1,10 @@
+export { StarIcon } from "./StarIcon";
+export { OfflineIcon } from "./OfflineIcon";
+export { HifiAudioIcon } from "./HifiAudioIcon";
+export { ListenAnyDeviceIcon } from "./ListenAnyDeviceIcon";
+export { PeoplesIcon } from "./PeoplesIcon";
+export { AccountsIcon } from "./AccountsIcon";
+export { RolesRbacIcon } from "./RolesRbacIcon";
+export { ShieldRoleIcon } from "./ShieldRoleIcon";
+export { TotalAdminUsersIcon } from "./TotalAdminUsersIcon";
+export { PendingInvitesIcon } from "./PendingInvitesIcon";

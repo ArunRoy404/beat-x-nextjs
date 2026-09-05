@@ -1,20 +1,72 @@
 "use client"
 
 import React from "react"
-import { useProductDetailsAnalyticsStore } from "@/zustandStore/admin/adminStore/productDetailsAnalyticsStore"
 import DashboardStats from "@/components/shared/Dashboard/DashboardStats/DashboardStats"
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
 
-const ProductDetailAnalytics = () => {
-  const productStatsCards = useProductDetailsAnalyticsStore((state) => state.productStatsCards)
-  const productPerformanceData = useProductDetailsAnalyticsStore((state) => state.productPerformanceData)
-  const productPlatformData = useProductDetailsAnalyticsStore((state) => state.productPlatformData)
-  const productCountryData = useProductDetailsAnalyticsStore((state) => state.productCountryData)
+const ProductDetailAnalytics = ({ product, analytics }) => {
+  const statsCards = [
+    {
+      id: "units_sold",
+      title: "Units Sold",
+      value: String(analytics?.unitsSold ?? product?.soldCount ?? product?.sold ?? 0),
+      trend: { direction: "up", percentage: "0%" },
+      subText: "total sold",
+    },
+    {
+      id: "revenue",
+      title: "Total Revenue",
+      value: `৳${(analytics?.revenue ?? 0).toLocaleString()}`,
+      trend: { direction: "up", percentage: "0%" },
+      subText: "gross revenue",
+    },
+    {
+      id: "avg_daily",
+      title: "Avg. Daily Sales",
+      value: String(analytics?.avgDaily ?? 0),
+      trend: { direction: "up", percentage: "0%" },
+      subText: "units/day",
+    },
+    {
+      id: "in_stock",
+      title: "In Stock",
+      value: String(analytics?.inStock ?? product?.stock ?? 0),
+      trend: { direction: "down", percentage: "0%" },
+      subText: "remaining inventory",
+    },
+  ]
+
+  const salesTrend = analytics?.salesTrend?.length
+    ? analytics.salesTrend
+    : [
+        { name: "Mon", sales: 0 },
+        { name: "Tue", sales: 0 },
+        { name: "Wed", sales: 0 },
+        { name: "Thu", sales: 0 },
+        { name: "Fri", sales: 0 },
+        { name: "Sat", sales: 0 },
+        { name: "Sun", sales: 0 },
+      ]
+
+  const byPlatform = analytics?.byPlatform?.length
+    ? analytics.byPlatform
+    : [
+        { name: "Mobile App", value: 65, color: "#3ADFFA" },
+        { name: "Web Store", value: 35, color: "#CC97FF" },
+      ]
+
+  const byCountry = analytics?.byCountry?.length
+    ? analytics.byCountry
+    : [
+        { name: "Bangladesh", flag: "🇧🇩", value: 80 },
+        { name: "United States", flag: "🇺🇸", value: 12 },
+        { name: "Other", flag: "🌐", value: 8 },
+      ]
 
   return (
     <div className="p-4 overflow-y-auto flex-1 min-h-0 scrollbar-thin space-y-5">
       {/* Stats Cards */}
-      <DashboardStats statsCards={productStatsCards} className="grid-cols-2! sm:grid-cols-2! lg:grid-cols-2!" />
+      <DashboardStats statsCards={statsCards} className="grid-cols-2! sm:grid-cols-2! lg:grid-cols-2!" />
 
       {/* Sales Trend Chart Card */}
       <div className="relative overflow-hidden rounded-[16px] border border-white/10 p-5 bg-[#0E0E0E]">
@@ -29,7 +81,7 @@ const ProductDetailAnalytics = () => {
 
         <div style={{ height: "200px", minHeight: "200px" }} className="w-full z-10 relative">
           <ResponsiveContainer width="100%" height="100%" minHeight={200} debounce={1000}>
-            <AreaChart data={productPerformanceData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+            <AreaChart data={salesTrend} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorProductSales" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#3ADFFA" stopOpacity={0.3} />
@@ -50,7 +102,6 @@ const ProductDetailAnalytics = () => {
                 fontSize={11}
                 tickLine={false}
                 axisLine={false}
-                ticks={[0, 10, 20, 30, 40, 50]}
                 dx={-5}
               />
               <Tooltip
@@ -95,7 +146,7 @@ const ProductDetailAnalytics = () => {
             By Platform
           </h3>
           <div className="flex flex-col gap-4 relative z-10 w-full">
-            {productPlatformData.map((plat) => (
+            {byPlatform.map((plat) => (
               <div key={plat.name} className="flex flex-col gap-1.5 w-full">
                 <div className="flex items-center justify-between text-[13px] font-sans font-medium">
                   <span className="text-light-gray">{plat.name}</span>
@@ -106,7 +157,7 @@ const ProductDetailAnalytics = () => {
                     className="h-full rounded-full transition-all duration-500"
                     style={{
                       width: `${plat.value}%`,
-                      backgroundColor: plat.color,
+                      backgroundColor: plat.color || "#3ADFFA",
                     }}
                   />
                 </div>
@@ -125,10 +176,10 @@ const ProductDetailAnalytics = () => {
             Top Countries
           </h3>
           <div className="flex flex-col gap-4 relative z-10 w-full">
-            {productCountryData.map((country) => (
+            {byCountry.map((country) => (
               <div key={country.name} className="flex items-center justify-between text-[13px] font-sans font-medium w-full">
                 <div className="flex items-center gap-2">
-                  <span className="text-[16px] leading-none shrink-0 select-none">{country.flag}</span>
+                  <span className="text-[16px] leading-none shrink-0 select-none">{country.flag || "🌐"}</span>
                   <span className="text-light-gray">{country.name}</span>
                 </div>
                 <span className="text-whitetext">{country.value}%</span>
@@ -142,3 +193,4 @@ const ProductDetailAnalytics = () => {
 }
 
 export default ProductDetailAnalytics
+

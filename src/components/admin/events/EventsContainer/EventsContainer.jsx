@@ -1,51 +1,45 @@
 "use client"
 
-import React, { useState } from "react"
+import React from "react"
 import CommonFilter from "@/components/shared/commonFilter/commonFilter"
 import CommonSearch from "@/components/shared/CommonSearch/CommonSearch"
 import CommonPagination from "@/components/shared/CommonPagination/CommonPagination"
 import CommonTableContainer from "@/components/shared/CommonTable/CommonTableContainer"
 import EventsCardsContainer from "./EventsCardsContainer"
-import { useAdminDashboardEventsStore } from "@/zustandStore/admin/adminStore/adminDashboardEventsStore"
+import { useUrlListParams } from "@/hooks/useUrlListParams"
+import { useEvents } from "@/hooks/api/admin/events/useEvents"
+import { buildEventsParams } from "@/hooks/api/admin/events/eventsParams"
 
 const EventsContainer = () => {
-  const events = useAdminDashboardEventsStore((state) => state.eventsList)
+  const { get, setParams } = useUrlListParams()
 
-  const [selectedStatusFilter, setSelectedStatusFilter] = useState("All")
-  const [searchQuery, setSearchQuery] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const pageSize = 5
+  const rawStatus = get("status", "")
+  const searchQuery = get("q", "")
+  const currentPage = Number(get("page", "1")) || 1
 
-  // Filter list
-  const filteredEvents = events.filter((event) => {
-    // Status / Tab Filter
-    if (selectedStatusFilter !== "All") {
-      if (event.status.toLowerCase() !== selectedStatusFilter.toLowerCase()) return false
-    }
+  // Format status for CommonFilter activeTab
+  const activeTab = rawStatus
+    ? rawStatus.charAt(0).toUpperCase() + rawStatus.slice(1).replace(/_/g, " ")
+    : "All"
 
-    // Search Query
-    if (searchQuery.trim() !== "") {
-      const q = searchQuery.toLowerCase()
-      if (
-        !event.title.toLowerCase().includes(q) &&
-        !event.venue.toLowerCase().includes(q) &&
-        !event.city.toLowerCase().includes(q) &&
-        !event.genre.toLowerCase().includes(q)
-      ) {
-        return false
-      }
-    }
-    return true
-  })
+  const rawParams = {
+    status: rawStatus,
+    q: searchQuery,
+    page: currentPage,
+    limit: 20,
+  }
 
-  // Pagination calculations
-  const totalItems = filteredEvents.length
+  const params = buildEventsParams(rawParams)
+  const { data: eventsResponse } = useEvents(params)
+
+  const events = eventsResponse?.data || eventsResponse?.events || []
+  const totalItems = eventsResponse?.total ?? events.length
+  const pageSize = eventsResponse?.limit ?? 20
   const totalPages = Math.ceil(totalItems / pageSize) || 1
-  const paginatedEvents = filteredEvents.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page)
+      setParams({ page }, { resetPage: false })
     }
   }
 
@@ -58,10 +52,10 @@ const EventsContainer = () => {
           {/* Tab pills */}
           <CommonFilter
             tabs={tabs}
-            activeTab={selectedStatusFilter}
+            activeTab={activeTab}
             onChange={(tab) => {
-              setSelectedStatusFilter(tab)
-              setCurrentPage(1)
+              const statusVal = tab === "All" ? "" : tab.toLowerCase().replace(/ /g, "_")
+              setParams({ status: statusVal, page: 1 })
             }}
           />
 
@@ -70,8 +64,7 @@ const EventsContainer = () => {
             <CommonSearch
               value={searchQuery}
               onChange={(e) => {
-                setSearchQuery(e.target.value)
-                setCurrentPage(1)
+                setParams({ q: e.target.value, page: 1 })
               }}
               placeholder="Search ....."
               className="flex-1 md:w-72"
@@ -81,7 +74,7 @@ const EventsContainer = () => {
       }
     >
       {/* Card list (all breakpoints) */}
-      <EventsCardsContainer events={paginatedEvents} />
+      <EventsCardsContainer events={events} />
 
       {/* Pagination Bar */}
       <CommonPagination

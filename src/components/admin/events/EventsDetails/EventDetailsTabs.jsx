@@ -5,7 +5,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import EventDetailContent from "./EventDetailContent"
 import EventDetailAnalytics from "./EventDetailAnalytics"
 
-const EventDetailsTabs = ({ event }) => {
+const EventDetailsTabs = ({ event, analytics }) => {
     return (
         <Tabs defaultValue="details" className="w-full flex flex-col flex-1 min-h-0">
             <div className="border-b border-white/5">
@@ -30,7 +30,7 @@ const EventDetailsTabs = ({ event }) => {
             </TabsContent>
 
             <TabsContent value="analytics" className="flex-1 min-h-0 flex flex-col overflow-hidden m-0">
-                <EventDetailAnalytics event={event} />
+                <EventDetailAnalytics event={event} analytics={analytics} />
             </TabsContent>
         </Tabs>
     )

@@ -12,16 +12,18 @@ import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import AddProductForm from "@/components/forms/shop/AddProductForm"
 
-const AddProductDialog = () => {
+const AddProductDialog = ({ children }) => {
   const [open, setOpen] = useState(false)
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="gradient" className="rounded-full px-5 h-10 flex items-center gap-1.5 font-semibold shrink-0 cursor-pointer">
-          <Plus className="w-4 h-4 shrink-0" />
-          <span>Add Product</span>
-        </Button>
+        {children || (
+          <Button variant="gradient" className="rounded-full px-5 h-10 flex items-center gap-1.5 font-semibold shrink-0 cursor-pointer">
+            <Plus className="w-4 h-4 shrink-0" />
+            <span>Add Product</span>
+          </Button>
+        )}
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[620px] max-h-[90vh] overflow-y-auto scrollbar-thin">

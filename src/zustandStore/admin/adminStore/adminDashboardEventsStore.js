@@ -1,12 +1,8 @@
 import { create } from "zustand"
-import {
-  eventsStatsCards,
-  eventsList
-} from "@/dummyData/admin/adminData/adminDashboardEventsData"
 
 export const useAdminDashboardEventsStore = create((set) => ({
-  eventsStatsCards: eventsStatsCards,
-  eventsList: eventsList,
+  eventsStatsCards: [],
+  eventsList: [],
   addEvent: (newEvent) => set((state) => ({
     eventsList: [
       {

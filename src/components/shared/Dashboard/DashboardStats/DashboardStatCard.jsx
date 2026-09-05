@@ -1,11 +1,16 @@
 import React from "react"
 import * as LucideIcons from "lucide-react"
+import * as CustomIcons from "@/components/icons"
 import CommonCard from "@/components/shared/CommonCard/CommonCard"
 
 const DashboardStatCard = ({ card }) => {
   if (!card) return null;
 
-  const IconComponent = card?.icon ? (LucideIcons[card.icon] || LucideIcons.HelpCircle) : null
+  const IconComponent = typeof card?.icon === "function"
+    ? card.icon
+    : card?.icon
+    ? (CustomIcons[card.icon] || LucideIcons[card.icon] || LucideIcons.HelpCircle)
+    : null;
 
   if (card?.layout === "vertical") {
     return (

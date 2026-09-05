@@ -1,12 +1,8 @@
 import { create } from "zustand"
-import {
-  shopStatsCards,
-  initialProductsList
-} from "@/dummyData/admin/adminData/adminDashboardShopData"
 
 export const useAdminDashboardShopStore = create((set) => ({
-  shopStatsCards: shopStatsCards,
-  productsList: initialProductsList,
+  shopStatsCards: [],
+  productsList: [],
   selectedStatusFilter: "All",
   searchQuery: "",
   currentPage: 1,
@@ -16,27 +12,5 @@ export const useAdminDashboardShopStore = create((set) => ({
   setSelectedStatusFilter: (filter) => set({ selectedStatusFilter: filter, currentPage: 1 }),
   setSearchQuery: (query) => set({ searchQuery: query, currentPage: 1 }),
   setCurrentPage: (page) => set({ currentPage: page }),
-
-  addProduct: (product) => set((state) => ({
-    productsList: [
-      {
-        id: `prod-${Date.now()}`,
-        currency: "৳",
-        stock: 42,
-        sold: 0,
-        status: "Active",
-        coinBadge: "50 coin",
-        ...product
-      },
-      ...state.productsList,
-    ]
-  })),
-
-  deleteProduct: (id) => set((state) => ({
-    productsList: state.productsList.filter((p) => p.id !== id)
-  })),
-
-  updateProduct: (updatedProduct) => set((state) => ({
-    productsList: state.productsList.map((p) => p.id === updatedProduct.id ? { ...p, ...updatedProduct } : p)
-  }))
 }))
+

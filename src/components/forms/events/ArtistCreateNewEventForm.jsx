@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { DialogClose } from "@/components/ui/dialog"
 import { CheckCircle2, Clock, FileText } from "lucide-react"
 import { toast } from "sonner"
-import { useArtistEventsStore } from "@/zustandStore/artist/artistStore/artistEventsStore"
+import { useCreateEvent } from "@/hooks/api/admin/events/useCreateEvent"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
 import CommonImageUpload from "@/components/shared/CommonInputs/CommonImageUpload/CommonImageUpload"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
@@ -23,7 +23,7 @@ const VISIBILITY_OPTIONS = [
 ]
 
 const ArtistCreateNewEventForm = ({ onSuccess, onCancel }) => {
-    const addEvent = useArtistEventsStore((state) => state.addEvent)
+    const createEventMutation = useCreateEvent()
 
     const {
         register,
@@ -37,11 +37,36 @@ const ArtistCreateNewEventForm = ({ onSuccess, onCancel }) => {
         defaultValues: uploadEventDefaultValues,
     })
 
-    const onSubmit = (data) => {
-        addEvent(data)
-        toast.success("Event submitted successfully!")
-        reset()
-        onSuccess?.()
+    const onSubmit = async (data) => {
+        const formData = new FormData()
+        if (data.eventTitle) formData.append("title", data.eventTitle)
+        if (data.venue) formData.append("venue", data.venue)
+        if (data.city) formData.append("city", data.city)
+        if (data.eventDate) {
+            const d = data.eventDate instanceof Date ? data.eventDate : new Date(data.eventDate)
+            formData.append("eventDate", !isNaN(d.getTime()) ? d.toISOString() : data.eventDate)
+        }
+        if (data.eventTime) formData.append("eventTime", data.eventTime)
+        if (data.ticketPrice !== undefined && data.ticketPrice !== "") formData.append("ticketPrice", String(data.ticketPrice))
+        if (data.totalTickets !== undefined && data.totalTickets !== "") formData.append("totalTickets", String(data.totalTickets))
+        if (data.description) formData.append("description", data.description)
+
+        const statusVal = data.status || (data.visibility === "publish" ? "active" : data.visibility || "active")
+        formData.append("status", statusVal)
+        if (data.ownerId) formData.append("ownerId", data.ownerId)
+
+        if (data.coverImage && (data.coverImage instanceof File || data.coverImage instanceof Blob)) {
+            formData.append("cover", data.coverImage)
+        }
+
+        try {
+            await createEventMutation.mutateAsync(formData)
+            toast.success("Event submitted successfully!")
+            reset()
+            onSuccess?.()
+        } catch (err) {
+            toast.error(err?.response?.data?.message || err?.message || "Failed to create event")
+        }
     }
 
     const onInvalid = (validationErrors) => {
@@ -176,8 +201,9 @@ const ArtistCreateNewEventForm = ({ onSuccess, onCancel }) => {
                     variant="gradient"
                     className="flex-1"
                     size="lg"
+                    disabled={createEventMutation.isPending}
                 >
-                    Submit for Review
+                    {createEventMutation.isPending ? "Submitting..." : "Submit for Review"}
                 </Button>
             </div>
         </CommonFormContainer>

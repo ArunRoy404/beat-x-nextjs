@@ -8,9 +8,11 @@ export const queryKeys = {
   auth: {
     all: ["auth"],
     me: () => [...queryKeys.auth.all, "me"],
+    loginHistory: () => [...queryKeys.auth.all, "loginHistory"],
   },
   users: {
     all: ["users"],
+    profile: () => [...queryKeys.users.all, "profile"],
     list: (params) => [...queryKeys.users.all, "list", params],
   },
   genre: {
@@ -63,6 +65,30 @@ export const queryKeys = {
     all: ["artists"],
     list: (params) => [...queryKeys.artists.all, "list", params],
     detail: (id) => [...queryKeys.artists.all, "detail", id],
+  },
+  products: {
+    all: ["products"],
+    dashboard: () => [...queryKeys.products.all, "dashboard"],
+    list: (params) => [...queryKeys.products.all, "list", params],
+    detail: (id) => [...queryKeys.products.all, "detail", id],
+    analytics: (id) => [...queryKeys.products.all, "analytics", id],
+  },
+  events: {
+    all: ["events"],
+    dashboard: () => [...queryKeys.events.all, "dashboard"],
+    list: (params) => [...queryKeys.events.all, "list", params],
+    detail: (id) => [...queryKeys.events.all, "detail", id],
+    analytics: (id) => [...queryKeys.events.all, "analytics", id],
+  },
+  subscriptions: {
+    all: ["subscriptions"],
+    dashboard: () => [...queryKeys.subscriptions.all, "dashboard"],
+    list: (params) => [...queryKeys.subscriptions.all, "list", params],
+  },
+  rolesRbac: {
+    all: ["rolesRbac"],
+    dashboard: () => [...queryKeys.rolesRbac.all, "dashboard"],
+    list: (params) => [...queryKeys.rolesRbac.all, "list", params],
   },
 };
 

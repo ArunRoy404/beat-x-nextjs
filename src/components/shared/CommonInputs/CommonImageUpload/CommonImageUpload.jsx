@@ -3,6 +3,14 @@ import Image from "next/image"
 import { Upload } from "lucide-react"
 import { cn } from "@/lib/utils"
 
+const getPreviewUrl = (val) => {
+    if (!val) return null
+    if (val instanceof File) return URL.createObjectURL(val)
+    if (typeof val === "string") return val
+    if (typeof val === "object") return val.url || val.src || val.path || val.coverUrl || null
+    return null
+}
+
 const CommonImageUpload = ({
     value,
     onChange,
@@ -19,9 +27,7 @@ const CommonImageUpload = ({
         }
     }
 
-    const previewUrl = value
-        ? (value instanceof File ? URL.createObjectURL(value) : value)
-        : null
+    const previewUrl = getPreviewUrl(value)
 
 
     return (
@@ -50,6 +56,7 @@ const CommonImageUpload = ({
                                 src={previewUrl}
                                 alt="Cover Art Preview"
                                 fill
+                                unoptimized
                                 className="object-cover"
                             />
                             {/* Upload Button Overlay */}

@@ -9,9 +9,14 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import EditEventForm from "@/components/forms/events/EditEventForm"
+import { useEventDetail } from "@/hooks/api/admin/events/useEventDetail"
 
 const EditEventDialog = ({ event, children }) => {
   const [open, setOpen] = useState(false)
+  const eventId = event?._id || event?.id
+
+  const { data: detailData } = useEventDetail(open ? eventId : null)
+  const detailedEvent = detailData || event
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -19,7 +24,7 @@ const EditEventDialog = ({ event, children }) => {
         {children}
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[620px] max-h-[90vh] overflow-y-auto scrollbar-thin">
+      <DialogContent>
         {/* Custom Header */}
         <DialogHeader>
           <DialogTitle>
@@ -29,7 +34,7 @@ const EditEventDialog = ({ event, children }) => {
 
         {/* Edit Modular Form */}
         <EditEventForm
-          event={event}
+          event={detailedEvent}
           onSuccess={() => setOpen(false)}
           onCancel={() => setOpen(false)}
         />

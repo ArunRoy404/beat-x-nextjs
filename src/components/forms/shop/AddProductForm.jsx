@@ -10,7 +10,6 @@ import { DialogClose } from "@/components/ui/dialog"
 import { CheckCircle2, Clock, FileText } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
-import { useAdminDashboardShopStore } from "@/zustandStore/admin/adminStore/adminDashboardShopStore"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
 import CommonMultiImageUpload from "@/components/shared/CommonInputs/CommonImageUpload/CommonMultiImageUpload"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
@@ -42,8 +41,6 @@ const productSchema = z.object({
 })
 
 const AddProductForm = ({ onSuccess, onCancel }) => {
-    const addProduct = useAdminDashboardShopStore((state) => state.addProduct)
-
     const {
         register,
         handleSubmit,
@@ -79,26 +76,7 @@ const AddProductForm = ({ onSuccess, onCancel }) => {
     }
 
     const onSubmit = (data) => {
-        const images = (data.images || []).filter(Boolean).map((img) =>
-            img instanceof File ? URL.createObjectURL(img) : img
-        )
-
-        addProduct({
-            title: data.productName,
-            artist: data.artist,
-            category: data.category,
-            price: Number(data.price) || 0,
-            currency: "৳",
-            stock: Number(data.stock) || 0,
-            sold: 0,
-            status: data.visibility === "draft" ? "Draft" : "Active",
-            image: images[0] || "/product-images/hoodie.png",
-            images,
-            coinBadge: data.coinReward ? `${data.coinReward} coin` : "50 coin",
-            sizes: data.hasSizeVariants ? data.sizes : [],
-            description: data.description,
-        })
-        toast.success("Product added successfully!")
+        toast.success("Product submitted successfully!")
         reset()
         onSuccess?.()
     }
@@ -167,7 +145,8 @@ const AddProductForm = ({ onSuccess, onCancel }) => {
                 <CommonInput
                     label="Price (৳)"
                     type="number"
-                    placeholder="e.g. 1"
+                    step="any"
+                    placeholder="e.g. 19.99"
                     {...register("price")}
                     error={errors.price?.message}
                 />

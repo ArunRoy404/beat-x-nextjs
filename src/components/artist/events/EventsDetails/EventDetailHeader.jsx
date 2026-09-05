@@ -1,7 +1,5 @@
 import React from "react"
 import Image from "next/image"
-import { SquarePen } from "lucide-react"
-import EditEventDialog from "@/components/dialogs/artist/events/EditEventDialog"
 import EventStatusBadge from "@/components/shared/EventStatusBadge/EventStatusBadge"
 
 const EventDetailHeader = ({ event }) => {
@@ -13,7 +11,7 @@ const EventDetailHeader = ({ event }) => {
             <div className="flex items-start gap-4">
                 {/* Cover Art */}
                 <Image
-                    src={event?.cover || "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&q=80&w=150"}
+                    src={event?.coverUrl || event?.cover || "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&q=80&w=150"}
                     alt={event?.title || "Event Cover"}
                     width={80}
                     height={80}
@@ -33,7 +31,7 @@ const EventDetailHeader = ({ event }) => {
 
                         {/* Subtitle / Artist + City */}
                         <p className="text-[14px] font-normal not-italic text-light-gray leading-none">
-                            {event?.artist || "—"} {event?.city ? `· ${event.city}` : ""}
+                            {event?.artist || event?.artistName || event?.ownerId?.name || "—"} {event?.city ? `· ${event.city}` : ""}
                         </p>
                     </div>
 
@@ -45,23 +43,11 @@ const EventDetailHeader = ({ event }) => {
                         </div>
                         <div className="w-[1px] h-6 bg-white/10" />
                         <div className="flex flex-col gap-[8px]">
-                            <span className="text-[16px] font-medium not-italic text-whitetext leading-tight">৳{event?.revenue || "0"}</span>
+                            <span className="text-[16px] font-medium not-italic text-whitetext leading-tight">৳{event?.revenue ?? ((event?.ticketsSold ?? 0) * (event?.ticketPrice ?? 0))}</span>
                             <span className="text-[12px] font-medium not-italic text-dark-gray uppercase tracking-wider">Revenue</span>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            {/* Absolute Edit Button placed to the left of Close button (Close is at top-4 right-6) */}
-            <div className="absolute top-4 right-16 z-50">
-                <EditEventDialog event={event}>
-                    <button
-                        className="h-7 border border-secondary/20 bg-secondary/10 hover:bg-secondary/20 text-secondary text-[11px] font-medium rounded-full px-3 flex items-center gap-1.5 cursor-pointer transition-colors active:scale-95"
-                    >
-                        <SquarePen className="w-3.5 h-3.5" />
-                        Edit
-                    </button>
-                </EditEventDialog>
             </div>
         </div>
     )

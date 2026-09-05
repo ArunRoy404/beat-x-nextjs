@@ -5,8 +5,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import ProductDetailContent from "./ProductDetailContent"
 import ProductDetailAnalytics from "./ProductDetailAnalytics"
 
-const ProductDetailsTabs = ({ product }) => {
-  const showAnalytics = product?.status === "Active"
+const ProductDetailsTabs = ({ product, analytics }) => {
+  const showAnalytics = product?.status === "active" || product?.status === "Active"
 
   if (!showAnalytics) {
     return (
@@ -40,10 +40,11 @@ const ProductDetailsTabs = ({ product }) => {
       </TabsContent>
 
       <TabsContent value="analytics" className="flex-1 min-h-0 flex flex-col overflow-hidden m-0">
-        <ProductDetailAnalytics product={product} />
+        <ProductDetailAnalytics product={product} analytics={analytics} />
       </TabsContent>
     </Tabs>
   )
 }
 
 export default ProductDetailsTabs
+

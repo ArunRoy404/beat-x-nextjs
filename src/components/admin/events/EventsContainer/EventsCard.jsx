@@ -53,7 +53,7 @@ const EventsCard = ({ event }) => {
                         </div>
                         <div className="flex flex-col items-center gap-0.5">
                             <span className="text-whitetext text-[18px] sm:text-[24px] font-normal leading-none">
-                                ৳{event?.revenue}
+                                ৳{event?.revenue ?? ((event?.ticketsSold ?? 0) * (event?.ticketPrice ?? 0))}
                             </span>
                             <span className="text-light-gray text-[12px] sm:text-[16px] font-normal leading-none">
                                 Revenue

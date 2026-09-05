@@ -5,6 +5,14 @@ import { cn } from "@/lib/utils"
 
 const DEFAULT_LABELS = ["Main image", "Image 2", "Image 3", "Image 4"]
 
+const getPreviewUrl = (val) => {
+    if (!val) return null
+    if (val instanceof File) return URL.createObjectURL(val)
+    if (typeof val === "string") return val
+    if (typeof val === "object") return val.url || val.src || val.path || val.coverUrl || null
+    return null
+}
+
 const CommonMultiImageUpload = ({
     value = [],
     onChange,
@@ -27,9 +35,7 @@ const CommonMultiImageUpload = ({
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full">
                 {labels.map((label, index) => {
                     const slotValue = value?.[index]
-                    const previewUrl = slotValue
-                        ? (slotValue instanceof File ? URL.createObjectURL(slotValue) : slotValue)
-                        : null
+                    const previewUrl = getPreviewUrl(slotValue)
 
                     return (
                         <div
@@ -54,6 +60,7 @@ const CommonMultiImageUpload = ({
                                         src={previewUrl}
                                         alt={label}
                                         fill
+                                        unoptimized
                                         sizes="120px"
                                         className="object-cover"
                                     />

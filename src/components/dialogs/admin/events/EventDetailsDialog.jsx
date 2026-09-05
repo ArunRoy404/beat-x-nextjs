@@ -10,9 +10,17 @@ import {
 import EventDetailHeader from "@/components/admin/events/EventsDetails/EventDetailHeader"
 import EventDetailsTabs from "@/components/admin/events/EventsDetails/EventDetailsTabs"
 import EventDetailFooter from "@/components/admin/events/EventsDetails/EventDetailFooter"
+import { useEventDetail } from "@/hooks/api/admin/events/useEventDetail"
+import { useEventAnalytics } from "@/hooks/api/admin/events/useEventAnalytics"
 
 const EventDetailsDialog = ({ event, children }) => {
     const [open, setOpen] = useState(false)
+
+    const eventId = event?._id || event?.id
+    const { data: detailData } = useEventDetail(open ? eventId : null)
+    const { data: analyticsData } = useEventAnalytics(open ? eventId : null)
+
+    const detailedEvent = detailData || event
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -24,17 +32,17 @@ const EventDetailsDialog = ({ event, children }) => {
             <DialogContent className="sm:max-w-[672px] p-0 overflow-hidden flex flex-col max-h-[95vh]">
                 {/* Screen reader only title for accessibility compliance */}
                 <DialogTitle className="sr-only">
-                    Event Details - {event?.title || "Unknown"}
+                    Event Details - {detailedEvent?.title || "Unknown"}
                 </DialogTitle>
 
                 {/* Common Header */}
-                <EventDetailHeader event={event} />
+                <EventDetailHeader event={detailedEvent} />
 
                 {/* Switchable Tabs between Details & Analytics */}
-                <EventDetailsTabs event={event} />
+                <EventDetailsTabs event={detailedEvent} analytics={analyticsData} />
 
                 {/* Footer with Delete and Close buttons */}
-                <EventDetailFooter event={event} />
+                <EventDetailFooter event={detailedEvent} />
             </DialogContent>
         </Dialog>
     )

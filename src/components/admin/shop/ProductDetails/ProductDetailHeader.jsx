@@ -1,11 +1,11 @@
 import React from "react"
 import Image from "next/image"
-import { Edit3, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import EditProductDialog from "@/components/dialogs/admin/shop/EditProductDialog"
+import { X } from "lucide-react"
+import { resolveMediaUrl } from "@/lib/format/resolveMediaUrl"
 
 const ProductDetailHeader = ({ product, onClose }) => {
-  const isActive = product?.status === "Active"
+  const isActive = product?.status === "active" || product?.status === "Active"
+  const coverUrl = product?.images?.[0]?.url || (typeof product?.images?.[0] === "string" ? product?.images?.[0] : null) || product?.image
 
   return (
     <div
@@ -15,7 +15,7 @@ const ProductDetailHeader = ({ product, onClose }) => {
       <div className="flex items-start gap-4">
         {/* Cover Art */}
         <Image
-          src={product?.image || "/product-images/hoodie.png"}
+          src={resolveMediaUrl(coverUrl || "/product-images/hoodie.png")}
           alt={product?.title || "Product Cover"}
           width={80}
           height={80}
@@ -33,11 +33,11 @@ const ProductDetailHeader = ({ product, onClose }) => {
               {/* Status Badge */}
               <span
                 className={`inline-flex items-center gap-1 text-[10px] font-medium px-2.5 py-0.5 rounded-full border select-none ${
-                  product?.status === "Active"
+                  product?.status === "active" || product?.status === "Active"
                     ? "bg-green-success/15 text-green-success border-green-success/20"
-                    : product?.status === "Rejected"
+                    : product?.status === "rejected" || product?.status === "Rejected"
                     ? "bg-red-error/15 text-red-error border-red-error/20"
-                    : product?.status === "Draft"
+                    : product?.status === "draft" || product?.status === "Draft"
                     ? "bg-white/5 text-light-gray/60 border-white/10"
                     : "bg-yellow-warning/15 text-yellow-warning border-yellow-warning/20" // Under review
                 }`}
@@ -48,8 +48,8 @@ const ProductDetailHeader = ({ product, onClose }) => {
             </div>
 
             {/* Subtitle */}
-            <p className="text-[13px] font-normal text-light-gray/80 leading-none">
-              {product?.artist || "Various"} · {product?.category || "vinyl"}
+            <p className="text-[13px] font-normal text-light-gray/80 leading-none capitalize">
+              {product?.artistName || product?.ownerId?.name || "Various"} · {product?.category || "vinyl"}
             </p>
           </div>
 
@@ -57,16 +57,16 @@ const ProductDetailHeader = ({ product, onClose }) => {
           <div className="flex items-center gap-6 mt-3">
             <div className="flex flex-col gap-1">
               <span className="text-[16px] font-semibold text-whitetext leading-none">
-                {product?.sold ?? 43}
+                {product?.soldCount ?? product?.sold ?? 0}
               </span>
               <span className="text-[11px] font-medium text-dark-gray uppercase tracking-wider">
-                Plays
+                Sold
               </span>
             </div>
             <div className="w-[1px] h-6 bg-white/10" />
             <div className="flex flex-col gap-1">
               <span className="text-[16px] font-semibold text-[#3ADFFA] leading-none">
-                {product?.currency === "$" ? "$" : "৳"}{product?.price ?? 2800}
+                ৳{product?.price ?? 0}
               </span>
               <span className="text-[11px] font-medium text-dark-gray uppercase tracking-wider">
                 Price
@@ -78,17 +78,6 @@ const ProductDetailHeader = ({ product, onClose }) => {
 
       {/* Right controls */}
       <div className="flex items-center gap-2 shrink-0">
-        {isActive && (
-          <EditProductDialog product={product}>
-            <Button
-              variant="outline"
-              className="border-secondary/20 bg-secondary/10 hover:bg-secondary/20 text-secondary gap-1 rounded-md h-8 text-[12px] px-3 font-semibold"
-            >
-              <Edit3 className="w-3.5 h-3.5" />
-              <span>Edit</span>
-            </Button>
-          </EditProductDialog>
-        )}
         <button
           onClick={onClose}
           className="w-7 h-7 rounded-full border border-white/10 flex items-center justify-center text-light-gray hover:text-white hover:bg-white/5 transition-all cursor-pointer"
@@ -101,3 +90,4 @@ const ProductDetailHeader = ({ product, onClose }) => {
 }
 
 export default ProductDetailHeader
+

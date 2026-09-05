@@ -7,16 +7,16 @@ import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { DialogClose } from "@/components/ui/dialog"
-import { CheckCircle2, Clock, FileText } from "lucide-react"
+import { CheckCircle2, Clock, FileText, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
-import { useAdminDashboardShopStore } from "@/zustandStore/admin/adminStore/adminDashboardShopStore"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
 import CommonMultiImageUpload from "@/components/shared/CommonInputs/CommonImageUpload/CommonMultiImageUpload"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSelect"
 import CommonSelectCards from "@/components/shared/CommonInputs/CommonInput/CommonSelectCards"
 import CommonInputContainer from "@/components/shared/CommonInputs/CommonInput/CommonInputContainer"
+import { useUpdateProduct } from "@/hooks/api/admin/products/useUpdateProduct"
 
 const CATEGORIES = ["Apparel", "Vinyl", "Accessories", "Bags", "Posters", "Other"]
 const SIZES = ["XS", "S", "M", "L", "XL", "XXL"]
@@ -42,7 +42,8 @@ const productSchema = z.object({
 })
 
 const EditProductForm = ({ product, onSuccess, onCancel }) => {
-    const updateProduct = useAdminDashboardShopStore((state) => state.updateProduct)
+    const { mutate: updateProduct, isPending } = useUpdateProduct()
+    const productId = product?._id || product?.id
 
     const existingImages = product?.images?.length
         ? [...product.images, ...Array(4 - product.images.length).fill(null)].slice(0, 4)
@@ -59,15 +60,15 @@ const EditProductForm = ({ product, onSuccess, onCancel }) => {
         defaultValues: {
             images: existingImages,
             productName: product?.title || "",
-            category: product?.category || "",
-            artist: product?.artist || "Various",
-            price: product?.price ? String(product.price) : "",
+            category: product?.category ? product.category.charAt(0).toUpperCase() + product.category.slice(1) : "",
+            artist: product?.artistName || product?.ownerId?.name || "Various",
+            price: product?.price !== undefined ? String(product.price) : "",
             stock: product?.stock !== undefined ? String(product.stock) : "",
-            coinReward: product?.coinBadge ? product.coinBadge.replace(/\D/g, "") : "",
-            hasSizeVariants: !!product?.sizes?.length,
-            sizes: product?.sizes || [],
+            coinReward: product?.coinReward !== undefined ? String(product.coinReward) : "",
+            hasSizeVariants: product?.hasSizeVariants ?? !!product?.availableSizes?.length,
+            sizes: product?.availableSizes || [],
             description: product?.description || "",
-            visibility: product?.status === "Draft" ? "draft" : "publish",
+            visibility: product?.status === "draft" || product?.status === "Draft" ? "draft" : "publish",
         },
     })
 
@@ -82,26 +83,36 @@ const EditProductForm = ({ product, onSuccess, onCancel }) => {
     }
 
     const onSubmit = (data) => {
-        const images = (data.images || []).filter(Boolean).map((img) =>
-            img instanceof File ? URL.createObjectURL(img) : img
-        )
+        if (!productId) {
+            toast.error("Invalid product ID")
+            return
+        }
 
-        updateProduct({
-            ...product,
+        const payload = {
             title: data.productName,
-            category: data.category,
-            artist: data.artist,
-            price: Number(data.price) || product.price,
-            stock: Number(data.stock) || product.stock,
-            status: data.visibility === "draft" ? "Draft" : "Active",
-            image: images[0] || product.image,
-            images,
-            coinBadge: data.coinReward ? `${data.coinReward} coin` : product.coinBadge,
-            sizes: data.hasSizeVariants ? data.sizes : [],
+            category: data.category?.toLowerCase(),
+            artistName: data.artist,
+            price: Number(data.price),
+            stock: Number(data.stock),
+            coinReward: Number(data.coinReward || 0),
             description: data.description,
-        })
-        toast.success("Product updated successfully!")
-        onSuccess?.()
+            status: data.visibility === "draft" ? "draft" : "active",
+            hasSizeVariants: Boolean(data.hasSizeVariants),
+            availableSizes: data.hasSizeVariants ? data.sizes : [],
+        }
+
+        updateProduct(
+            { id: productId, data: payload },
+            {
+                onSuccess: () => {
+                    toast.success("Product updated successfully!")
+                    onSuccess?.()
+                },
+                onError: (err) => {
+                    toast.error(err?.response?.data?.message || err?.message || "Failed to update product")
+                },
+            }
+        )
     }
 
     const onInvalid = (validationErrors) => {
@@ -168,7 +179,8 @@ const EditProductForm = ({ product, onSuccess, onCancel }) => {
                 <CommonInput
                     label="Price (৳)"
                     type="number"
-                    placeholder="e.g. 1"
+                    step="any"
+                    placeholder="e.g. 19.99"
                     {...register("price")}
                     error={errors.price?.message}
                 />
@@ -270,6 +282,7 @@ const EditProductForm = ({ product, onSuccess, onCancel }) => {
                         className="w-full rounded-full"
                         size="lg"
                         onClick={onCancel}
+                        disabled={isPending}
                     >
                         Cancel
                     </Button>
@@ -279,7 +292,9 @@ const EditProductForm = ({ product, onSuccess, onCancel }) => {
                     variant="gradient"
                     className="flex-1"
                     size="lg"
+                    disabled={isPending}
                 >
+                    {isPending ? <Loader2 className="w-4 h-4 animate-spin shrink-0 mr-2" /> : null}
                     Save Changes
                 </Button>
             </div>
