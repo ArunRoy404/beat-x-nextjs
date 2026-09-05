@@ -74,6 +74,20 @@ const CommonCalender = ({
         }
     }, [showCalendar, updatePosition])
 
+    const selectedDate = React.useMemo(() => {
+        if (!value) return undefined
+        const d = value instanceof Date ? value : new Date(value)
+        return !isNaN(d.getTime()) ? d : undefined
+    }, [value])
+
+    const [month, setMonth] = useState(() => selectedDate || new Date())
+
+    useEffect(() => {
+        if (showCalendar && selectedDate) {
+            setMonth(selectedDate)
+        }
+    }, [showCalendar, selectedDate])
+
     const handleSelect = (date) => {
         onChange?.(date)
         setShowCalendar(false)
@@ -97,8 +111,8 @@ const CommonCalender = ({
                     className
                 )}
             >
-                <span className={value ? "text-whitetext font-medium" : "text-light-gray"}>
-                    {value ? format(value, "PPP") : placeholder}
+                <span className={selectedDate ? "text-whitetext font-medium" : "text-light-gray"}>
+                    {selectedDate ? format(selectedDate, "PPP") : placeholder}
                 </span>
                 <CalendarIcon className="w-5 h-5 text-light-gray shrink-0" />
             </button>
@@ -132,8 +146,10 @@ const CommonCalender = ({
                         </div>
                         <Calendar
                             mode="single"
-                            selected={value}
+                            selected={selectedDate}
                             onSelect={handleSelect}
+                            month={month}
+                            onMonthChange={setMonth}
                             className="bg-transparent text-whitetext [--cell-size:32px] p-1"
                         />
                     </div>
