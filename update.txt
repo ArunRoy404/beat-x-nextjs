@@ -2,7 +2,7 @@ BeatX
 
 Hello there,
 
-I wanted to share a quick update on our Backend Development progress. Most parts of both the User and Admin features are now connected and working across the platform. In this update, we are highlighting the modules that have been fully integrated and tested, and we will be sharing the remaining updates very soon:
+I wanted to share a quick update on our Backend Development and Platform Integration progress. Most parts of both the User and Admin features are now connected and working across the platform. In this update, we are highlighting the modules that have been fully integrated, updated, and tested:
 
 Admin Login & Security
 - We have connected secure admin sign-in with email code verification (OTP) and password reset options
@@ -33,6 +33,21 @@ Users Management
 - We have connected user management with fast search, status filters (All, Verified, Unverified), smooth pagination, and user details previews
 - We have integrated user deletion and the streamlined new user invitation banner placed beneath the stats cards
 
+Shop & Products (Merchandise)
+- We have connected full product and shop merchandise management with product details previews, category filtering, stock tracking, and product management modals
+
+Tours & Events
+- We have connected event and tour management supporting event status workflows, venue location details, ticket pricing, and event creation & editing
+
+Subscriptions Management (Frontend Update)
+- We have updated the Subscriptions page layout with plan overview cards, subscriber list table with plan filters, search, and responsive mobile card layouts
+
+Roles & RBAC Management (Frontend Update)
+- We have updated the Roles & Permissions management screen featuring system role cards, granular permission matrices, and role editing modals
+
+Admin Profile & Login Audit History (Frontend Update)
+- We have updated the Admin Profile page featuring account overview cards, system preferences, saved collections, and the Login Audit History module with stationary table headers, fixed-height log scrolling, and responsive card views for smaller screens
+
 Video Explanation Link:
 https://app.usebubbles.com/a7H28teXZA85DnUDbTMXq4/update-beat-x-sep-05-2026
 
@@ -43,6 +58,11 @@ https://beat-x-nextjs.vercel.app/admin/dashboard/music
 https://beat-x-nextjs.vercel.app/admin/dashboard/videos
 https://beat-x-nextjs.vercel.app/admin/dashboard/artists
 https://beat-x-nextjs.vercel.app/admin/dashboard/users
+https://beat-x-nextjs.vercel.app/admin/dashboard/shop
+https://beat-x-nextjs.vercel.app/admin/dashboard/tours
+https://beat-x-nextjs.vercel.app/admin/dashboard/subscriptions
+https://beat-x-nextjs.vercel.app/admin/dashboard/roles-rbac
+https://beat-x-nextjs.vercel.app/admin/dashboard/profile
 
 Admin credentials:
 email: techreion@gmail.com
