@@ -83,5 +83,10 @@ export const queryKeys = {
     dashboard: () => [...queryKeys.subscriptions.all, "dashboard"],
     list: (params) => [...queryKeys.subscriptions.all, "list", params],
   },
+  rolesRbac: {
+    all: ["rolesRbac"],
+    dashboard: () => [...queryKeys.rolesRbac.all, "dashboard"],
+    list: (params) => [...queryKeys.rolesRbac.all, "list", params],
+  },
 };
 

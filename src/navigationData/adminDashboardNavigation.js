@@ -144,6 +144,13 @@ export const adminDashboardNavigation = {
           subtitle: "Generate and view sales reports"
         },
         { 
+          title: "Roles & RBAC", 
+          navbarTitle: "Roles & RBAC",
+          url: "/admin/dashboard/roles-rbac", 
+          iconName: "RolesRbacIcon",
+          subtitle: "Role-based access control management"
+        },
+        { 
           title: "Settings", 
           navbarTitle: "Settings",
           url: "/admin/dashboard/settings", 

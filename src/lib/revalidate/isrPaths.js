@@ -17,5 +17,6 @@ export const isrPaths = [
   "/admin/dashboard/shop",
   "/admin/dashboard/tours",
   "/admin/dashboard/subscriptions",
+  "/admin/dashboard/roles-rbac",
 ];
 
