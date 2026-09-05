@@ -12,15 +12,17 @@ import { Button } from "@/components/ui/button"
 import { PlusCircle } from "lucide-react"
 import InviteUserForm from "@/components/forms/users/InviteUserForm"
 
-const InviteUserDialog = () => {
+const InviteUserDialog = ({ children }) => {
     const [open, setOpen] = useState(false)
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="gradient">
-                    <PlusCircle /> Invite User
-                </Button>
+                {children || (
+                    <Button variant="gradient">
+                        <PlusCircle /> Invite User
+                    </Button>
+                )}
             </DialogTrigger>
 
             <DialogContent className="sm:max-w-[500px]">

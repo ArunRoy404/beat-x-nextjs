@@ -1,17 +1,31 @@
 "use client"
 
-import React from "react"
+import React, { useMemo } from "react"
 import { useUsers } from "@/hooks/api/admin/users/useUsers"
+import { useUrlListParams } from "@/hooks/useUrlListParams"
+import { buildUsersParams } from "@/hooks/api/admin/users/usersParams"
 import DashboardStats from "@/components/shared/Dashboard/DashboardStats/DashboardStats"
 import UsersContainer from "@/components/admin/users/UsersContainer"
+import AddNewUser from "@/components/admin/users/AddNewUser"
 
 const AdminDashboardUsersPage = () => {
-  const { data: users = [] } = useUsers()
+  const { get } = useUrlListParams()
+  const rawStatus = get("status", "all")
+  const rawSearch = get("q", "")
+  const page = Number(get("page", "1")) || 1
+  const limit = Number(get("limit", "20")) || 20
 
-  const verifiedCount = users.filter((user) => user.isVerified).length
+  const params = useMemo(() => {
+    return buildUsersParams({ status: rawStatus, q: rawSearch, page, limit })
+  }, [rawStatus, rawSearch, page, limit])
+
+  const { data } = useUsers(params)
+  const users = Array.isArray(data) ? data : data?.data || []
+
+  const verifiedCount = users.filter((user) => user?.isVerified).length
   const now = new Date()
   const newThisMonthCount = users.filter((user) => {
-    if (!user.createdAt) return false
+    if (!user?.createdAt) return false
     const createdAt = new Date(user.createdAt)
     return createdAt.getMonth() === now.getMonth() && createdAt.getFullYear() === now.getFullYear()
   }).length
@@ -56,6 +70,9 @@ const AdminDashboardUsersPage = () => {
       {/* Upper Stats grid */}
       <DashboardStats statsCards={statsCards} />
 
+      {/* Register new user banner */}
+      <AddNewUser />
+
       {/* Users table / collection container */}
       <UsersContainer />
     </div>
@@ -63,3 +80,4 @@ const AdminDashboardUsersPage = () => {
 }
 
 export default AdminDashboardUsersPage
+
