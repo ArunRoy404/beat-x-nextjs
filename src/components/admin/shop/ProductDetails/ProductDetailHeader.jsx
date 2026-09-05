@@ -1,8 +1,6 @@
 import React from "react"
 import Image from "next/image"
-import { Edit3, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import EditProductDialog from "@/components/dialogs/admin/shop/EditProductDialog"
+import { X } from "lucide-react"
 import { resolveMediaUrl } from "@/lib/format/resolveMediaUrl"
 
 const ProductDetailHeader = ({ product, onClose }) => {
@@ -80,18 +78,6 @@ const ProductDetailHeader = ({ product, onClose }) => {
 
       {/* Right controls */}
       <div className="flex items-center gap-2 shrink-0">
-        {isActive && (
-          <EditProductDialog product={product}>
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className="border-secondary/20 bg-secondary/10 hover:bg-secondary/20 text-secondary gap-1 rounded-md h-8 text-[12px] px-3 font-semibold cursor-pointer"
-            >
-              <Edit3 className="w-3.5 h-3.5" />
-              <span>Edit</span>
-            </Button>
-          </EditProductDialog>
-        )}
         <button
           onClick={onClose}
           className="w-7 h-7 rounded-full border border-white/10 flex items-center justify-center text-light-gray hover:text-white hover:bg-white/5 transition-all cursor-pointer"
