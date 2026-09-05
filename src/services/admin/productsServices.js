@@ -5,7 +5,7 @@ import { axiosPrivate } from "@/lib/axios/axiosPrivate"
  * GET /admin/products/dashboard
  */
 export async function getProductsDashboardStatsRequest() {
-  const res = await axiosPrivate.get("/products/dashboard")
+  const res = await axiosPrivate.get("/admin/products/dashboard")
   return res?.data?.data ?? res?.data
 }
 
@@ -14,7 +14,7 @@ export async function getProductsDashboardStatsRequest() {
  * GET /admin/products
  */
 export async function getProductsRequest(params) {
-  const res = await axiosPrivate.get("/products", { params })
+  const res = await axiosPrivate.get("/admin/products", { params })
   return res?.data?.data ?? res?.data
 }
 
@@ -24,7 +24,7 @@ export async function getProductsRequest(params) {
  */
 export async function getProductDetailRequest(productId) {
   if (!productId) return null
-  const res = await axiosPrivate.get(`/products/${productId}`)
+  const res = await axiosPrivate.get(`/admin/products/${productId}`)
   return res?.data?.data ?? res?.data
 }
 
@@ -33,7 +33,7 @@ export async function getProductDetailRequest(productId) {
  * PATCH /admin/products/:productId
  */
 export async function updateProductRequest({ id, data }) {
-  const res = await axiosPrivate.patch(`/products/${id}`, data)
+  const res = await axiosPrivate.patch(`/admin/products/${id}`, data)
   return res?.data?.data ?? res?.data
 }
 
@@ -43,7 +43,7 @@ export async function updateProductRequest({ id, data }) {
  */
 export async function getProductAnalyticsRequest(productId) {
   if (!productId) return null
-  const res = await axiosPrivate.get(`/products/${productId}/analytics`)
+  const res = await axiosPrivate.get(`/admin/products/${productId}/analytics`)
   return res?.data?.data ?? res?.data
 }
 
@@ -52,6 +52,7 @@ export async function getProductAnalyticsRequest(productId) {
  * DELETE /admin/products/:productId
  */
 export async function deleteProductRequest(productId) {
-  const res = await axiosPrivate.delete(`/products/${productId}`)
+  const res = await axiosPrivate.delete(`/admin/products/${productId}`)
   return res?.data?.data ?? res?.data
 }
+
