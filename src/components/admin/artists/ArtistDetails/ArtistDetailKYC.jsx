@@ -1,6 +1,10 @@
+"use client"
+
 import React from "react"
 import { FileText, User, Check } from "lucide-react"
 import { resolveMediaUrl } from "@/lib/format/resolveMediaUrl"
+import { useUpdateArtistChecklist } from "@/hooks/api/admin/artists/useUpdateArtistChecklist"
+import { toast } from "sonner"
 
 const KYCCard = ({ title, bg, icon: Icon, iconColor, url }) => {
   const imageUrl = url ? resolveMediaUrl(url) : ""
@@ -43,18 +47,45 @@ const KYCCard = ({ title, bg, icon: Icon, iconColor, url }) => {
 }
 
 const ArtistDetailKYC = ({ artist }) => {
+  const verificationId = artist?._id || artist?.id
   const docType = artist?.identityDocs?.documentType?.toUpperCase() || "NATIONAL ID CARD"
   const frontSideUrl = artist?.identityDocs?.frontSideUrl || artist?.identityDocs?.frontSideKey
   const backSideUrl = artist?.identityDocs?.backSideUrl || artist?.identityDocs?.backSideKey
   const selfieUrl = artist?.identityDocs?.selfieUrl || artist?.identityDocs?.selfieKey
   const checklist = artist?.identityDocs?.checklist || {}
 
+  const updateChecklistMutation = useUpdateArtistChecklist()
+
+  const currentChecklist = {
+    documentReadable: checklist.documentReadable ?? Boolean(frontSideUrl),
+    nameMatchesProfile: checklist.nameMatchesProfile ?? Boolean(frontSideUrl),
+    documentNotExpired: checklist.documentNotExpired ?? Boolean(frontSideUrl),
+    selfieMatchesPhoto: checklist.selfieMatchesPhoto ?? Boolean(selfieUrl),
+  }
+
   const checklistItems = [
-    { label: "Document Readable", checked: checklist.documentReadable ?? Boolean(frontSideUrl) },
-    { label: "Name Matches Profile", checked: checklist.nameMatchesProfile ?? Boolean(frontSideUrl) },
-    { label: "Document Not Expired", checked: checklist.documentNotExpired ?? Boolean(frontSideUrl) },
-    { label: "Selfie Matches Document Photo", checked: checklist.selfieMatchesPhoto ?? Boolean(selfieUrl) },
+    { key: "documentReadable", label: "Document Readable", checked: currentChecklist.documentReadable },
+    { key: "nameMatchesProfile", label: "Name Matches Profile", checked: currentChecklist.nameMatchesProfile },
+    { key: "documentNotExpired", label: "Document Not Expired", checked: currentChecklist.documentNotExpired },
+    { key: "selfieMatchesPhoto", label: "Selfie Matches Document Photo", checked: currentChecklist.selfieMatchesPhoto },
   ]
+
+  const handleToggle = async (key) => {
+    if (!verificationId) return
+    const updatedData = {
+      ...currentChecklist,
+      [key]: !currentChecklist[key],
+    }
+    try {
+      await updateChecklistMutation.mutateAsync({
+        id: verificationId,
+        data: updatedData,
+      })
+      toast.success("Document checklist updated.")
+    } catch (err) {
+      toast.error(err?.response?.data?.message || err?.message || "Failed to update checklist.")
+    }
+  }
 
   return (
     <div className="p-4 flex flex-col gap-5 overflow-y-auto flex-1 min-h-0 scrollbar-thin">
@@ -105,8 +136,14 @@ const ArtistDetailKYC = ({ artist }) => {
           Document Checklist
         </h4>
         <div className="flex flex-col gap-2">
-          {checklistItems.map((item, idx) => (
-            <div key={idx} className="flex items-center gap-2 text-[13px] text-light-gray font-normal">
+          {checklistItems.map((item) => (
+            <button
+              key={item.key}
+              type="button"
+              disabled={updateChecklistMutation.isPending}
+              onClick={() => handleToggle(item.key)}
+              className="flex items-center gap-2 text-[13px] text-light-gray font-normal text-left cursor-pointer hover:text-white transition-colors"
+            >
               <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
                 item.checked
                   ? "bg-green-success/20 border border-green-success/30 text-green-success"
@@ -115,7 +152,7 @@ const ArtistDetailKYC = ({ artist }) => {
                 <Check className="w-2.5 h-2.5 stroke-[3px]" />
               </div>
               <span>{item.label}</span>
-            </div>
+            </button>
           ))}
         </div>
       </div>
@@ -124,4 +161,5 @@ const ArtistDetailKYC = ({ artist }) => {
 }
 
 export default ArtistDetailKYC
+
 

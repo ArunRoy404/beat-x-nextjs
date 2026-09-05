@@ -7,26 +7,32 @@ import { DialogClose } from "@/components/ui/dialog"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSelect"
 import { toast } from "sonner"
+import { useApproveArtist } from "@/hooks/api/admin/artists/useApproveArtist"
+import { useRejectArtist } from "@/hooks/api/admin/artists/useRejectArtist"
+import { useRequestMoreInfoArtist } from "@/hooks/api/admin/artists/useRequestMoreInfoArtist"
+import { useSuspendArtist } from "@/hooks/api/admin/artists/useSuspendArtist"
+import { useReactivateArtist } from "@/hooks/api/admin/artists/useReactivateArtist"
 
 const rejectionReasons = [
-  { value: "identity_unclear", label: "Identity document unclear or unreadable" },
+  { value: "document_unclear", label: "Identity document unclear or unreadable" },
   { value: "invalid_details", label: "Incomplete or fake profile information" },
   { value: "copyright_issue", label: "Potential Copyright Infringement" },
   { value: "tos_violation", label: "Terms of Service violation" }
 ]
 
 const ArtistDetailFooter = ({ artist, onClose }) => {
+  const verificationId = artist?._id || artist?.id
+
   // Footer state logic
   const statusKey = (artist?.status || "").toLowerCase()
   const isSuspended = statusKey === "suspended"
   const isVerified = statusKey === "approved" || statusKey === "verified"
 
-
   // Review states
   const [reviewMode, setReviewMode] = useState("main") // "main" | "request_info" | "reject"
   const [adminNote, setAdminNote] = useState("")
   const [customMessage, setCustomMessage] = useState("")
-  const [rejectionReason, setRejectionReason] = useState("identity_unclear")
+  const [rejectionReason, setRejectionReason] = useState("document_unclear")
   const [rejectionNote, setRejectionNote] = useState("")
   
   // Info Request Checkboxes
@@ -38,6 +44,20 @@ const ArtistDetailFooter = ({ artist, onClose }) => {
     platformLinks: false,
   })
 
+  // Mutation hooks
+  const approveMutation = useApproveArtist()
+  const rejectMutation = useRejectArtist()
+  const requestInfoMutation = useRequestMoreInfoArtist()
+  const suspendMutation = useSuspendArtist()
+  const reactivateMutation = useReactivateArtist()
+
+  const isPending =
+    approveMutation.isPending ||
+    rejectMutation.isPending ||
+    requestInfoMutation.isPending ||
+    suspendMutation.isPending ||
+    reactivateMutation.isPending
+
   const toggleChecklist = (key) => {
     setInfoChecklist(prev => ({
       ...prev,
@@ -46,41 +66,78 @@ const ArtistDetailFooter = ({ artist, onClose }) => {
   }
 
   // Action handlers
-  const handleApprove = () => {
-    toast.success("Artist application approved successfully!")
-    onClose?.()
+  const handleApprove = async () => {
+    if (!verificationId) return
+    try {
+      await approveMutation.mutateAsync({ id: verificationId })
+      toast.success("Artist application approved successfully!")
+      onClose?.()
+    } catch (err) {
+      toast.error(err?.response?.data?.message || err?.message || "Failed to approve artist.")
+    }
   }
 
-  const handleSendInfoRequest = () => {
-    const requestedItems = []
-    if (infoChecklist.documentPhotos) requestedItems.push("Clearer ID document photos")
-    if (infoChecklist.resolutionSelfie) requestedItems.push("Higher resolution selfie")
-    if (infoChecklist.socialLinks) requestedItems.push("Missing social profile links")
-    if (infoChecklist.incompleteBio) requestedItems.push("Incorrect or incomplete bio")
-    if (infoChecklist.platformLinks) requestedItems.push("Music platform links needed")
+  const handleSendInfoRequest = async () => {
+    if (!verificationId) return
 
-    if (requestedItems.length === 0 && !customMessage) {
+    const items = []
+    if (infoChecklist.documentPhotos) items.push("clearer_id_photos")
+    if (infoChecklist.resolutionSelfie) items.push("higher_res_selfie")
+    if (infoChecklist.socialLinks) items.push("missing_social_links")
+    if (infoChecklist.incompleteBio) items.push("incomplete_bio")
+    if (infoChecklist.platformLinks) items.push("platform_links_needed")
+
+    if (items.length === 0 && !customMessage) {
       toast.error("Please select at least one checklist item or write a custom message.")
       return
     }
 
-    toast.info("Information request sent to artist.")
-    onClose?.()
-  }
-
-  const handleConfirmRejection = () => {
-    toast.error("Artist application rejected.")
-    onClose?.()
-  }
-
-  const handleToggleSuspend = () => {
-    if (isSuspended) {
-      toast.success("Artist reactivated successfully!")
-    } else {
-      toast.warning("Artist suspended!")
+    try {
+      await requestInfoMutation.mutateAsync({
+        id: verificationId,
+        items,
+        message: customMessage || "Please provide the requested items.",
+      })
+      toast.info("Information request sent to artist.")
+      onClose?.()
+    } catch (err) {
+      toast.error(err?.response?.data?.message || err?.message || "Failed to request info.")
     }
   }
 
+  const handleConfirmRejection = async () => {
+    if (!verificationId) return
+    try {
+      await rejectMutation.mutateAsync({
+        id: verificationId,
+        reasonCode: rejectionReason,
+        note: rejectionNote || "Please re-upload clearer verification documents.",
+      })
+      toast.error("Artist application rejected.")
+      onClose?.()
+    } catch (err) {
+      toast.error(err?.response?.data?.message || err?.message || "Failed to reject artist.")
+    }
+  }
+
+  const handleToggleSuspend = async () => {
+    if (!verificationId) return
+    try {
+      if (isSuspended) {
+        await reactivateMutation.mutateAsync({ id: verificationId })
+        toast.success("Artist reactivated successfully!")
+      } else {
+        await suspendMutation.mutateAsync({
+          id: verificationId,
+          reason: "Policy violation or administrative action.",
+        })
+        toast.warning("Artist suspended!")
+      }
+      onClose?.()
+    } catch (err) {
+      toast.error(err?.response?.data?.message || err?.message || "Action failed.")
+    }
+  }
 
   // 1. Suspended View
   if (isSuspended) {
@@ -92,10 +149,11 @@ const ArtistDetailFooter = ({ artist, onClose }) => {
         <div className="flex items-center gap-3 shrink-0">
           <Button
             type="button"
-            className="rounded-full bg-green-success hover:bg-green-success/90 text-white font-semibold px-4 h-9 cursor-pointer select-none border-0"
+            disabled={isPending}
+            className="rounded-full bg-green-success hover:bg-green-success/90 text-white font-semibold px-4 h-9 cursor-pointer select-none border-0 disabled:opacity-50"
             onClick={handleToggleSuspend}
           >
-            Reactivate Artist
+            {reactivateMutation.isPending ? "Reactivating..." : "Reactivate Artist"}
           </Button>
           <DialogClose asChild>
             <Button
@@ -119,15 +177,16 @@ const ArtistDetailFooter = ({ artist, onClose }) => {
           className="text-[#ADAAAA] font-normal leading-[15px] font-sans select-none"
           style={{ fontFamily: "Space Grotesk", fontSize: "11.25px" }}
         >
-          Verified by Nadia Islam on 2023-03-18
+          {artist?.reviewedBy?.name ? `Verified by ${artist.reviewedBy.name}` : "Verified Artist"}
         </span>
         <div className="flex items-center gap-3 shrink-0">
           <Button
             type="button"
-            className="rounded-full bg-red-error hover:bg-red-error/90 text-white font-semibold px-4 h-9 cursor-pointer select-none border-0"
+            disabled={isPending}
+            className="rounded-full bg-red-error hover:bg-red-error/90 text-white font-semibold px-4 h-9 cursor-pointer select-none border-0 disabled:opacity-50"
             onClick={handleToggleSuspend}
           >
-            Suspend Artist
+            {suspendMutation.isPending ? "Suspending..." : "Suspend Artist"}
           </Button>
           <DialogClose asChild>
             <Button
@@ -191,11 +250,12 @@ const ArtistDetailFooter = ({ artist, onClose }) => {
         {/* Actions */}
         <div className="flex items-center gap-3">
           <Button
+            disabled={isPending}
             onClick={handleSendInfoRequest}
-            className="bg-[#FFAE00] hover:bg-[#FFAE00]/90 text-black font-semibold rounded-[10px] px-4 h-10 flex items-center gap-2 border-0 cursor-pointer transition-all active:scale-95"
+            className="bg-[#FFAE00] hover:bg-[#FFAE00]/90 text-black font-semibold rounded-[10px] px-4 h-10 flex items-center gap-2 border-0 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
           >
             <AlertCircle className="w-4 h-4 stroke-[2px]" />
-            Send Info Request
+            {requestInfoMutation.isPending ? "Sending..." : "Send Info Request"}
           </Button>
           <Button
             onClick={() => setReviewMode("main")}
@@ -232,7 +292,7 @@ const ArtistDetailFooter = ({ artist, onClose }) => {
           <span className="text-[12px] text-dark-gray font-semibold uppercase tracking-wider font-sans">Additional note to artist</span>
           <CommonInput
             type="textarea"
-            placeholder="Explain what the artist need to fix...."
+            placeholder="Explain what the artist needs to fix...."
             value={rejectionNote}
             onChange={(e) => setRejectionNote(e.target.value)}
           />
@@ -241,11 +301,12 @@ const ArtistDetailFooter = ({ artist, onClose }) => {
         {/* Rejecting Actions */}
         <div className="flex items-center gap-3">
           <Button
+            disabled={isPending}
             onClick={handleConfirmRejection}
-            className="bg-red-error hover:bg-red-error/90 text-whitetext font-semibold rounded-[10px] px-4 h-10 flex items-center gap-2 border-0 cursor-pointer transition-all active:scale-95"
+            className="bg-red-error hover:bg-red-error/90 text-whitetext font-semibold rounded-[10px] px-4 h-10 flex items-center gap-2 border-0 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
           >
             <XCircle className="w-4 h-4 stroke-[2px]" />
-            Confirm Rejection
+            {rejectMutation.isPending ? "Rejecting..." : "Confirm Rejection"}
           </Button>
           <Button
             onClick={() => setReviewMode("main")}
@@ -278,11 +339,12 @@ const ArtistDetailFooter = ({ artist, onClose }) => {
       <div className="flex items-center justify-between w-full">
         <div className="flex items-center gap-3 flex-wrap">
           <Button
+            disabled={isPending}
             onClick={handleApprove}
-            className="bg-[#24C767] hover:bg-[#24C767]/90 text-black font-semibold rounded-[10px] px-4 h-10 flex items-center gap-2 border-0 cursor-pointer transition-all active:scale-95"
+            className="bg-[#24C767] hover:bg-[#24C767]/90 text-black font-semibold rounded-[10px] px-4 h-10 flex items-center gap-2 border-0 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
           >
             <ShieldCheck className="w-4 h-4 stroke-[2px]" />
-            Approve Artist
+            {approveMutation.isPending ? "Approving..." : "Approve Artist"}
           </Button>
           
           <Button
@@ -315,3 +377,4 @@ const ArtistDetailFooter = ({ artist, onClose }) => {
 }
 
 export default ArtistDetailFooter
+
