@@ -71,5 +71,12 @@ export const queryKeys = {
     detail: (id) => [...queryKeys.products.all, "detail", id],
     analytics: (id) => [...queryKeys.products.all, "analytics", id],
   },
+  events: {
+    all: ["events"],
+    dashboard: () => [...queryKeys.events.all, "dashboard"],
+    list: (params) => [...queryKeys.events.all, "list", params],
+    detail: (id) => [...queryKeys.events.all, "detail", id],
+    analytics: (id) => [...queryKeys.events.all, "analytics", id],
+  },
 };
 

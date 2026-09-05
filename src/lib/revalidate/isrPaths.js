@@ -15,5 +15,6 @@ export const isrPaths = [
   "/admin/dashboard/videos",
   "/admin/dashboard/artists",
   "/admin/dashboard/shop",
+  "/admin/dashboard/tours",
 ];
 
