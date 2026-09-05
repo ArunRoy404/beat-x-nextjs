@@ -7,22 +7,27 @@ I wanted to share a quick update on our progress, covering both API integration 
 API Integration Updates
 -----------------------
 Shop & Products (Merchandise)
-- We have connected full product and shop merchandise management with product details previews, category filtering, stock tracking, and product management modals
+- Connected real-time shop dashboard statistics, paginated products listing with search and status filters
+- Connected product detail preview, product analytics metrics, update product data, and product deletion endpoints
 
 Tours & Events
-- We have connected event and tour management supporting event status workflows, venue location details, ticket pricing, and event creation & editing
+- Connected real-time events dashboard statistics, paginated events list with search and status filters
+- Connected single event detail preview, event analytics, event creation, update event, and event deletion endpoints
+
+Admin Profile & Login Audit History
+- Connected live admin profile data (/auth/me) and authentication log history (/auth/login-history)
 
 
 New Page UI Updates
 -------------------
 Subscriptions Management
-- We have updated the Subscriptions page layout with plan overview cards, subscriber list table with plan filters, search, and responsive mobile card layouts
+- Updated Subscriptions page layout with plan overview cards, subscriber list table with plan filters, search, and responsive mobile card layouts
 
 Roles & RBAC Management
-- We have updated the Roles & Permissions management screen featuring system role cards, granular permission matrices, and role editing modals
+- Updated Roles & Permissions management screen featuring system role cards, granular permission matrices, and role editing modals
 
-Admin Profile & Login Audit History
-- We have updated the Admin Profile page featuring account overview cards, system preferences, saved collections, and the Login Audit History module with stationary table headers, fixed-height log scrolling, and responsive card views for smaller screens
+Admin Profile Page & Audit Logs UI
+- Updated Admin Profile page with account overview cards, system preferences, saved collections, and redesigned the Login Audit History table with non-scrolling stationary headers, fixed-height log scrolling, and responsive card views for smaller devices
 
 
 Video Explanation Link:
