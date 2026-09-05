@@ -8,6 +8,7 @@ import CommonSearch from "@/components/shared/CommonSearch/CommonSearch"
 import CommonPagination from "@/components/shared/CommonPagination/CommonPagination"
 import CommonTableContainer from "@/components/shared/CommonTable/CommonTableContainer"
 import DashboardStats from "@/components/shared/Dashboard/DashboardStats/DashboardStats"
+import AddNewArtist from "@/components/admin/artists/AddNewArtist"
 import { Eye, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
@@ -125,6 +126,9 @@ const ArtistsContainer = () => {
     <div className="flex flex-col gap-6 w-full">
       {/* Upper Stats grid */}
       <DashboardStats statsCards={statsCards} />
+
+      {/* Register new artist banner */}
+      <AddNewArtist />
 
       <CommonTableContainer
         headerChildren={
