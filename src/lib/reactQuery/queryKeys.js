@@ -11,7 +11,7 @@ export const queryKeys = {
   },
   users: {
     all: ["users"],
-    list: () => [...queryKeys.users.all, "list"],
+    list: (params) => [...queryKeys.users.all, "list", params],
   },
   genre: {
     all: ["genre"],

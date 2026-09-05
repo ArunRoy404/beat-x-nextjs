@@ -5,12 +5,12 @@ import { getUsersRequest } from "@/services/admin/usersServices"
 import { queryKeys } from "@/lib/reactQuery/queryKeys"
 
 /**
- * Fetches the full admin users list.
- *   const { data: users = [], isLoading, isError, error, refetch } = useUsers()
+ * Fetches the admin users list.
+ *   const { data: users = [], isLoading, isError, error, refetch } = useUsers(params)
  */
-export function useUsers() {
+export function useUsers(params) {
   return useQuery({
-    queryKey: queryKeys.users.list(),
-    queryFn: getUsersRequest,
+    queryKey: queryKeys.users.list(params),
+    queryFn: () => getUsersRequest(params),
   })
 }
