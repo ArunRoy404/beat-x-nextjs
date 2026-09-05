@@ -19,7 +19,7 @@ const EditProductDialog = ({ product, children }) => {
         {children}
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[620px] max-h-[90vh] overflow-y-auto scrollbar-thin">
+      <DialogContent>
         {/* Custom Header */}
         <DialogHeader>
           <DialogTitle>
