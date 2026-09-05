@@ -78,5 +78,10 @@ export const queryKeys = {
     detail: (id) => [...queryKeys.events.all, "detail", id],
     analytics: (id) => [...queryKeys.events.all, "analytics", id],
   },
+  subscriptions: {
+    all: ["subscriptions"],
+    dashboard: () => [...queryKeys.subscriptions.all, "dashboard"],
+    list: (params) => [...queryKeys.subscriptions.all, "list", params],
+  },
 };
 
