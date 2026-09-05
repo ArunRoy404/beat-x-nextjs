@@ -1,7 +1,10 @@
 "use client"
 
 import React from "react"
+import { Pencil, Trash2 } from "lucide-react"
 import { resolveMediaUrl } from "@/lib/format/resolveMediaUrl"
+import EditProductDialog from "@/components/dialogs/admin/shop/EditProductDialog"
+import DeleteProductDialog from "@/components/dialogs/admin/shop/DeleteProductDialog"
 
 const ProductCard = ({ product }) => {
   const stock = product?.stock ?? 0
@@ -27,7 +30,7 @@ const ProductCard = ({ product }) => {
 
   return (
     <div
-      className="flex p-1 flex-col items-center gap-2 rounded-[8px] border border-[#20201F] bg-[#20201F]/30 backdrop-blur-[5px] w-full select-none h-full"
+      className="flex p-1 flex-col items-center gap-2 rounded-[8px] border border-[#20201F] bg-[#20201F]/30 backdrop-blur-[5px] w-full select-none h-full group"
     >
       {/* Image container */}
       <div className="relative flex h-[221px] p-1 flex-col items-end justify-between self-stretch rounded-[8px] border border-[#484847]/15 overflow-hidden w-full bg-white/[0.02]">
@@ -62,6 +65,33 @@ const ProductCard = ({ product }) => {
               {product.coinReward} Coins
             </div>
           )}
+        </div>
+
+        {/* Quick Actions (Edit / Delete) Overlay */}
+        <div className="absolute bottom-2 right-2 flex items-center gap-1.5 z-10 pointer-events-auto opacity-90 group-hover:opacity-100 transition-opacity">
+          <div onClick={(e) => e.stopPropagation()}>
+            <EditProductDialog product={product}>
+              <button
+                type="button"
+                title="Edit Product"
+                className="w-8 h-8 rounded-full border border-secondary/30 bg-[#0E0E0E]/80 backdrop-blur-md hover:bg-secondary/30 text-secondary flex items-center justify-center transition-all cursor-pointer shadow-md active:scale-95"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+              </button>
+            </EditProductDialog>
+          </div>
+
+          <div onClick={(e) => e.stopPropagation()}>
+            <DeleteProductDialog product={product}>
+              <button
+                type="button"
+                title="Delete Product"
+                className="w-8 h-8 rounded-full border border-red-error/30 bg-[#0E0E0E]/80 backdrop-blur-md hover:bg-red-error/30 text-red-error flex items-center justify-center transition-all cursor-pointer shadow-md active:scale-95"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </DeleteProductDialog>
+          </div>
         </div>
       </div>
 

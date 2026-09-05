@@ -84,6 +84,7 @@ const ProductDetailHeader = ({ product, onClose }) => {
           <EditProductDialog product={product}>
             <Button
               variant="outline"
+              onClick={onClose}
               className="border-secondary/20 bg-secondary/10 hover:bg-secondary/20 text-secondary gap-1 rounded-md h-8 text-[12px] px-3 font-semibold cursor-pointer"
             >
               <Edit3 className="w-3.5 h-3.5" />
