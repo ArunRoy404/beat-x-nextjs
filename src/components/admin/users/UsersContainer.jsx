@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useMemo } from "react"
 import { format } from "date-fns"
 import DataTable from "@/components/ui/DataTable"
 import { getUsersColumns } from "@/components/DataTableColumns/admin/users/UsersColumns"
@@ -11,24 +11,48 @@ import CommonTableContainer from "@/components/shared/CommonTable/CommonTableCon
 import InviteUserDialog from "@/components/dialogs/admin/users/InviteUserDialog"
 import UserDetailsDialog from "@/components/dialogs/admin/users/UserDetailsDialog"
 import DeleteUserDialog from "@/components/dialogs/admin/users/DeleteUserDialog"
-import { useAdminDashboardUsersStore } from "@/zustandStore/admin/adminStore/adminDashboardUsersStore"
 import { useUsers } from "@/hooks/api/admin/users/useUsers"
+import { useUrlListParams } from "@/hooks/useUrlListParams"
+import { buildUsersParams } from "@/hooks/api/admin/users/usersParams"
 import { Trash2, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import CommonAvatar from "@/components/shared/CommonAvatar"
 
 const UsersContainer = () => {
-  const { data: usersList = [], isLoading, isError, error, refetch } = useUsers()
-  const selectedStatusFilter = useAdminDashboardUsersStore((state) => state.selectedStatusFilter)
-  const setSelectedStatusFilter = useAdminDashboardUsersStore((state) => state.setSelectedStatusFilter)
-  const searchQuery = useAdminDashboardUsersStore((state) => state.searchQuery)
-  const setSearchQuery = useAdminDashboardUsersStore((state) => state.setSearchQuery)
+  const { get, setParams } = useUrlListParams()
+
+  const rawStatus = get("status", "all")
+  const rawSearch = get("q", "")
+  const page = Number(get("page", "1")) || 1
+  const limit = Number(get("limit", "20")) || 20
+
+  const params = useMemo(() => {
+    return buildUsersParams({ status: rawStatus, q: rawSearch, page, limit })
+  }, [rawStatus, rawSearch, page, limit])
+
+  const { data, isLoading, isError, error, refetch } = useUsers(params)
+
+  const usersList = Array.isArray(data) ? data : data?.data || []
+  const totalItems = data?.total ?? usersList.length
+  const totalPages = (data?.totalPages ?? Math.ceil(totalItems / limit)) || 1
+
+  const activeTab = useMemo(() => {
+    const s = (rawStatus || "").toLowerCase()
+    if (s === "verified") return "Verified"
+    if (s === "unverified") return "Unverified"
+    return "All"
+  }, [rawStatus])
+
+  const handleTabChange = (tabName) => {
+    const name = tabName.toLowerCase()
+    if (name === "verified") setParams({ status: "verified" })
+    else if (name === "unverified") setParams({ status: "unverified" })
+    else setParams({ status: "" })
+  }
 
   const columns = getUsersColumns()
 
-  // Filter/search tabs are UI-only for now — GET /users takes no query
-  // params yet, so wire them to real params once the API supports it.
   return (
     <CommonTableContainer
       headerChildren={
@@ -36,19 +60,18 @@ const UsersContainer = () => {
           {/* Tab pills */}
           <CommonFilter
             tabs={["All", "Verified", "Unverified"]}
-            activeTab={selectedStatusFilter}
-            onChange={(tab) => setSelectedStatusFilter(tab)}
+            activeTab={activeTab}
+            onChange={handleTabChange}
           />
 
-          {/* Right Side: Search + Invite User */}
+          {/* Right Side: Search */}
           <div className="flex items-center gap-3 w-full md:w-auto shrink-0">
             <CommonSearch
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={rawSearch}
+              onChange={(e) => setParams({ q: e.target.value })}
               placeholder="Search users..."
               className="flex-1 md:w-72"
             />
-            <InviteUserDialog />
           </div>
         </>
       }
@@ -78,7 +101,7 @@ const UsersContainer = () => {
           <div className="block md:hidden">
             <div className="flex flex-col gap-3">
               {usersList.map((user) => (
-                <div key={user._id} className="border border-white/10 bg-[#0E0E0E] rounded-[12px] p-4 flex flex-col gap-3">
+                <div key={user._id || user.id} className="border border-white/10 bg-[#0E0E0E] rounded-[12px] p-4 flex flex-col gap-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <CommonAvatar src={user.avatar || ""} alt={user.name} className="w-10 h-10 rounded-full border border-white/5" />
@@ -137,10 +160,11 @@ const UsersContainer = () => {
 
           {/* Pagination Bar */}
           <CommonPagination
-            currentPage={1}
-            totalItems={usersList.length}
-            pageSize={5}
-            totalPages={Math.ceil(usersList.length / 5) || 1}
+            currentPage={page}
+            totalItems={totalItems}
+            pageSize={limit}
+            totalPages={totalPages}
+            onPageChange={(newPage) => setParams({ page: newPage }, { resetPage: false })}
           />
         </>
       )}
@@ -149,3 +173,4 @@ const UsersContainer = () => {
 }
 
 export default UsersContainer
+

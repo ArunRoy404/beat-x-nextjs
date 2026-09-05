@@ -7,7 +7,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar"
 import CommonAvatar from "@/components/shared/CommonAvatar"
 import { useNavigationDetailsStore } from "@/navigationStore/navigationDetailsStore"
 
-const CommonDashboardNavbar = () => {
+const CommonDashboardNavbar = ({ userMenu }) => {
   const pathname = usePathname()
   const navigationDetails = useNavigationDetailsStore((state) => state.navigationDetails)
 
@@ -64,7 +64,7 @@ const CommonDashboardNavbar = () => {
         </button>
 
         {/* User Profile Avatar */}
-        <CommonAvatar />
+        {userMenu || <CommonAvatar />}
       </div>
     </header>
   )

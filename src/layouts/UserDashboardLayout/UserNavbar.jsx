@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { Bell, ChevronDown, Download, Gem } from "lucide-react"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import CommonSearch from "@/components/shared/CommonSearch/CommonSearch"
@@ -32,17 +33,17 @@ const UserNavbar = () => {
                     Download App
                 </button>
 
-                <button
-                    type="button"
+                <Link
+                    href="/notifications"
                     className="relative flex size-11 shrink-0 items-center justify-center rounded-[8px] bg-dark-accent"
                 >
                     <Bell className="size-6 text-whitetext" />
                     {profile.notificationCount > 0 && (
-                        <span className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-red-error text-[10px] text-whitetext font-outfit">
+                        <span className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-red-error text-[10px] text-whitetext font-switzer">
                             {profile.notificationCount}
                         </span>
                     )}
-                </button>
+                </Link>
 
                 <button
                     type="button"
@@ -50,7 +51,7 @@ const UserNavbar = () => {
                 >
                     <CommonAvatar src={profile.avatar} alt={profile.name} className="size-9" />
                     <span className="hidden flex-col items-start sm:flex">
-                        <span className="font-outfit text-xs text-whitetext">{profile.name}</span>
+                        <span className="font-switzer text-xs text-whitetext">{profile.name}</span>
                         {profile.isPremium && (
                             <span className="flex items-center gap-1 text-xs text-secondary">
                                 <Gem className="size-3" />

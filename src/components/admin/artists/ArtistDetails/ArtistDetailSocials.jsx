@@ -1,4 +1,8 @@
+"use client"
+
 import React from "react"
+import { useUpdateArtistSocialChecklist } from "@/hooks/api/admin/artists/useUpdateArtistSocialChecklist"
+import { toast } from "sonner"
 
 const InternetIcon = () => (
   <div className="flex w-[26.25px] h-[26.25px] justify-center items-center shrink-0 bg-white/5 rounded-full">
@@ -18,7 +22,7 @@ const InternetIcon = () => (
   </div>
 )
 
-const SocialRow = ({ platform, link, isOptional = false }) => {
+const SocialRow = ({ platform, link, isOptional = false, isChecked, onToggle, isPending }) => {
   const isLinked = link && link !== "Not provided"
 
   return (
@@ -33,7 +37,21 @@ const SocialRow = ({ platform, link, isOptional = false }) => {
         </div>
       </div>
 
-      <div className="shrink-0 select-none">
+      <div className="flex items-center gap-2 shrink-0 select-none">
+        {onToggle && (
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={onToggle}
+            className={`text-[10px] font-medium px-2.5 py-1 rounded-full border transition-all cursor-pointer ${
+              isChecked
+                ? "bg-green-success/20 text-green-success border-green-success/30"
+                : "bg-white/5 text-light-gray/60 border-white/10 hover:bg-white/10"
+            }`}
+          >
+            {isChecked ? "Verified ✓" : "Verify"}
+          </button>
+        )}
         {isLinked ? (
           <span className="inline-flex items-center gap-1 text-[9px] font-medium px-2 py-0.5 rounded-full border bg-green-success/15 text-green-success border-green-success/20">
             ✓ Linked
@@ -49,6 +67,36 @@ const SocialRow = ({ platform, link, isOptional = false }) => {
 }
 
 const ArtistDetailSocials = ({ artist }) => {
+  const verificationId = artist?._id || artist?.id
+  const socials = artist?.socialLinks || {}
+  const checklist = artist?.socialLinksChecklist || {}
+
+  const updateSocialChecklistMutation = useUpdateArtistSocialChecklist()
+
+  const currentSocialChecklist = {
+    facebook: checklist.facebook ?? Boolean(socials.facebook),
+    instagram: checklist.instagram ?? Boolean(socials.instagram),
+    twitter: checklist.twitter ?? Boolean(socials.twitter),
+    youtube: checklist.youtube ?? Boolean(socials.youtube),
+  }
+
+  const handleToggleSocial = async (platformKey) => {
+    if (!verificationId) return
+    const updatedData = {
+      ...currentSocialChecklist,
+      [platformKey]: !currentSocialChecklist[platformKey],
+    }
+    try {
+      await updateSocialChecklistMutation.mutateAsync({
+        id: verificationId,
+        data: updatedData,
+      })
+      toast.success("Social links checklist updated.")
+    } catch (err) {
+      toast.error(err?.response?.data?.message || err?.message || "Failed to update social checklist.")
+    }
+  }
+
   return (
     <div className="p-4 flex flex-col gap-5 overflow-y-auto flex-1 min-h-0 scrollbar-thin">
       {/* Required Social Profiles */}
@@ -57,10 +105,34 @@ const ArtistDetailSocials = ({ artist }) => {
           Required Social Profiles
         </h3>
         <div className="flex flex-col gap-3">
-          <SocialRow platform="Facebook *" link={`https://facebook.com/${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}.official`} />
-          <SocialRow platform="Instagram *" link={`@${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}.music`} />
-          <SocialRow platform="X (Twitter) *" link={`@${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}official`} />
-          <SocialRow platform="YouTube *" link={`https://youtube.com/@${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}official`} />
+          <SocialRow
+            platform="Facebook *"
+            link={socials.facebook || "Not provided"}
+            isChecked={currentSocialChecklist.facebook}
+            onToggle={() => handleToggleSocial("facebook")}
+            isPending={updateSocialChecklistMutation.isPending}
+          />
+          <SocialRow
+            platform="Instagram *"
+            link={socials.instagram || "Not provided"}
+            isChecked={currentSocialChecklist.instagram}
+            onToggle={() => handleToggleSocial("instagram")}
+            isPending={updateSocialChecklistMutation.isPending}
+          />
+          <SocialRow
+            platform="X (Twitter) *"
+            link={socials.twitter || "Not provided"}
+            isChecked={currentSocialChecklist.twitter}
+            onToggle={() => handleToggleSocial("twitter")}
+            isPending={updateSocialChecklistMutation.isPending}
+          />
+          <SocialRow
+            platform="YouTube *"
+            link={socials.youtube || "Not provided"}
+            isChecked={currentSocialChecklist.youtube}
+            onToggle={() => handleToggleSocial("youtube")}
+            isPending={updateSocialChecklistMutation.isPending}
+          />
         </div>
       </div>
 
@@ -70,8 +142,8 @@ const ArtistDetailSocials = ({ artist }) => {
           Optional Social Profiles
         </h3>
         <div className="flex flex-col gap-3">
-          <SocialRow platform="TikTok" link={`@${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}.bd`} isOptional />
-          <SocialRow platform="Official Website" link={`https://${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}.com.bd`} isOptional />
+          <SocialRow platform="TikTok" link={socials.tiktok || "Not provided"} isOptional />
+          <SocialRow platform="Official Website" link={socials.officialWebsite || "Not provided"} isOptional />
         </div>
       </div>
 
@@ -81,10 +153,10 @@ const ArtistDetailSocials = ({ artist }) => {
           Music Platform Links
         </h3>
         <div className="flex flex-col gap-3">
-          <SocialRow platform="Spotify" link={`https://open.spotify.com/artist/${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}`} />
-          <SocialRow platform="Apple Music" link={`https://music.apple.com/artist/${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}`} />
-          <SocialRow platform="YouTube Music" link={`https://music.youtube.com/channel/${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}`} />
-          <SocialRow platform="SoundCloud" link="Not provided" isOptional />
+          <SocialRow platform="Spotify" link={socials.spotify || "Not provided"} />
+          <SocialRow platform="Apple Music" link={socials.appleMusic || "Not provided"} />
+          <SocialRow platform="YouTube Music" link={socials.youtubeMusic || "Not provided"} />
+          <SocialRow platform="SoundCloud" link={socials.soundcloud || "Not provided"} isOptional />
         </div>
       </div>
     </div>
@@ -92,3 +164,5 @@ const ArtistDetailSocials = ({ artist }) => {
 }
 
 export default ArtistDetailSocials
+
+

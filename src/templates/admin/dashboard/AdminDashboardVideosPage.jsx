@@ -1,21 +1,33 @@
 "use client"
 
 import React from "react"
-import { useAdminDashboardVideosStore } from "@/zustandStore/admin/adminStore/adminDashboardVideosStore"
 import DashboardStats from "@/components/shared/Dashboard/DashboardStats/DashboardStats"
 import VideosContainer from "@/components/admin/videos/VideosContainer"
 import UploadVideoDialog from "@/components/dialogs/admin/videos/UploadVideoDialog"
 import { Upload } from "lucide-react"
+import { useVideos } from "@/hooks/api/admin/videos/useVideos"
+import { buildVideosParams } from "@/hooks/api/admin/videos/videosParams"
 
 const AdminDashboardVideosPage = () => {
-  const statsCards = useAdminDashboardVideosStore((state) => state.videosStatsCards)
+  const { data: allData } = useVideos(buildVideosParams())
+
+  const statsCards = [
+    {
+      id: 1,
+      title: "Total Videos",
+      value: (allData?.total ?? 0).toLocaleString(),
+      icon: "Video",
+      iconColor: "#CC97FF",
+      iconBg: "rgba(204, 151, 255, 0.15)",
+    },
+  ]
 
   return (
     <div className="flex flex-col gap-6 w-full pb-8">
       {/* Upper Stats grid */}
       <DashboardStats statsCards={statsCards} />
 
-      {/* Upload Video Banner (Styled like Audiobooks banner) */}
+      {/* Upload Video Banner */}
       <div
         className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 rounded-[16px] border-dashed border-2 border-secondary/15 bg-secondary/[0.03] gap-4 w-full"
       >

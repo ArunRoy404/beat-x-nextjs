@@ -41,5 +41,15 @@ export async function updateSongStatusRequest({ id, status }) {
 
 export async function deleteSongRequest({ id }) {
   const res = await axiosPrivate.delete(`/admin/songs/${id}`);
-  return res.data.data;
+  return res.data?.data ?? res.data ?? true;
+}
+
+export async function approveSongRequest({ id }) {
+  const res = await axiosPrivate.patch(`/admin/songs/${id}/approve`);
+  return res.data?.data ?? res.data;
+}
+
+export async function rejectSongRequest({ id, reason }) {
+  const res = await axiosPrivate.patch(`/admin/songs/${id}/reject`, { reason });
+  return res.data?.data ?? res.data;
 }

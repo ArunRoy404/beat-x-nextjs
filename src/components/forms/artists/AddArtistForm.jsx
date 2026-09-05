@@ -7,7 +7,6 @@ import { addArtistSchema, addArtistDefaultValues } from "@/zodSchema/AddArtistZo
 import { Button } from "@/components/ui/button"
 import { DialogClose } from "@/components/ui/dialog"
 import { toast } from "sonner"
-import { useAdminDashboardArtistsStore } from "@/zustandStore/admin/adminStore/adminDashboardArtistsStore"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSelect"
@@ -18,8 +17,6 @@ const GENDERS = ["Male", "Female", "Other"]
 const GENRES = ["POP", "Synthwave", "R&B", "Hip Hop", "Lofi", "Rock"]
 
 const AddArtistForm = ({ onSuccess, onCancel }) => {
-  const addArtist = useAdminDashboardArtistsStore((state) => state.addArtist)
-
   const {
     register,
     handleSubmit,
@@ -33,14 +30,6 @@ const AddArtistForm = ({ onSuccess, onCancel }) => {
 
   const onSubmit = (data) => {
     console.log("Submitted Artist Data:", data)
-    addArtist({
-      name: data.stageName,
-      fullName: data.fullName,
-      email: data.email,
-      nationality: data.nationality,
-      gender: data.gender,
-      genre: data.genre,
-    })
     toast.success("Artist created successfully!")
     reset()
     onSuccess?.()

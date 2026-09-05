@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import { useQuery } from "@tanstack/react-query"
-import { getGenresRequest } from "@/services/admin/genreServices"
-import { queryKeys } from "@/lib/reactQuery/queryKeys"
+import { useQuery } from "@tanstack/react-query";
+import { getGenresRequest } from "@/services/admin/genreServices";
+import { queryKeys } from "@/lib/reactQuery/queryKeys";
 
 /**
- * Fetches the full admin genre list.
- *   const { data: genres = [], isLoading, isError, error, refetch } = useGenres()
+ * Fetches the paginated admin genre list.
+ *   const { data, isLoading, isError, error, refetch } = useGenres(params)
  */
-export function useGenres() {
+export function useGenres(params) {
   return useQuery({
-    queryKey: queryKeys.genre.list(),
-    queryFn: getGenresRequest,
-  })
+    queryKey: queryKeys.genre.list(params),
+    queryFn: () => getGenresRequest(params),
+  });
 }

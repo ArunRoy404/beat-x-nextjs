@@ -16,6 +16,7 @@ const CommonSelect = ({
     options = [],
     error,
     containerClassName,
+    labelClassName,
     className
 }) => {
     // Select.Value calls this with the raw value, not the matching item's
@@ -31,7 +32,7 @@ const CommonSelect = ({
     return (
         <div className={cn("flex flex-col gap-1.5 shrink-0", containerClassName)}>
             {label && (
-                <label className="text-primary text-[16px] not-italic font-normal font-sans">
+                <label className={cn("text-primary text-[16px] not-italic font-normal font-sans", labelClassName)}>
                     {label}
                 </label>
             )}
@@ -48,12 +49,21 @@ const CommonSelect = ({
                         {(val) => getDisplayValue(val)}
                     </SelectValue>
                 </SelectTrigger>
-                <SelectContent className="bg-background border border-whitetext/10 rounded-[12px] text-whitetext max-h-[200px] overflow-y-auto">
+                <SelectContent
+                    align="start"
+                    alignItemWithTrigger={false}
+                    sideOffset={8}
+                    className="w-(--anchor-width) min-w-32 max-h-60 overflow-y-auto rounded-[16px] border border-whitetext/10 bg-dark-accent p-1.5 text-whitetext shadow-xl"
+                >
                     {options.map((opt) => {
                         const optVal = typeof opt === "string" ? opt : opt.value
                         const optLabel = typeof opt === "string" ? opt : opt.label
                         return (
-                            <SelectItem key={optVal} value={optVal}>
+                            <SelectItem
+                                key={optVal}
+                                value={optVal}
+                                className="min-h-9 rounded-[10px] px-3 py-2 text-[14px] text-light-gray data-highlighted:bg-white/10 data-highlighted:text-whitetext data-selected:text-secondary"
+                            >
                                 {optLabel}
                             </SelectItem>
                         )

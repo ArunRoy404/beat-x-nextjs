@@ -1,24 +1,36 @@
 "use client"
 
 import React from "react"
-import { usePodcastDetailsAnalyticsStore } from "@/zustandStore/admin/adminStore/podcastDetailsAnalyticsStore"
-import DashboardStats from "@/components/shared/Dashboard/DashboardStats/DashboardStats"
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
+// Uncomment imports when backend API returns podcast analytics metrics/charts
+// import DashboardStats from "@/components/shared/Dashboard/DashboardStats/DashboardStats"
+// import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
 
-const PodcastDetailAnalytics = () => {
-    const podcastStatsCards = usePodcastDetailsAnalyticsStore((state) => state.podcastStatsCards)
-    const podcastPerformanceData = usePodcastDetailsAnalyticsStore((state) => state.podcastPerformanceData)
-    const podcastPlatformData = usePodcastDetailsAnalyticsStore((state) => state.podcastPlatformData)
-    const podcastCountryData = usePodcastDetailsAnalyticsStore((state) => state.podcastCountryData)
-
+/**
+ * PodcastDetailAnalytics Component
+ * Note: Styled per project rules since backend endpoint GET /api/v1/admin/podcasts/:id
+ * does not currently return individual podcast analytics data (play charts, platform breakdown, country stats).
+ * Preserved for future backend integration.
+ */
+const PodcastDetailAnalytics = ({ podcast }) => {
     return (
         <div className="p-4 overflow-y-auto flex-1 min-h-0 scrollbar-thin space-y-5">
-            {/* Stats Cards */}
-            <DashboardStats statsCards={podcastStatsCards} className="grid-cols-2! sm:grid-cols-2! lg:grid-cols-2!" />
+            {/* Empty State placeholder until backend analytics endpoint is available */}
+            <div className="flex flex-col items-center justify-center p-8 text-dark-gray text-sm border border-dashed border-white/10 rounded-[16px]">
+                <span>Analytics data for &quot;{podcast?.title || "this podcast"}&quot; is not provided by the current API response.</span>
+                <span className="text-xs text-light-gray/60 mt-1">Design blocks commented in code awaiting backend integration.</span>
+            </div>
 
-            {/* Performance Chart Card */}
+            {/* 
+            ========================================================================
+            COMMENTED DESIGN BLOCKS FOR FUTURE INTEGRATION WHEN BACKEND SUPPORTS ANALYTICS:
+            ========================================================================
+
+            {/* Stats Cards *}
+            {/* <DashboardStats statsCards={podcast?.statsCards || []} className="grid-cols-2! sm:grid-cols-2! lg:grid-cols-2!" /> *}
+
+            {/* Performance Chart Card *}
+            {/* 
             <div className="relative overflow-hidden rounded-[16px] border border-white/10 p-5 bg-[#0E0E0E]">
-                {/* Background image layer */}
                 <div
                     className="absolute inset-0 bg-cover bg-center opacity-10 pointer-events-none"
                     style={{ backgroundImage: "url('/bg-images/card_bg.png')" }}
@@ -30,7 +42,7 @@ const PodcastDetailAnalytics = () => {
 
                 <div style={{ height: "200px", minHeight: "200px" }} className="w-full z-10 relative">
                     <ResponsiveContainer width="100%" height="100%" minHeight={200} debounce={1000}>
-                        <AreaChart data={podcastPerformanceData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+                        <AreaChart data={podcast?.performanceData || []} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                             <defs>
                                 <linearGradient id="colorPodcastStream" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="5%" stopColor="#3ADFFA" stopOpacity={0.3} />
@@ -83,10 +95,12 @@ const PodcastDetailAnalytics = () => {
                     </ResponsiveContainer>
                 </div>
             </div>
+            *}
 
-            {/* Two Column Grid */}
+            {/* Two Column Grid: By Platform & Top Countries *}
+            {/* 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* By Platform */}
+                {/* By Platform *}
                 <div className="relative overflow-hidden rounded-[16px] border border-white/10 p-5 bg-[#0E0E0E]">
                     <div
                         className="absolute inset-0 bg-cover bg-center opacity-10 pointer-events-none"
@@ -96,7 +110,7 @@ const PodcastDetailAnalytics = () => {
                         By Platform
                     </h3>
                     <div className="flex flex-col gap-4 relative z-10">
-                        {podcastPlatformData.map((plat) => (
+                        {(podcast?.platformData || []).map((plat) => (
                             <div key={plat.name} className="flex flex-col gap-1.5">
                                 <div className="flex items-center justify-between text-xs font-medium">
                                     <span className="text-light-gray">{plat.name}</span>
@@ -113,7 +127,7 @@ const PodcastDetailAnalytics = () => {
                     </div>
                 </div>
 
-                {/* Top Countries */}
+                {/* Top Countries *}
                 <div className="relative overflow-hidden rounded-[16px] border border-white/10 p-5 bg-[#0E0E0E]">
                     <div
                         className="absolute inset-0 bg-cover bg-center opacity-10 pointer-events-none"
@@ -123,7 +137,7 @@ const PodcastDetailAnalytics = () => {
                         Top Countries
                     </h3>
                     <div className="flex flex-col gap-3 relative z-10">
-                        {podcastCountryData.map((country) => (
+                        {(podcast?.countryData || []).map((country) => (
                             <div key={country.name} className="flex items-center justify-between py-1 border-b border-white/5 last:border-0 text-xs font-medium">
                                 <div className="flex items-center gap-2">
                                     <span className="text-sm shrink-0">{country.flag}</span>
@@ -135,6 +149,8 @@ const PodcastDetailAnalytics = () => {
                     </div>
                 </div>
             </div>
+            *}
+            */}
         </div>
     )
 }

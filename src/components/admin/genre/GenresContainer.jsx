@@ -1,49 +1,67 @@
-"use client"
+"use client";
 
-import React, { useEffect, useState } from "react"
-import { format } from "date-fns"
-import DataTable from "@/components/ui/DataTable"
-import { getGenresColumns } from "@/components/DataTableColumns/admin/genre/GenresColumns"
-import CommonSearch from "@/components/shared/CommonSearch/CommonSearch"
-import CommonPagination from "@/components/shared/CommonPagination/CommonPagination"
-import CommonTableContainer from "@/components/shared/CommonTable/CommonTableContainer"
-import AddGenreDialog from "@/components/dialogs/admin/genre/AddGenreDialog"
-import EditGenreDialog from "@/components/dialogs/admin/genre/EditGenreDialog"
-import DeleteGenreDialog from "@/components/dialogs/admin/genre/DeleteGenreDialog"
-import { useUrlListParams } from "@/hooks/useUrlListParams"
-import { useGenres } from "@/hooks/api/admin/genre/useGenres"
-import { useSearchGenres } from "@/hooks/api/admin/genre/useSearchGenres"
-import { Tag, Pencil, Trash2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Spinner } from "@/components/ui/spinner"
+import React, { useEffect, useState } from "react";
+import { format } from "date-fns";
+import DataTable from "@/components/ui/DataTable";
+import { getGenresColumns } from "@/components/DataTableColumns/admin/genre/GenresColumns";
+import CommonSearch from "@/components/shared/CommonSearch/CommonSearch";
+import CommonPagination from "@/components/shared/CommonPagination/CommonPagination";
+import CommonTableContainer from "@/components/shared/CommonTable/CommonTableContainer";
+import AddGenreDialog from "@/components/dialogs/admin/genre/AddGenreDialog";
+import EditGenreDialog from "@/components/dialogs/admin/genre/EditGenreDialog";
+import DeleteGenreDialog from "@/components/dialogs/admin/genre/DeleteGenreDialog";
+import { useUrlListParams } from "@/hooks/useUrlListParams";
+import { useGenres } from "@/hooks/api/admin/genre/useGenres";
+import { useSearchGenres } from "@/hooks/api/admin/genre/useSearchGenres";
+import { GENRES_PAGE_SIZE, buildGenresParams } from "@/hooks/api/admin/genre/genreParams";
+import { Tag, Pencil, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 
-const SEARCH_DEBOUNCE_MS = 300
+const SEARCH_DEBOUNCE_MS = 300;
 
 const GenresContainer = () => {
-  const { get, setParams } = useUrlListParams()
-  const urlSearch = get("q", "")
+  const { get, setParams } = useUrlListParams();
+  const urlSearch = get("q", "");
+  const currentPage = Number(get("page", "1")) || 1;
 
-  const [searchInput, setSearchInput] = useState(urlSearch)
+  const [searchInput, setSearchInput] = useState(urlSearch);
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (searchInput.trim() !== urlSearch) {
-        setParams({ q: searchInput.trim() })
+        setParams({ q: searchInput.trim() });
       }
-    }, SEARCH_DEBOUNCE_MS)
-    return () => clearTimeout(timeout)
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchInput])
+  }, [searchInput]);
 
-  const isSearching = urlSearch.length > 0
+  const isSearching = urlSearch.trim().length > 0;
 
-  const listQuery = useGenres()
-  const searchResultQuery = useSearchGenres(urlSearch)
+  const params = buildGenresParams({
+    q: urlSearch,
+    page: currentPage,
+  });
 
-  const { data: genresList = [], isLoading, isError, error, refetch } = isSearching
+  const listQuery = useGenres(params);
+  const searchResultQuery = useSearchGenres(urlSearch.trim());
+
+  const { data, isLoading, isError, error, refetch } = isSearching
     ? searchResultQuery
-    : listQuery
+    : listQuery;
 
-  const columns = getGenresColumns()
+  const genresList =
+    data?.genre ??
+    data?.genres ??
+    data?.data ??
+    (Array.isArray(data) ? data : []);
+
+  const total = data?.total ?? genresList.length;
+  const limit = data?.limit ?? GENRES_PAGE_SIZE;
+  const totalPages = Math.ceil(total / limit) || 1;
+
+  const columns = getGenresColumns();
 
   return (
     <CommonTableContainer
@@ -76,27 +94,24 @@ const GenresContainer = () => {
         <>
           {/* Desktop view */}
           <div className="hidden md:block">
-            <DataTable
-              columns={columns}
-              data={genresList}
-            />
+            <DataTable columns={columns} data={genresList} />
           </div>
 
           {/* Mobile view */}
           <div className="block md:hidden">
             <div className="flex flex-col gap-3">
               {genresList.map((genre) => (
-                <div key={genre._id} className="border border-white/10 bg-[#0E0E0E] rounded-[12px] p-4 flex flex-col gap-3">
+                <div key={genre?._id} className="border border-white/10 bg-[#0E0E0E] rounded-[12px] p-4 flex flex-col gap-3">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-secondary shrink-0">
                       <Tag className="w-4 h-4" />
                     </div>
-                    <span className="text-whitetext font-semibold text-sm">{genre.name}</span>
+                    <span className="text-whitetext font-semibold text-sm">{genre?.name || "-"}</span>
                   </div>
 
                   <div className="flex items-center justify-between border-t border-white/5 pt-3">
                     <span className="text-white/40 text-[10px] uppercase font-semibold">
-                      Created {genre.createdAt ? format(new Date(genre.createdAt), "MMM d, yyyy") : "-"}
+                      Created {genre?.createdAt ? format(new Date(genre.createdAt), "MMM d, yyyy") : "-"}
                     </span>
                     <div className="flex items-center gap-2">
                       <EditGenreDialog genre={genre}>
@@ -128,15 +143,16 @@ const GenresContainer = () => {
 
           {/* Pagination Bar */}
           <CommonPagination
-            currentPage={1}
-            totalItems={genresList.length}
-            pageSize={5}
-            totalPages={Math.ceil(genresList.length / 5) || 1}
+            currentPage={currentPage}
+            totalItems={total}
+            pageSize={limit}
+            totalPages={totalPages}
+            onPageChange={(page) => setParams({ page }, { resetPage: false })}
           />
         </>
       )}
     </CommonTableContainer>
-  )
-}
+  );
+};
 
-export default GenresContainer
+export default GenresContainer;

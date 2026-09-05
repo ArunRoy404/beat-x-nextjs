@@ -19,7 +19,7 @@ export const getGenresColumns = () => [
             <Tag className="w-4 h-4" />
           </div>
           <span className="text-whitetext font-semibold text-sm">
-            {genre.name}
+            {genre?.name}
           </span>
         </div>
       )

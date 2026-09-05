@@ -1,12 +1,14 @@
 export function buildSongFormData(data) {
   const formData = new FormData()
 
-  formData.append("title", data.title)
-  formData.append("artist", data.artist)
-  formData.append("genre", data.genre)
-  formData.append("explicit", String(data.explicit))
+  if (data.title) formData.append("title", data.title)
+  if (data.artist) formData.append("artist", data.artist)
+  if (data.genre) formData.append("genre", data.genre)
+  if (data.explicit !== undefined) formData.append("explicit", String(data.explicit))
 
-  formData.append("status", data.visibility === "publish" ? "active" : "draft")
+  const status = data.status || (data.visibility === "publish" ? "active" : "draft")
+  formData.append("status", status)
+
   if (data.visibility === "schedule" && data.scheduledAt) {
     formData.append("scheduledAt", data.scheduledAt.toISOString())
   }

@@ -33,8 +33,11 @@ const getDefaultVisibility = (album) => {
 }
 
 const EditAlbumForm = ({ album, onSuccess, onCancel }) => {
-    const { data: genres = [] } = useGenres()
-    const genreOptions = genres.map((genre) => ({ value: genre._id, label: genre.name }))
+    const { data: genresData } = useGenres()
+    const genresList = Array.isArray(genresData)
+        ? genresData
+        : (genresData?.genre || genresData?.genres || genresData?.data?.genre || genresData?.data || [])
+    const genreOptions = genresList.map((genre) => ({ value: genre._id, label: genre.name }))
 
     const [cover, setCover] = useState(album?.coverUrl || null)
 

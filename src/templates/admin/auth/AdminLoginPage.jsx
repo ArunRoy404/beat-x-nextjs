@@ -46,7 +46,7 @@ const AdminLoginPage = () => {
             {
                 onSuccess: () => {
                     toast.success("Logged in successfully!")
-                    router.push(getSafeCallbackUrl(searchParams.get("callbackUrl"), "/admin/dashboard"))
+                    router.push(getSafeCallbackUrl(searchParams.get("callbackUrl"), "/admin/dashboard/overview"))
                     // The destination may have been cached client-side as an
                     // unauthenticated redirect (proxy.js) before login — force
                     // a fresh server round-trip so it isn't served stale.

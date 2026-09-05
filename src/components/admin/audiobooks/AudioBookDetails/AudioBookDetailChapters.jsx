@@ -42,7 +42,7 @@ const AudioBookDetailChapters = ({ book, chapters: chaptersProp = [] }) => {
 
             <div className="flex flex-col gap-3">
                 {chapters.map((chapter, index) => (
-                    <ChapterRow key={chapter._id} audiobookId={book?._id} chapter={chapter} index={index} />
+                    <ChapterRow key={chapter._id} audiobookId={book?._id} book={book} chapter={chapter} index={index} />
                 ))}
                 {chapters.length === 0 && !showAddForm && (
                     <div className="py-10 text-center text-muted-foreground bg-white/[0.02] border border-white/5 rounded-[16px] text-sm">

@@ -45,11 +45,14 @@ export const getSongsColumns = () => [
   {
     accessorKey: "genre",
     header: () => <CommonTableHeader>Genre</CommonTableHeader>,
-    cell: ({ getValue }) => (
-      <CommonTableTag>
-        {getValue()?.name || "-"}
-      </CommonTableTag>
-    )
+    cell: ({ getValue }) => {
+      const val = getValue()
+      return (
+        <CommonTableTag>
+          {val?.name || (typeof val === "string" ? val : "-")}
+        </CommonTableTag>
+      )
+    }
   },
   {
     accessorKey: "playCount",

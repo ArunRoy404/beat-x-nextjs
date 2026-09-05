@@ -10,93 +10,104 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { DialogClose } from "@/components/ui/dialog"
-import { Upload, X, CheckCircle2, Clock, FileText, Image as ImageIcon, Video as VideoIcon } from "lucide-react"
+import { Upload, X, CheckCircle2, Clock, FileText, Image as ImageIcon } from "lucide-react"
 import { toast } from "sonner"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSelect"
 import CommonSelectCards from "@/components/shared/CommonInputs/CommonInput/CommonSelectCards"
 import { Switch } from "@/components/ui/switch"
-import { useAdminDashboardVideosStore } from "@/zustandStore/admin/adminStore/adminDashboardVideosStore"
-
-const ARTISTS = ["Iqbal Hasan", "Tashrif Khan", "Fahim Islam", "Aura Borealis", "Nabila", "Kazi Shuvo"]
-const GENRES = ["Pop", "Folk", "Hip Hop", "Rock", "Lofi", "Biography"]
+import { useVideoDetail } from "@/hooks/api/admin/videos/useVideoDetail"
+import { useUpdateVideo } from "@/hooks/api/admin/videos/useUpdateVideo"
+import { useUpdateVideoCover } from "@/hooks/api/admin/videos/useUpdateVideoCover"
+import { useGenres } from "@/hooks/api/admin/genre/useGenres"
 
 const VISIBILITY_OPTIONS = [
-  { value: "publish", label: "Publish Now", icon: CheckCircle2 },
-  { value: "schedule", label: "Schedule", icon: Clock },
+  { value: "active", label: "Active / Published", icon: CheckCircle2 },
   { value: "draft", label: "Save as Draft", icon: FileText },
+  { value: "archived", label: "Archived", icon: Clock },
 ]
 
-const EditVideoDialog = ({ video, children }) => {
+const EditVideoDialog = ({ video: summary, children }) => {
   const [open, setOpen] = useState(false)
-  const updateVideo = useAdminDashboardVideosStore((state) => state.updateVideo)
+  const { data: detail } = useVideoDetail(open ? summary?._id : undefined)
+  const video = detail || summary
 
-  const videoInputRef = useRef(null)
   const imageInputRef = useRef(null)
 
-  // Form states
-  const [videoFile, setVideoFile] = useState(null)
-  const [coverImage, setCoverImage] = useState(null)
+  const { mutateAsync: updateVideo, isPending: isUpdatingData } = useUpdateVideo()
+  const { mutateAsync: updateCover, isPending: isUpdatingCover } = useUpdateVideoCover()
+  const isPending = isUpdatingData || isUpdatingCover
+
+  const genresQuery = useGenres()
+  const genresData = genresQuery?.data
+  const genresList =
+    genresData?.genre ??
+    genresData?.genres ??
+    genresData?.data ??
+    (Array.isArray(genresData) ? genresData : [])
+
+  const genreOptions = genresList.map((g) => ({
+    value: g?._id || g?.id,
+    label: g?.name || "Unnamed Genre",
+  }))
+
+  const [newCoverFile, setNewCoverFile] = useState(null)
+  const [coverPreview, setCoverPreview] = useState(video?.coverUrl || video?.cover || null)
   const [videoTitle, setVideoTitle] = useState("")
-  const [artist, setArtist] = useState("")
   const [genre, setGenre] = useState("")
   const [description, setDescription] = useState("")
-  const [visibility, setVisibility] = useState("publish")
-  const [isPremium, setIsPremium] = useState(false)
+  const [status, setStatus] = useState("active")
+  const [isFeatured, setIsFeatured] = useState(false)
+  const [isTrending, setIsTrending] = useState(false)
 
-  // Sync initial values on open
   useEffect(() => {
     if (video && open) {
       setVideoTitle(video.title || "")
-      setArtist(video.artist || "")
-      setGenre(video.genre || "")
-      setDescription(video.synopsis || "")
-      setIsPremium(video.isPremium || false)
-      setCoverImage(video.cover || null)
-      setVideoFile(video.videoFile || "video.mp4") // Mock string reference to avoid empty check
-      setVisibility(
-        video.status === "Published"
-          ? "publish"
-          : video.status === "Scheduled"
-            ? "schedule"
-            : "draft"
-      )
+      setGenre(video.genre?._id || video.genre?.id || (typeof video.genre === "string" ? video.genre : ""))
+      setDescription(video.description || video.synopsis || "")
+      setStatus((video.status || "active").toLowerCase())
+      setIsFeatured(Boolean(video.isFeatured))
+      setIsTrending(Boolean(video.isTrending))
+      setCoverPreview(video.coverUrl || video.cover || null)
+      setNewCoverFile(null)
     }
   }, [video, open])
 
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
     if (!videoTitle.trim()) {
       toast.error("Video Title is required")
       return
     }
-    if (!genre) {
-      toast.error("Please choose a genre")
-      return
+
+    try {
+      const body = {
+        title: videoTitle.trim(),
+        description: description.trim(),
+        genre: genre || undefined,
+        status,
+        isFeatured,
+        isTrending,
+      }
+
+      await updateVideo({ id: video._id, body })
+
+      if (newCoverFile) {
+        await updateCover({ id: video._id, file: newCoverFile })
+      }
+
+      toast.success("Video changes saved successfully!")
+      setOpen(false)
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error?.message || "Failed to update video.")
     }
-
-    updateVideo(video.id, {
-      videoFile,
-      coverImage,
-      videoTitle,
-      artist,
-      genre,
-      description,
-      visibility,
-      isPremium
-    })
-
-    toast.success("Video changes saved successfully!")
-    setOpen(false)
-  }
-
-  const handleVideoSelect = (e) => {
-    const file = e.target.files?.[0]
-    if (file) setVideoFile(file)
   }
 
   const handleImageSelect = (e) => {
     const file = e.target.files?.[0]
-    if (file) setCoverImage(file)
+    if (file) {
+      setNewCoverFile(file)
+      setCoverPreview(URL.createObjectURL(file))
+    }
   }
 
   return (
@@ -121,85 +132,43 @@ const EditVideoDialog = ({ video, children }) => {
         {/* Scrollable Body Content */}
         <div className="p-5 flex flex-col gap-4 overflow-y-auto flex-1 scrollbar-thin">
           
-          {/* Two column layout for upload zones in Image 5 */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Custom Video File Dropzone */}
-            <div className="flex flex-col gap-1.5 w-full">
-              <span className="text-[12px] text-dark-gray font-semibold uppercase tracking-wider">Video File *</span>
-              <div
-                onClick={() => videoInputRef.current?.click()}
-                className="group flex flex-col items-center justify-center p-4 h-28 rounded-[16px] border border-dashed border-secondary/15 bg-secondary/5 hover:bg-secondary/10 cursor-pointer transition-all gap-2 relative w-full"
-              >
-                <input
-                  type="file"
-                  ref={videoInputRef}
-                  onChange={handleVideoSelect}
-                  accept="video/*"
-                  className="hidden"
-                />
-                {videoFile ? (
-                  <div className="text-center min-w-0 w-full px-2 flex flex-col items-center gap-0.5">
-                    <p className="text-whitetext text-xs font-medium truncate max-w-full">
-                      {typeof videoFile === "string" ? videoFile : videoFile.name}
-                    </p>
-                    <p className="text-light-whitetext text-[10px]">
-                      {typeof videoFile === "string" ? "MP4, 230MB" : `${(videoFile.size / 1024 / 1024).toFixed(2)} MB`}
-                    </p>
-                    <span className="mt-0.5 px-2 py-0.5 rounded-full bg-secondary/20 hover:bg-secondary/30 text-secondary text-[10px] font-medium transition-colors">
-                      Replace File
-                    </span>
-                  </div>
-                ) : (
-                  <div className="text-center flex flex-col items-center gap-1">
-                    <div className="w-6 h-6 rounded-full bg-secondary/10 flex items-center justify-center text-secondary group-hover:scale-105 transition-transform">
-                      <VideoIcon className="w-3.5 h-3.5" />
-                    </div>
-                    <p className="text-whitetext text-xs font-medium font-sans">
-                      Drop video file here
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Custom Thumbnail Image Dropzone */}
-            <div className="flex flex-col gap-1.5 w-full">
-              <span className="text-[12px] text-dark-gray font-semibold uppercase tracking-wider">Thumbnail Image *</span>
-              <div
-                onClick={() => imageInputRef.current?.click()}
-                className="group flex flex-col items-center justify-center p-4 h-28 rounded-[16px] border border-dashed border-secondary/15 bg-secondary/5 hover:bg-secondary/10 cursor-pointer transition-all gap-2 relative w-full"
-              >
-                <input
-                  type="file"
-                  ref={imageInputRef}
-                  onChange={handleImageSelect}
-                  accept="image/*"
-                  className="hidden"
-                />
-                {coverImage ? (
-                  <div className="relative flex flex-col items-center gap-1">
-                    <div className="relative w-[80px] h-[48px] rounded-[8px] overflow-hidden border border-whitetext/10">
-                      <img
-                        src={typeof coverImage === "string" ? coverImage : URL.createObjectURL(coverImage)}
-                        alt="Thumbnail Preview"
-                        className="object-cover w-full h-full"
-                      />
-                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-90 group-hover:opacity-100 transition-opacity">
-                        <Upload className="w-3.5 h-3.5 text-white" />
-                      </div>
+          {/* Custom Thumbnail Image Dropzone */}
+          <div className="flex flex-col gap-1.5 w-full">
+            <span className="text-[12px] text-dark-gray font-semibold uppercase tracking-wider">Thumbnail Image</span>
+            <div
+              onClick={() => imageInputRef.current?.click()}
+              className="group flex flex-col items-center justify-center p-4 h-32 rounded-[16px] border border-dashed border-secondary/15 bg-secondary/5 hover:bg-secondary/10 cursor-pointer transition-all gap-2 relative w-full"
+            >
+              <input
+                type="file"
+                ref={imageInputRef}
+                onChange={handleImageSelect}
+                accept="image/*"
+                className="hidden"
+              />
+              {coverPreview ? (
+                <div className="relative flex flex-col items-center gap-1">
+                  <div className="relative w-[120px] h-[64px] rounded-[8px] overflow-hidden border border-white/10">
+                    <img
+                      src={coverPreview}
+                      alt="Thumbnail Preview"
+                      className="object-cover w-full h-full"
+                    />
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Upload className="w-4 h-4 text-white" />
                     </div>
                   </div>
-                ) : (
-                  <div className="text-center flex flex-col items-center gap-1">
-                    <div className="w-6 h-6 rounded-full bg-secondary/10 flex items-center justify-center text-secondary group-hover:scale-105 transition-transform">
-                      <ImageIcon className="w-3.5 h-3.5" />
-                    </div>
-                    <p className="text-whitetext text-xs font-medium font-sans">
-                      Upload thumbnail
-                    </p>
+                </div>
+              ) : (
+                <div className="text-center flex flex-col items-center gap-1">
+                  <div className="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center text-secondary group-hover:scale-105 transition-transform">
+                    <ImageIcon className="w-4 h-4" />
                   </div>
-                )}
-              </div>
+                  <p className="text-whitetext text-xs font-medium font-sans">
+                    Upload thumbnail
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -211,23 +180,14 @@ const EditVideoDialog = ({ video, children }) => {
             placeholder="e.g. Nishithe Asha — Official Music Video"
           />
 
-          {/* Artist & Genre */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-            <CommonSelect
-              label="Artist"
-              value={artist}
-              onChange={(val) => setArtist(val)}
-              options={ARTISTS}
-              placeholder="Chose Artist"
-            />
-            <CommonSelect
-              label="Genre *"
-              value={genre}
-              onChange={(val) => setGenre(val)}
-              options={GENRES}
-              placeholder="Choose genre"
-            />
-          </div>
+          {/* Genre */}
+          <CommonSelect
+            label="Genre"
+            value={genre}
+            onChange={(val) => setGenre(val)}
+            options={genreOptions}
+            placeholder="Choose genre"
+          />
 
           {/* Description */}
           <CommonInput
@@ -235,27 +195,32 @@ const EditVideoDialog = ({ video, children }) => {
             type="textarea"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Episode description / show notes..."
+            placeholder="Video description..."
             rows={3}
           />
 
-          {/* Visibility */}
+          {/* Status */}
           <CommonSelectCards
-            label="Visibility"
-            value={visibility}
-            onChange={(val) => setVisibility(val)}
+            label="Status"
+            value={status}
+            onChange={(val) => setStatus(val)}
             options={VISIBILITY_OPTIONS}
           />
 
-          {/* Feature as Premium Video */}
-          <div className="flex items-center justify-between py-2 border-t border-b border-white/5 shrink-0">
-            <span className="text-light-gray text-[16px] not-italic font-medium font-sans">
-              Feature as Premium Video
-            </span>
+          {/* Feature & Trending Toggles */}
+          <div className="flex items-center justify-between py-2 border-t border-white/5">
+            <span className="text-light-gray text-[14px] font-medium">Featured Video</span>
             <Switch
-              checked={isPremium}
-              onCheckedChange={setIsPremium}
-              className="data-checked:bg-secondary data-unchecked:bg-light-gray/20"
+              checked={isFeatured}
+              onCheckedChange={setIsFeatured}
+            />
+          </div>
+
+          <div className="flex items-center justify-between py-2 border-t border-b border-white/5">
+            <span className="text-light-gray text-[14px] font-medium">Trending Video</span>
+            <Switch
+              checked={isTrending}
+              onCheckedChange={setIsTrending}
             />
           </div>
         </div>
@@ -278,6 +243,7 @@ const EditVideoDialog = ({ video, children }) => {
             className="flex-1"
             size="lg"
             onClick={handleSaveChanges}
+            isLoading={isPending}
           >
             Save Changes
           </Button>

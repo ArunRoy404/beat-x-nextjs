@@ -1,5 +1,5 @@
 export const navigationDetails = {
-  "/admin/dashboard": {
+  "/admin/dashboard/overview": {
     title: "Music Management",
     subtitle: "Manage all platform music — upload, review, approve"
   },

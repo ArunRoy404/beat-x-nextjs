@@ -12,16 +12,27 @@ export async function getAudioBooksRequest({ status, genre, q, page = 1, limit =
   return res.data.data;
 }
 
-// No dedicated /admin/audiobooks/:id route exists — the public detail
-// endpoint accepts a bearer token too and is the only way to fetch a
-// single audiobook's full chapter list.
 export async function getAudioBookDetailRequest({ id }) {
-  const res = await axiosPrivate.get(`/audiobooks/${id}`);
+  const res = await axiosPrivate.get(`/admin/audiobooks/${id}`);
   return res.data.data;
 }
 
 export async function createAudioBookRequest(formData) {
   const res = await axiosPrivate.post("/admin/audiobooks", formData);
+  return res.data.data;
+}
+
+export async function updateAudioBookRequest({ id, data }) {
+  const res = await axiosPrivate.patch(`/admin/audiobooks/${id}`, data);
+  return res.data.data;
+}
+
+export async function updateAudioBookCoverRequest({ id, file }) {
+  const formData = new FormData();
+  formData.append("file", file);
+  const res = await axiosPrivate.patch(`/admin/audiobooks/${id}/cover`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
   return res.data.data;
 }
 

@@ -7,16 +7,17 @@ export const userDashboardNavigation = {
         { title: "Home", url: "/", iconName: "HomeIcon" },
         { title: "Explore", url: "/explore", iconName: "SearchNormalIcon" },
         { title: "Trending", url: "/trending", iconName: "TrendingIcon" },
+        { title: "Notifications", url: "/notifications", iconName: "NotificationIcon" },
       ],
     },
     {
       category: "Your Library",
       items: [
         { title: "Library", url: "/library", iconName: "MusicLibraryIcon" },
-        { title: "Albums", url: "/library/albums", iconName: "AlbumIcon" },
-        { title: "Create Playlist", url: "/library/create-playlist", iconName: "AddCircleIcon" },
-        { title: "Like Songs", url: "/library/liked", iconName: "HeartIcon" },
-        { title: "Download", url: "/library/downloads", iconName: "DownloadTrayIcon" },
+        { title: "Albums", url: "/albums", iconName: "AlbumIcon" },
+        { title: "Create Playlist", url: "/create-playlist", iconName: "AddCircleIcon" },
+        { title: "Like Songs", url: "/liked", iconName: "HeartIcon" },
+        { title: "Download", url: "/downloads", iconName: "DownloadTrayIcon" },
       ],
     },
     {

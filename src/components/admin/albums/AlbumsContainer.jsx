@@ -39,10 +39,20 @@ const AlbumsContainer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchInput])
 
-  const { data: genres = [] } = useGenres()
+  const genresQuery = useGenres()
+  const genresData = genresQuery?.data
+  const genresList =
+    genresData?.genre ??
+    genresData?.genres ??
+    genresData?.data ??
+    (Array.isArray(genresData) ? genresData : [])
+
   const genreOptions = [
     { value: "all", label: "All Genres" },
-    ...genres.map((genre) => ({ value: genre._id, label: genre.name })),
+    ...genresList.map((genre) => ({
+      value: genre?._id || genre?.id,
+      label: genre?.name || "Unnamed Genre",
+    })),
   ]
 
   const params = buildAlbumsParams({
@@ -53,9 +63,15 @@ const AlbumsContainer = () => {
   })
 
   const { data, isLoading, isError, error, refetch } = useAlbums(params)
-  const albums = data?.data ?? []
-  const total = data?.total ?? 0
-  const totalPages = Math.ceil(total / ALBUMS_PAGE_SIZE) || 1
+  const albums =
+    data?.data ??
+    data?.album ??
+    data?.albums ??
+    (Array.isArray(data) ? data : [])
+
+  const total = data?.total ?? albums.length
+  const limit = data?.limit ?? ALBUMS_PAGE_SIZE
+  const totalPages = Math.ceil(total / limit) || 1
 
   const columns = getAlbumsColumns()
 

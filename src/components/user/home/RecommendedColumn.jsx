@@ -11,7 +11,7 @@ const RecommendedColumn = () => {
 
     return (
         <section className="flex w-full flex-col gap-4 lg:w-88 lg:shrink-0">
-            <h2 className="text-2xl font-space-grotesk text-whitetext sm:text-[30px]">Recommended</h2>
+            <h2 className="text-2xl font-switzer text-whitetext sm:text-[30px]">Recommended</h2>
             <CommonGlassPanel className="flex flex-col gap-6 overflow-hidden p-4">
                 <div aria-hidden className="pointer-events-none absolute -top-px -right-px size-32 rounded-full bg-primary/20 blur-3xl" />
                 <div aria-hidden className="pointer-events-none absolute -bottom-px -left-px size-32 rounded-full bg-secondary/20 blur-3xl" />

@@ -1,22 +1,21 @@
-import React, { useState } from "react"
-import { cn } from "@/lib/utils"
+import React from "react";
+import { cn } from "@/lib/utils";
 
 const TimeFilters = ({ activeFilter = "7D", onChange }) => {
-  const filters = ["7D", "30D", "3M", "6M", "1Y"]
-  const [selected, setSelected] = useState(activeFilter)
+  const filters = ["7D", "30D", "3M", "6M", "1Y"];
 
   const handleSelect = (filter) => {
-    setSelected(filter)
-    if (onChange) onChange(filter)
-  }
+    if (onChange) onChange(filter);
+  };
 
   return (
     <div className="flex items-center gap-2 select-none">
       {filters.map((filter) => {
-        const isActive = selected === filter
+        const isActive = activeFilter.toUpperCase() === filter.toUpperCase();
         return (
           <button
             key={filter}
+            type="button"
             onClick={() => handleSelect(filter)}
             className={cn(
               "px-3 py-1.5 rounded-[6px] text-xs font-semibold cursor-pointer transition-all duration-200",
@@ -27,10 +26,10 @@ const TimeFilters = ({ activeFilter = "7D", onChange }) => {
           >
             {filter}
           </button>
-        )
+        );
       })}
     </div>
-  )
-}
+  );
+};
 
-export default TimeFilters
+export default TimeFilters;

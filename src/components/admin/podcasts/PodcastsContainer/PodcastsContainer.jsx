@@ -71,12 +71,13 @@ const PodcastsContainer = () => {
           />
 
           <div className="flex items-center gap-3 w-full md:w-auto shrink-0 flex-wrap">
-            <CommonSelect
+            {/* Commented out genre filter per user instruction */}
+            {/* <CommonSelect
               value={selectedGenre}
               onChange={(genre) => setParams({ genre: genre === "all" ? undefined : genre })}
               options={genreOptions}
               className="w-44 h-8 px-4 text-[12px] border-border bg-transparent"
-            />
+            /> */}
             <CommonSearch
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}

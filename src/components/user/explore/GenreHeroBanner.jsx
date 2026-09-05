@@ -39,7 +39,7 @@ const GenreHeroBanner = () => {
 
     return (
         <div
-            className="group relative h-72 w-full shrink-0 overflow-hidden rounded-[16px] sm:h-96 lg:h-[450px]"
+            className="group relative min-h-90 w-full shrink-0 overflow-hidden rounded-[16px] sm:min-h-96 lg:h-112.5 lg:min-h-0"
             onMouseEnter={() => {
                 isHovered.current = true
             }}

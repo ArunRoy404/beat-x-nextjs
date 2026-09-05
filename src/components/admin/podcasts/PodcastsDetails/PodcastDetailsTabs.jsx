@@ -37,7 +37,7 @@ const PodcastDetailsTabs = ({ podcast }) => {
             </TabsContent>
 
             <TabsContent value="reviews" className="flex-1 min-h-0 flex flex-col overflow-hidden m-0">
-                <PodcastDetailReviews podcastId={podcast?._id} />
+                <PodcastDetailReviews podcast={podcast} />
             </TabsContent>
 
             <TabsContent value="analytics" className="flex-1 min-h-0 flex flex-col overflow-hidden m-0">

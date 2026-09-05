@@ -8,7 +8,7 @@ import DeleteSongDialog from "@/components/dialogs/admin/music/DeleteSongDialog"
 
 const SongDetailFooter = ({ song }) => {
     return (
-        <div className="p-4 border-t border-white/5 mt-auto shrink-0 bg-card">
+        <div className="p-3 sm:p-4 border-t border-white/5 mt-auto shrink-0 bg-card">
             <div className="flex items-center justify-between w-full">
                 <DeleteSongDialog song={song}>
                     <Button

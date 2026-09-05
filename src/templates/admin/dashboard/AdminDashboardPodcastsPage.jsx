@@ -3,7 +3,6 @@
 import React from "react"
 import DashboardStats from "@/components/shared/Dashboard/DashboardStats/DashboardStats"
 import UploadNewPodcast from "@/components/admin/podcasts/UploadNewPodcast"
-import SchedulerStatusWidget from "@/components/admin/podcasts/SchedulerStatusWidget"
 import PodcastsContainer from "@/components/admin/podcasts/PodcastsContainer/PodcastsContainer"
 import { usePodcasts } from "@/hooks/api/admin/podcasts/usePodcasts"
 import { buildPodcastsParams } from "@/hooks/api/admin/podcasts/podcastsParams"
@@ -34,9 +33,6 @@ const AdminDashboardPodcastsPage = () => {
 
       {/* Upload podcast selector container */}
       <UploadNewPodcast />
-
-      {/* Scheduled-publish status + manual trigger */}
-      <SchedulerStatusWidget />
 
       {/* Podcasts table / collection container */}
       <PodcastsContainer />

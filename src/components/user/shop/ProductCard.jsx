@@ -1,4 +1,7 @@
+"use client"
+
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Heart, Leaf, Plus, Star, Truck } from "lucide-react"
 import { cn } from "@/lib/utils"
 import ProductImagePlaceholder from "./ProductImagePlaceholder"
@@ -9,11 +12,14 @@ const badgeToneClasses = {
 }
 
 const ProductMeta = ({ meta }) => {
+    const router = useRouter()
+
     switch (meta?.type) {
         case "quickAdd":
             return (
                 <button
                     type="button"
+                    onClick={() => router.push("/shop/checkout")}
                     className="flex cursor-pointer items-center gap-2 rounded-full bg-white px-4 py-2 text-xs text-background"
                 >
                     <Plus className="size-4" />

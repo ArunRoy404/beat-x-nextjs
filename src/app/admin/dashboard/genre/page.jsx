@@ -2,27 +2,23 @@ import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 import { getQueryClient } from "@/lib/reactQuery/getQueryClient";
 import { queryKeys } from "@/lib/reactQuery/queryKeys";
 import { getGenresRequest, searchGenresRequest } from "@/services/admin/genreServices";
+import { buildGenresParams } from "@/hooks/api/admin/genre/genreParams";
 import AdminDashboardGenrePage from "@/templates/admin/dashboard/AdminDashboardGenrePage";
 
-// No `export const revalidate` here on purpose: getGenresRequest reads the
-// admin's session (cookies), which already forces Next.js into fully dynamic
-// rendering — a `revalidate` value would be a no-op, and Next's segment
-// config validator requires it to be a static literal anyway (not the
-// env-derived `env.revalidateTime`), which fails the production build.
-
 const page = async ({ searchParams }) => {
-  const { q } = await searchParams;
+  const rawParams = await searchParams;
+  const params = buildGenresParams(rawParams);
   const queryClient = getQueryClient();
 
-  if (q) {
+  if (params.q) {
     await queryClient.prefetchQuery({
-      queryKey: queryKeys.genre.search(q),
-      queryFn: () => searchGenresRequest({ name: q }),
+      queryKey: queryKeys.genre.search(params.q),
+      queryFn: () => searchGenresRequest({ name: params.q }),
     });
   } else {
     await queryClient.prefetchQuery({
-      queryKey: queryKeys.genre.list(),
-      queryFn: getGenresRequest,
+      queryKey: queryKeys.genre.list(params),
+      queryFn: () => getGenresRequest(params),
     });
   }
 

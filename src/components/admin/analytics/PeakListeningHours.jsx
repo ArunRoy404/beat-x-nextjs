@@ -27,7 +27,7 @@ const PeakListeningHours = ({ data }) => {
               fontSize={12}
               tickLine={false}
               axisLine={false}
-              ticks={[0, 600, 1200, 1600, 2400]}
+              allowDecimals={false}
               dx={-5}
             />
             <Tooltip

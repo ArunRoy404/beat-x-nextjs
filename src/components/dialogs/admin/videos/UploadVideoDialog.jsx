@@ -16,48 +16,55 @@ import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInpu
 import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSelect"
 import CommonSelectCards from "@/components/shared/CommonInputs/CommonInput/CommonSelectCards"
 import { Switch } from "@/components/ui/switch"
-import { useAdminDashboardVideosStore } from "@/zustandStore/admin/adminStore/adminDashboardVideosStore"
-
-const ARTISTS = ["Iqbal Hasan", "Tashrif Khan", "Fahim Islam", "Aura Borealis", "Nabila", "Kazi Shuvo"]
-const GENRES = ["Pop", "Folk", "Hip Hop", "Rock", "Lofi", "Biography"]
+import { useCreateVideo } from "@/hooks/api/admin/videos/useCreateVideo"
+import { useGenres } from "@/hooks/api/admin/genre/useGenres"
 
 const VISIBILITY_OPTIONS = [
-  { value: "publish", label: "Publish Now", icon: CheckCircle2 },
-  { value: "schedule", label: "Schedule", icon: Clock },
+  { value: "active", label: "Publish Now", icon: CheckCircle2 },
   { value: "draft", label: "Save as Draft", icon: FileText },
 ]
 
 const UploadVideoDialog = ({ children }) => {
   const [open, setOpen] = useState(false)
-  const addVideo = useAdminDashboardVideosStore((state) => state.addVideo)
+  const { mutate: createVideo, isPending } = useCreateVideo()
 
   const videoInputRef = useRef(null)
   const imageInputRef = useRef(null)
 
-  // Form states
+  const genresQuery = useGenres()
+  const genresData = genresQuery?.data
+  const genresList =
+    genresData?.genre ??
+    genresData?.genres ??
+    genresData?.data ??
+    (Array.isArray(genresData) ? genresData : [])
+
+  const genreOptions = genresList.map((g) => ({
+    value: g?._id || g?.id,
+    label: g?.name || "Unnamed Genre",
+  }))
+
   const [videoFile, setVideoFile] = useState(null)
   const [coverImage, setCoverImage] = useState(null)
   const [videoTitle, setVideoTitle] = useState("")
-  const [artist, setArtist] = useState("")
   const [genre, setGenre] = useState("")
   const [description, setDescription] = useState("")
-  const [visibility, setVisibility] = useState("publish")
-  const [isPremium, setIsPremium] = useState(false)
+  const [status, setStatus] = useState("active")
+  const [isFeatured, setIsFeatured] = useState(false)
 
   const handleReset = () => {
     setVideoFile(null)
     setCoverImage(null)
     setVideoTitle("")
-    setArtist("")
     setGenre("")
     setDescription("")
-    setVisibility("publish")
-    setIsPremium(false)
+    setStatus("active")
+    setIsFeatured(false)
   }
 
   const handleUpload = () => {
     if (!videoFile) {
-      toast.error("Please drop or choose a video file")
+      toast.error("Please select a video file")
       return
     }
     if (!coverImage) {
@@ -68,26 +75,24 @@ const UploadVideoDialog = ({ children }) => {
       toast.error("Video Title is required")
       return
     }
-    if (!genre) {
-      toast.error("Please choose a genre")
-      return
-    }
 
-    // Call store action
-    addVideo({
-      videoFile,
-      coverImage,
-      videoTitle,
-      artist,
-      genre,
-      description,
-      visibility,
-      isPremium
+    const formData = new FormData()
+    formData.append("title", videoTitle.trim())
+    formData.append("video", videoFile)
+    formData.append("cover", coverImage)
+    if (genre) formData.append("genre", genre)
+    if (description) formData.append("description", description.trim())
+    formData.append("status", status)
+    formData.append("isFeatured", String(isFeatured))
+
+    createVideo(formData, {
+      onSuccess: () => {
+        toast.success("Video uploaded successfully! Processing video now.")
+        handleReset()
+        setOpen(false)
+      },
+      onError: (error) => toast.error(error?.response?.data?.message || error?.message || "Failed to upload video."),
     })
-
-    toast.success("Video uploaded successfully!")
-    handleReset()
-    setOpen(false)
   }
 
   const handleVideoSelect = (e) => {
@@ -142,10 +147,10 @@ const UploadVideoDialog = ({ children }) => {
               {videoFile ? (
                 <div className="text-center min-w-0 w-full px-4 flex flex-col items-center gap-1">
                   <p className="text-whitetext text-sm font-medium truncate">
-                    {typeof videoFile === "string" ? videoFile : videoFile.name}
+                    {videoFile.name}
                   </p>
                   <p className="text-light-whitetext text-xs">
-                    {typeof videoFile === "string" ? "MP4, 230MB" : `${(videoFile.size / 1024 / 1024).toFixed(2)} MB`}
+                    {(videoFile.size / 1024 / 1024).toFixed(2)} MB
                   </p>
                   <span className="mt-1 px-3 py-1 rounded-full bg-secondary/20 hover:bg-secondary/30 text-secondary text-[11px] font-medium transition-colors">
                     Replace File
@@ -185,7 +190,7 @@ const UploadVideoDialog = ({ children }) => {
                 <div className="relative flex flex-col items-center gap-2">
                   <div className="relative w-[120px] h-[72px] rounded-[12px] overflow-hidden border border-whitetext/10">
                     <img
-                      src={typeof coverImage === "string" ? coverImage : URL.createObjectURL(coverImage)}
+                      src={URL.createObjectURL(coverImage)}
                       alt="Thumbnail Preview"
                       className="object-cover w-full h-full"
                     />
@@ -196,7 +201,7 @@ const UploadVideoDialog = ({ children }) => {
                     </div>
                   </div>
                   <span className="text-light-whitetext text-[13px] font-sans">
-                    thumbnail image
+                    {coverImage.name}
                   </span>
                 </div>
               ) : (
@@ -223,23 +228,14 @@ const UploadVideoDialog = ({ children }) => {
             placeholder="e.g. Nishithe Asha — Official Music Video"
           />
 
-          {/* Artist & Genre */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-            <CommonSelect
-              label="Artist"
-              value={artist}
-              onChange={(val) => setArtist(val)}
-              options={ARTISTS}
-              placeholder="Chose Artist"
-            />
-            <CommonSelect
-              label="Genre *"
-              value={genre}
-              onChange={(val) => setGenre(val)}
-              options={GENRES}
-              placeholder="Choose genre"
-            />
-          </div>
+          {/* Genre */}
+          <CommonSelect
+            label="Genre"
+            value={genre}
+            onChange={(val) => setGenre(val)}
+            options={genreOptions}
+            placeholder="Choose genre"
+          />
 
           {/* Description */}
           <CommonInput
@@ -247,27 +243,26 @@ const UploadVideoDialog = ({ children }) => {
             type="textarea"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Episode description / show notes..."
+            placeholder="Video description..."
             rows={3}
           />
 
-          {/* Visibility */}
+          {/* Status */}
           <CommonSelectCards
-            label="Visibility"
-            value={visibility}
-            onChange={(val) => setVisibility(val)}
+            label="Status"
+            value={status}
+            onChange={(val) => setStatus(val)}
             options={VISIBILITY_OPTIONS}
           />
 
-          {/* Feature as Premium Video */}
+          {/* Feature Video */}
           <div className="flex items-center justify-between py-2 border-t border-b border-white/5 shrink-0">
-            <span className="text-light-gray text-[16px] not-italic font-medium font-sans">
-              Feature as Premium Video
+            <span className="text-light-gray text-[14px] not-italic font-medium font-sans">
+              Feature Video
             </span>
             <Switch
-              checked={isPremium}
-              onCheckedChange={setIsPremium}
-              className="data-checked:bg-secondary data-unchecked:bg-light-gray/20"
+              checked={isFeatured}
+              onCheckedChange={setIsFeatured}
             />
           </div>
         </div>
@@ -290,6 +285,7 @@ const UploadVideoDialog = ({ children }) => {
             className="flex-1"
             size="lg"
             onClick={handleUpload}
+            isLoading={isPending}
           >
             Upload Now
           </Button>

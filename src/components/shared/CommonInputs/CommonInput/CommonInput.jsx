@@ -11,6 +11,7 @@ const CommonInput = React.forwardRef(({
     error,
     className,
     containerClassName,
+    labelClassName,
     leftIcon,
     rightIcon,
     ...props
@@ -36,7 +37,7 @@ const CommonInput = React.forwardRef(({
     return (
         <div className={cn("flex flex-col gap-1.5 shrink-0", containerClassName)}>
             {label && (
-                <label className="text-primary text-[16px] not-italic font-normal font-sans">
+                <label className={cn("text-primary text-[16px] not-italic font-normal font-sans", labelClassName)}>
                     {label}
                 </label>
             )}

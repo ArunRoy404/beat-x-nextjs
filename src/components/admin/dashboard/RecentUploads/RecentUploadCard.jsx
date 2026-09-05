@@ -17,7 +17,7 @@ const RecentUploadCard = ({ item, index }) => {
             {/* Left Column: Number, Thumbnail, Details */}
             <div className="flex items-center gap-4 min-w-0">
                 <span className="text-dark-gray text-[14px] not-italic font-normal w-5 shrink-0">
-                    {item?.id || (index !== undefined ? `0${index + 1}` : "")}
+                    {item?.number ?? (index !== undefined ? String(index + 1).padStart(2, "0") : "")}
                 </span>
 
                 {/* Cover Thumbnail using CommonAvatar */}

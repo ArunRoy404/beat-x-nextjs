@@ -1,7 +1,8 @@
 import React from "react"
-import { Clock, Star, Trash2 } from "lucide-react"
+import { Clock, Edit2, Star, Trash2 } from "lucide-react"
 import { formatDurationMs } from "@/lib/format/formatDuration"
 import AudioBookDetailsDialog from "@/components/dialogs/admin/audiobooks/AudioBookDetailsDialog"
+import EditAudioBookDialog from "@/components/dialogs/admin/audiobooks/EditAudioBookDialog"
 import DeleteAudioBookDialog from "@/components/dialogs/admin/audiobooks/DeleteAudioBookDialog"
 
 const STATUS_COLORS = {
@@ -84,6 +85,15 @@ const AudioBookCard = ({ book }) => {
           </AudioBookDetailsDialog>
 
           <div className="flex items-center gap-2">
+            <EditAudioBookDialog book={book}>
+              <button
+                title="Edit Audiobook"
+                className="w-7 h-7 rounded-full flex items-center justify-center border border-white/10 bg-white/5 hover:bg-white/10 text-white cursor-pointer transition-colors active:scale-95 shrink-0"
+              >
+                <Edit2 className="w-3.5 h-3.5" />
+              </button>
+            </EditAudioBookDialog>
+
             <DeleteAudioBookDialog book={book}>
               <button
                 title="Delete Audiobook"

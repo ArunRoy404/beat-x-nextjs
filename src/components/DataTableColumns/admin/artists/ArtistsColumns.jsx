@@ -34,15 +34,27 @@ export const getArtistsColumns = ({ onViewDetails, onEdit, onDelete } = {}) => [
     header: () => <CommonTableHeader>Artist</CommonTableHeader>,
     cell: ({ row }) => {
       const artist = row.original
+      const name =
+        artist?.personalInfo?.stageName ||
+        artist?.personalInfo?.fullName ||
+        artist?.user?.name ||
+        artist?.userId?.name ||
+        artist?.name ||
+        "-"
+      const email = artist?.user?.email || artist?.userId?.email || artist?.email || "-"
+      const avatar = artist?.mediaAssets?.profilePictureUrl || artist?.avatar || ""
+      const isVerified =
+        artist?.status === "approved" || artist?.status === "verified" || Boolean(artist?.isVerified)
+
       return (
         <div className="flex items-center gap-3">
           <div className="relative shrink-0">
             <CommonAvatar
-              src={artist.avatar || ""}
-              alt={artist.name}
+              src={avatar}
+              alt={name}
               className="w-10 h-10 rounded-full border border-white/5"
             />
-            {artist.isVerified && (
+            {isVerified && (
               <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-[#FFAE00] rounded-full flex items-center justify-center border border-[#0E0E0E]">
                 <svg className="w-2.5 h-2.5 text-[#0E0E0E]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="4">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -51,8 +63,8 @@ export const getArtistsColumns = ({ onViewDetails, onEdit, onDelete } = {}) => [
             )}
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="text-whitetext font-semibold text-sm truncate">{artist.name}</span>
-            <span className="text-light-gray/60 text-xs truncate">{artist.email}</span>
+            <span className="text-whitetext font-semibold text-sm truncate">{name}</span>
+            <span className="text-light-gray/60 text-xs truncate">{email}</span>
           </div>
         </div>
       )
@@ -61,8 +73,12 @@ export const getArtistsColumns = ({ onViewDetails, onEdit, onDelete } = {}) => [
   {
     accessorKey: "genre",
     header: () => <CommonTableHeader>Genre</CommonTableHeader>,
-    cell: ({ getValue }) => {
-      const val = getValue()
+    cell: ({ row }) => {
+      const artist = row.original
+      const val =
+        artist?.genre?.name ||
+        (Array.isArray(artist?.genres) && artist?.genres[0]?.name) ||
+        (typeof artist?.genre === "string" ? artist.genre : "-")
       return (
         <CommonTableTag className="border-white/20 text-light-gray text-[11px]">
           {val}
@@ -73,8 +89,8 @@ export const getArtistsColumns = ({ onViewDetails, onEdit, onDelete } = {}) => [
   {
     accessorKey: "songsCount",
     header: () => <CommonTableHeader>Songs</CommonTableHeader>,
-    cell: ({ getValue }) => {
-      const val = getValue() || 0
+    cell: ({ row }) => {
+      const val = row.original?.songsCount || 0
       if (val > 0) {
         return (
           <span className="text-[#34C759] text-[14px] font-semibold">
@@ -92,17 +108,17 @@ export const getArtistsColumns = ({ onViewDetails, onEdit, onDelete } = {}) => [
   {
     accessorKey: "followers",
     header: () => <CommonTableHeader>Followers</CommonTableHeader>,
-    cell: ({ getValue }) => (
+    cell: ({ row }) => (
       <CommonTableCell>
-        {formatFollowers(getValue() || 0)}
+        {formatFollowers(row.original?.followers || 0)}
       </CommonTableCell>
     )
   },
   {
     accessorKey: "revenue",
     header: () => <CommonTableHeader>Revenue</CommonTableHeader>,
-    cell: ({ getValue }) => {
-      const val = getValue() || 0
+    cell: ({ row }) => {
+      const val = row.original?.revenue || 0
       return (
         <span className="text-[#3ADFFA] text-[14px] font-semibold">
           {formatRevenue(val)}
@@ -113,20 +129,29 @@ export const getArtistsColumns = ({ onViewDetails, onEdit, onDelete } = {}) => [
   {
     accessorKey: "status",
     header: () => <CommonTableHeader>Status</CommonTableHeader>,
-    cell: ({ getValue }) => {
-      const status = getValue()
+    cell: ({ row }) => {
+      const rawStatus = (row.original?.status || "pending").toLowerCase()
+      const statusLabels = {
+        approved: "Verified",
+        verified: "Verified",
+        pending: "Pending",
+        rejected: "Rejected",
+        suspended: "Suspended",
+      }
+      const displayStatus = statusLabels[rawStatus] || rawStatus
       const statusColors = {
         Verified: "text-[#34C759] border-[#34C759]/20 bg-[#34C759]/10",
+        Approved: "text-[#34C759] border-[#34C759]/20 bg-[#34C759]/10",
         Rejected: "text-[#FF453A] border-[#FF453A]/20 bg-[#FF453A]/10",
         Pending: "text-[#FFCC00] border-[#FFCC00]/20 bg-[#FFCC00]/10",
         Suspended: "text-[#FF453A] border-[#FF453A]/20 bg-[#FF453A]/10",
         "Info Required": "text-[#3ADFFA] border-[#3ADFFA]/20 bg-[#3ADFFA]/10"
       }
-      const colorClass = statusColors[status] || statusColors.Pending
+      const colorClass = statusColors[displayStatus] || statusColors.Pending
       return (
         <div className="flex">
-          <span className={`inline-block px-2.5 py-0.5 rounded-full border text-[12px] font-normal select-none ${colorClass}`}>
-            {status}
+          <span className={`inline-block px-2.5 py-0.5 rounded-full border text-[12px] font-normal select-none capitalize ${colorClass}`}>
+            {displayStatus}
           </span>
         </div>
       )

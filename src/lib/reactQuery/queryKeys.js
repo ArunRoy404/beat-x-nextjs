@@ -11,11 +11,11 @@ export const queryKeys = {
   },
   users: {
     all: ["users"],
-    list: () => [...queryKeys.users.all, "list"],
+    list: (params) => [...queryKeys.users.all, "list", params],
   },
   genre: {
     all: ["genre"],
-    list: () => [...queryKeys.genre.all, "list"],
+    list: (params) => [...queryKeys.genre.all, "list", params],
     search: (name) => [...queryKeys.genre.all, "search", name],
   },
   audiobooks: {
@@ -46,4 +46,23 @@ export const queryKeys = {
     list: (params) => [...queryKeys.albums.all, "list", params],
     detail: (id) => [...queryKeys.albums.all, "detail", id],
   },
+  dashboard: {
+    all: ["dashboard"],
+    overview: () => [...queryKeys.dashboard.all, "overview"],
+  },
+  videos: {
+    all: ["videos"],
+    list: (params) => [...queryKeys.videos.all, "list", params],
+    detail: (id) => [...queryKeys.videos.all, "detail", id],
+  },
+  analytics: {
+    all: ["analytics"],
+    detail: (params) => [...queryKeys.analytics.all, "detail", params],
+  },
+  artists: {
+    all: ["artists"],
+    list: (params) => [...queryKeys.artists.all, "list", params],
+    detail: (id) => [...queryKeys.artists.all, "detail", id],
+  },
 };
+

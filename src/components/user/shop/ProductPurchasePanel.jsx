@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Heart, ShieldCheck, Zap } from "lucide-react"
 import { cn } from "@/lib/utils"
 import ProductIcon from "./ProductIcon"
@@ -15,6 +16,7 @@ const CartIcon = (props) => (
 )
 
 const ProductPurchasePanel = ({ product }) => {
+    const router = useRouter()
     const detail = product.detail
     const [activeColor, setActiveColor] = useState(detail.defaultColorIndex ?? 0)
     const [activeSize, setActiveSize] = useState(detail.defaultSize ?? detail.sizes?.[0])
@@ -106,6 +108,7 @@ const ProductPurchasePanel = ({ product }) => {
             <div className="flex items-center gap-4">
                 <button
                     type="button"
+                    onClick={() => router.push("/shop/checkout")}
                     className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-primary py-3 text-lg font-semibold text-background transition-transform active:scale-95"
                 >
                     <CartIcon className="size-5" />

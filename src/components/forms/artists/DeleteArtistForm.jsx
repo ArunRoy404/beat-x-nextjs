@@ -7,16 +7,16 @@ import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Trash2, Lock } from "lucide-react"
 import { toast } from "sonner"
-import { useAdminDashboardArtistsStore } from "@/zustandStore/admin/adminStore/adminDashboardArtistsStore"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
+import { useDeleteArtist } from "@/hooks/api/admin/artists/useDeleteArtist"
 
 const deleteSchema = z.object({
     password: z.string().min(1, "Password is required"),
 })
 
 const DeleteArtistForm = ({ artist, onSuccess, onCancel }) => {
-    const deleteArtist = useAdminDashboardArtistsStore((state) => state.deleteArtist)
+    const { mutate: deleteArtist, isPending } = useDeleteArtist()
 
     const {
         register,
@@ -31,14 +31,25 @@ const DeleteArtistForm = ({ artist, onSuccess, onCancel }) => {
     })
 
     const onSubmit = (data) => {
-        if (data.password !== "admin") {
-            toast.error("Incorrect password! (Use 'admin' to delete)")
+        const id = artist?._id || artist?.id
+        if (!id) {
+            toast.error("Artist ID missing.")
             return
         }
-        deleteArtist(artist.id)
-        toast.success("Artist deleted successfully!")
-        reset()
-        onSuccess?.()
+
+        deleteArtist(
+            { id, password: data.password },
+            {
+                onSuccess: () => {
+                    toast.success("Artist deleted successfully!")
+                    reset()
+                    onSuccess?.()
+                },
+                onError: (err) => {
+                    toast.error(err?.message || "Failed to delete artist. Check admin password.")
+                },
+            }
+        )
     }
 
     return (
@@ -80,6 +91,7 @@ const DeleteArtistForm = ({ artist, onSuccess, onCancel }) => {
                 </Button>
                 <Button
                     type="submit"
+                    isLoading={isPending}
                     className="flex-1 rounded-full bg-red-error hover:bg-red-error/90 text-white font-semibold h-[52px]! flex items-center justify-center gap-2 border-0 cursor-pointer"
                     size="lg"
                 >
@@ -91,3 +103,4 @@ const DeleteArtistForm = ({ artist, onSuccess, onCancel }) => {
 }
 
 export default DeleteArtistForm
+

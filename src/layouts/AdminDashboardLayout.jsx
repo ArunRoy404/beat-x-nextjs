@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import CommonDashboardLayout from "./CommonDashboardLayout/CommonDashboardLayout";
-import SidebarUserFooter from "./CommonDashboardLayout/SidebarUserFooter";
+import NavbarUserMenu from "./CommonDashboardLayout/NavbarUserMenu";
 import { useAdminDashboardNavigationStore } from "@/navigationStore/adminDashboardNavigationStore";
 import { useLogout } from "@/hooks/api/auth/useLogout";
 
@@ -33,8 +33,8 @@ const AdminDashboardLayout = ({ children }) => {
     <CommonDashboardLayout
       sidebarData={navigationData?.navMain}
       sidebarTitle={navigationData?.sidebarTitle}
-      sidebarFooter={
-        <SidebarUserFooter
+      userMenu={
+        <NavbarUserMenu
           name={session?.user?.email}
           role="Admin"
           href="/admin/dashboard/settings"

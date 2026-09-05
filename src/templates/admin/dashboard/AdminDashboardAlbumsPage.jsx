@@ -6,14 +6,23 @@ import CreateNewAlbum from "@/components/admin/albums/CreateNewAlbum"
 import AlbumsContainer from "@/components/admin/albums/AlbumsContainer"
 import { useAlbums } from "@/hooks/api/admin/albums/useAlbums"
 import { buildAlbumsParams } from "@/hooks/api/admin/albums/albumsParams"
+import { useUrlListParams } from "@/hooks/useUrlListParams"
 
 const AdminDashboardAlbumsPage = () => {
-  // Deliberately the global unfiltered total, not whatever's in the URL —
-  // "Total Albums" should mean all of them, not just the current filter.
-  // Only matches the SSR-prefetched query (zero-spinner) when the URL has no
-  // filters; with filters active this fetches client-side, same as genre's
-  // stats do when its own search is active.
-  const { data: allData } = useAlbums(buildAlbumsParams())
+  const { get } = useUrlListParams()
+  const selectedStatus = get("status", "all")
+  const selectedGenre = get("genre", "all")
+  const urlSearch = get("q", "")
+  const currentPage = Number(get("page", "1")) || 1
+
+  const params = buildAlbumsParams({
+    status: selectedStatus,
+    genre: selectedGenre,
+    q: urlSearch,
+    page: currentPage,
+  })
+
+  const { data: allData } = useAlbums(params)
 
   const statsCards = [
     {

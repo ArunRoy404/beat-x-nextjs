@@ -3,7 +3,7 @@ import CommonDashboardNavbar from "./CommonDashboardNavbar"
 import CommonDashboardOutlet from "./CommonDashboardOutlet"
 import CommonDashboardSidebar from "./CommonDashboardSidebar"
 
-export default function CommonDashboardLayout({ children, sidebarData, sidebarTitle, sidebarFooter }) {
+export default function CommonDashboardLayout({ children, sidebarData, sidebarTitle, sidebarFooter, userMenu }) {
     return (
         <SidebarProvider
             className="bg-cover bg-center bg-no-repeat w-full min-h-screen"
@@ -11,7 +11,7 @@ export default function CommonDashboardLayout({ children, sidebarData, sidebarTi
         >
             <CommonDashboardSidebar data={sidebarData} title={sidebarTitle} footer={sidebarFooter} />
             <SidebarInset className="bg-transparent">
-                <CommonDashboardNavbar />
+                <CommonDashboardNavbar userMenu={userMenu} />
                 <CommonDashboardOutlet>{children}</CommonDashboardOutlet>
             </SidebarInset>
         </SidebarProvider>

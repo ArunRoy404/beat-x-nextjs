@@ -16,7 +16,7 @@ import { useSongs } from "@/hooks/api/admin/songs/useSongs"
 import { SONGS_PAGE_SIZE, buildSongsParams } from "@/hooks/api/admin/songs/songsParams"
 import { useGenres } from "@/hooks/api/admin/genre/useGenres"
 
-const STATUS_TABS = ["All", "Draft", "Active", "Archived"]
+const STATUS_TABS = ["All", "Draft", "Pending", "Active", "Archived"]
 const SEARCH_DEBOUNCE_MS = 300
 
 const SongsContainer = () => {
@@ -39,10 +39,20 @@ const SongsContainer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchInput])
 
-  const { data: genres = [] } = useGenres()
+  const genresQuery = useGenres()
+  const genresData = genresQuery?.data
+  const genresList =
+    genresData?.genre ??
+    genresData?.genres ??
+    genresData?.data ??
+    (Array.isArray(genresData) ? genresData : [])
+
   const genreOptions = [
     { value: "all", label: "All Genres" },
-    ...genres.map((genre) => ({ value: genre._id, label: genre.name })),
+    ...genresList.map((genre) => ({
+      value: genre?._id || genre?.id,
+      label: genre?.name || "Unnamed Genre",
+    })),
   ]
 
   const params = buildSongsParams({
@@ -53,9 +63,10 @@ const SongsContainer = () => {
   })
 
   const { data, isLoading, isError, error, refetch } = useSongs(params)
-  const songs = data?.data ?? []
+  const songs = data?.song ?? data?.songs ?? data?.data ?? []
   const total = data?.total ?? 0
-  const totalPages = Math.ceil(total / SONGS_PAGE_SIZE) || 1
+  const limit = data?.limit ?? SONGS_PAGE_SIZE
+  const totalPages = Math.ceil(total / limit) || 1
 
   const columns = getSongsColumns()
 
@@ -117,7 +128,7 @@ const SongsContainer = () => {
           <CommonPagination
             currentPage={currentPage}
             totalItems={total}
-            pageSize={SONGS_PAGE_SIZE}
+            pageSize={limit}
             totalPages={totalPages}
             onPageChange={(page) => setParams({ page }, { resetPage: false })}
           />

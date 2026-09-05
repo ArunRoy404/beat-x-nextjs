@@ -10,7 +10,7 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { useSongDetail } from "@/hooks/api/admin/songs/useSongDetail"
 import SongDetailHeader from "@/components/admin/music/SongsDetails/SongDetailHeader"
-import SongDetailContent from "@/components/admin/music/SongsDetails/SongDetailContent"
+import SongDetailsTabs from "@/components/admin/music/SongsDetails/SongDetailsTabs"
 import SongDetailFooter from "@/components/admin/music/SongsDetails/SongDetailFooter"
 
 const SongDetailsDialog = ({ song: summary, children }) => {
@@ -24,7 +24,7 @@ const SongDetailsDialog = ({ song: summary, children }) => {
                 {children}
             </DialogTrigger>
 
-            <DialogContent className="sm:max-w-[672px] p-0 overflow-hidden flex flex-col max-h-[95vh]">
+            <DialogContent className="w-[95vw] max-w-[95vw] sm:max-w-[672px] p-0 overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[95vh] rounded-[16px] sm:rounded-[24px]">
                 {/* Screen reader only title for accessibility compliance */}
                 <DialogTitle className="sr-only">
                     Song Details - {song?.title || "Unknown"}
@@ -37,7 +37,7 @@ const SongDetailsDialog = ({ song: summary, children }) => {
                 ) : (
                     <>
                         <SongDetailHeader song={song} />
-                        <SongDetailContent song={song} />
+                        <SongDetailsTabs song={song} />
                         <SongDetailFooter song={song} />
                     </>
                 )}

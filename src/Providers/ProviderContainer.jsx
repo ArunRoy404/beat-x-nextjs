@@ -3,6 +3,7 @@ import { ThemeProvider } from "next-themes"
 import { Toaster } from "@/components/ui/sonner"
 import AuthSessionProvider from "./AuthSessionProvider"
 import QueryProvider from "./QueryProvider"
+import GlobalFloatingMediaPlayer from "@/components/shared/GlobalFloatingMediaPlayer/GlobalFloatingMediaPlayer"
 
 export default function ProviderContainer({ children, session }) {
   return (
@@ -15,6 +16,7 @@ export default function ProviderContainer({ children, session }) {
           disableTransitionOnChange
         >
           {children}
+          <GlobalFloatingMediaPlayer />
           <Toaster position="top-right" closeButton={true} />
         </ThemeProvider>
       </QueryProvider>
