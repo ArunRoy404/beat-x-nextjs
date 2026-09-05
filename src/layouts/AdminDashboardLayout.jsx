@@ -37,7 +37,7 @@ const AdminDashboardLayout = ({ children }) => {
         <NavbarUserMenu
           name={session?.user?.email}
           role="Admin"
-          href="/admin/dashboard/settings"
+          href="/admin/dashboard/profile"
           onLogout={handleLogout}
           isLoggingOut={isLoggingOut}
         />

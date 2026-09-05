@@ -151,6 +151,13 @@ export const adminDashboardNavigation = {
           subtitle: "Role-based access control management"
         },
         { 
+          title: "Profile", 
+          navbarTitle: "Admin Profile",
+          url: "/admin/dashboard/profile", 
+          iconName: "UserGroupIcon",
+          subtitle: "View admin profile and login history"
+        },
+        { 
           title: "Settings", 
           navbarTitle: "Settings",
           url: "/admin/dashboard/settings", 
