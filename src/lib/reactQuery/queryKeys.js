@@ -64,5 +64,12 @@ export const queryKeys = {
     list: (params) => [...queryKeys.artists.all, "list", params],
     detail: (id) => [...queryKeys.artists.all, "detail", id],
   },
+  products: {
+    all: ["products"],
+    dashboard: () => [...queryKeys.products.all, "dashboard"],
+    list: (params) => [...queryKeys.products.all, "list", params],
+    detail: (id) => [...queryKeys.products.all, "detail", id],
+    analytics: (id) => [...queryKeys.products.all, "analytics", id],
+  },
 };
 
