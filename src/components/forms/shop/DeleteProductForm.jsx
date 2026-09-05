@@ -5,18 +5,19 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
-import { Trash2, Lock } from "lucide-react"
+import { Trash2, Lock, Loader2 } from "lucide-react"
 import { toast } from "sonner"
-import { useAdminDashboardShopStore } from "@/zustandStore/admin/adminStore/adminDashboardShopStore"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
+import { useDeleteProduct } from "@/hooks/api/admin/products/useDeleteProduct"
 
 const deleteSchema = z.object({
     password: z.string().min(1, "Password is required"),
 })
 
 const DeleteProductForm = ({ product, onSuccess, onCancel }) => {
-    const deleteProduct = useAdminDashboardShopStore((state) => state.deleteProduct)
+    const { mutate: deleteProduct, isPending } = useDeleteProduct()
+    const productId = product?._id || product?.id
 
     const {
         register,
@@ -31,24 +32,31 @@ const DeleteProductForm = ({ product, onSuccess, onCancel }) => {
     })
 
     const onSubmit = (data) => {
-        if (data.password !== "admin") {
-            toast.error("Incorrect password! (Use 'admin' to delete)")
+        if (!productId) {
+            toast.error("Invalid product ID")
             return
         }
-        deleteProduct(product.id)
-        toast.success("Product deleted successfully!")
-        reset()
-        onSuccess?.()
+
+        deleteProduct(productId, {
+            onSuccess: () => {
+                toast.success("Product deleted successfully!")
+                reset()
+                onSuccess?.()
+            },
+            onError: (err) => {
+                toast.error(err?.response?.data?.message || err?.message || "Failed to delete product")
+            },
+        })
     }
 
     return (
         <CommonFormContainer onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-col gap-4">
                 <p className="text-light-whitetext text-[14px] not-italic font-normal leading-[22px] font-sans">
-                    You are about to permanently delete this Product. This action cannot be undone.
+                    You are about to permanently delete <strong className="text-white">{product?.title || "this product"}</strong>. This action cannot be undone.
                 </p>
                 <p className="text-light-whitetext text-[14px] not-italic font-normal leading-[22px] font-sans">
-                    Enter the admin password to proceed.
+                    Enter your password or confirm deletion to proceed.
                 </p>
             </div>
 
@@ -75,15 +83,22 @@ const DeleteProductForm = ({ product, onSuccess, onCancel }) => {
                     className="flex-1 rounded-full h-[52px]!"
                     size="lg"
                     onClick={onCancel}
+                    disabled={isPending}
                 >
                     Cancel
                 </Button>
                 <Button
                     type="submit"
-                    className="flex-1 rounded-full bg-red-error hover:bg-red-error/90 text-white font-semibold h-[52px]! flex items-center justify-center gap-2 border-0 cursor-pointer"
+                    disabled={isPending}
+                    className="flex-1 rounded-full bg-red-error hover:bg-red-error/90 text-white font-semibold h-[52px]! flex items-center justify-center gap-2 border-0 cursor-pointer disabled:opacity-50"
                     size="lg"
                 >
-                    <Trash2 className="w-4 h-4 shrink-0" /> Delete product
+                    {isPending ? (
+                        <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+                    ) : (
+                        <Trash2 className="w-4 h-4 shrink-0" />
+                    )}
+                    Delete product
                 </Button>
             </div>
         </CommonFormContainer>

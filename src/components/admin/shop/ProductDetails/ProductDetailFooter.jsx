@@ -1,14 +1,14 @@
 "use client"
 
 import React, { useState } from "react"
-import { ShieldCheck, AlertCircle, XCircle, Trash2 } from "lucide-react"
+import { ShieldCheck, AlertCircle, XCircle, Trash2, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DialogClose } from "@/components/ui/dialog"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSelect"
-import { useAdminDashboardShopStore } from "@/zustandStore/admin/adminStore/adminDashboardShopStore"
 import DeleteProductDialog from "@/components/dialogs/admin/shop/DeleteProductDialog"
 import { toast } from "sonner"
+import { useUpdateProduct } from "@/hooks/api/admin/products/useUpdateProduct"
 
 const rejectionReasons = [
   { value: "identity_unclear", label: "Identity Music unclear or unreadable" },
@@ -17,8 +17,9 @@ const rejectionReasons = [
 ]
 
 const ProductDetailFooter = ({ product, onClose }) => {
-  const updateProduct = useAdminDashboardShopStore((state) => state.updateProduct)
-  const isUnderReview = product?.status === "Under review"
+  const { mutate: updateProduct, isPending } = useUpdateProduct()
+  const productId = product?._id || product?.id
+  const isUnderReview = product?.status === "under_review" || product?.status === "Under review"
 
   // Moderation state variables
   const [isRejecting, setIsRejecting] = useState(false)
@@ -27,27 +28,51 @@ const ProductDetailFooter = ({ product, onClose }) => {
   const [additionalNote, setAdditionalNote] = useState("")
 
   const handleApprove = () => {
-    updateProduct({
-      ...product,
-      status: "Active",
-      adminNote: adminNote || undefined
-    })
-    toast.success("Product approved successfully!")
-    onClose?.()
+    if (!productId) return
+    updateProduct(
+      {
+        id: productId,
+        data: {
+          status: "active",
+          adminNote: adminNote || undefined,
+        },
+      },
+      {
+        onSuccess: () => {
+          toast.success("Product approved successfully!")
+          onClose?.()
+        },
+        onError: (err) => {
+          toast.error(err?.response?.data?.message || err?.message || "Failed to approve product")
+        },
+      }
+    )
   }
 
   const handleConfirmRejection = () => {
+    if (!productId) return
     const selectedReasonLabel = rejectionReasons.find(r => r.value === rejectionReason)?.label || rejectionReason
-    updateProduct({
-      ...product,
-      status: "Rejected",
-      rejection: {
-        reason: selectedReasonLabel,
-        note: additionalNote
+    updateProduct(
+      {
+        id: productId,
+        data: {
+          status: "rejected",
+          rejection: {
+            reason: selectedReasonLabel,
+            note: additionalNote,
+          },
+        },
+      },
+      {
+        onSuccess: () => {
+          toast.error("Product rejected.")
+          onClose?.()
+        },
+        onError: (err) => {
+          toast.error(err?.response?.data?.message || err?.message || "Failed to reject product")
+        },
       }
-    })
-    toast.error("Product rejected.")
-    onClose?.()
+    )
   }
 
   // 1. Rejection Form Subview
@@ -84,13 +109,15 @@ const ProductDetailFooter = ({ product, onClose }) => {
         <div className="flex items-center gap-3 w-full">
           <Button
             onClick={handleConfirmRejection}
-            className="bg-red-error hover:bg-red-error/90 text-whitetext font-semibold rounded-[10px] px-4 h-10 flex items-center gap-2 border-0 cursor-pointer transition-all active:scale-95"
+            disabled={isPending}
+            className="bg-red-error hover:bg-red-error/90 text-whitetext font-semibold rounded-[10px] px-4 h-10 flex items-center gap-2 border-0 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
           >
-            <XCircle className="w-4 h-4 stroke-[2px]" />
+            {isPending ? <Loader2 className="w-4 h-4 animate-spin shrink-0" /> : <XCircle className="w-4 h-4 stroke-[2px]" />}
             Confirm Rejection
           </Button>
           <Button
             onClick={() => setIsRejecting(false)}
+            disabled={isPending}
             className="bg-white/5 hover:bg-white/10 border border-white/10 text-light-gray font-medium rounded-[10px] px-6 h-10 flex items-center justify-center cursor-pointer transition-all active:scale-95"
           >
             Go Back
@@ -122,13 +149,15 @@ const ProductDetailFooter = ({ product, onClose }) => {
           <div className="flex items-center gap-3">
             <Button
               onClick={handleApprove}
-              className="bg-green-success hover:bg-green-success/90 text-black font-semibold rounded-[10px] px-4 h-10 flex items-center gap-2 border-0 cursor-pointer transition-all active:scale-95"
+              disabled={isPending}
+              className="bg-green-success hover:bg-green-success/90 text-black font-semibold rounded-[10px] px-4 h-10 flex items-center gap-2 border-0 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
             >
-              <ShieldCheck className="w-4 h-4 stroke-[2px]" />
-              Approve Song
+              {isPending ? <Loader2 className="w-4 h-4 animate-spin shrink-0" /> : <ShieldCheck className="w-4 h-4 stroke-[2px]" />}
+              Approve Product
             </Button>
             <Button
               onClick={() => setIsRejecting(true)}
+              disabled={isPending}
               className="bg-red-error/15 hover:bg-red-error/25 border border-red-error/25 text-red-error font-medium rounded-[10px] px-4 h-10 flex items-center justify-center cursor-pointer transition-all active:scale-95"
             >
               Reject
@@ -173,3 +202,4 @@ const ProductDetailFooter = ({ product, onClose }) => {
 }
 
 export default ProductDetailFooter
+
