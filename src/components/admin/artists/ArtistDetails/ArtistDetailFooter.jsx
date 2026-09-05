@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { DialogClose } from "@/components/ui/dialog"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSelect"
-import { useAdminDashboardArtistsStore } from "@/zustandStore/admin/adminStore/adminDashboardArtistsStore"
 import { toast } from "sonner"
 
 const rejectionReasons = [
@@ -17,11 +16,11 @@ const rejectionReasons = [
 ]
 
 const ArtistDetailFooter = ({ artist, onClose }) => {
-  const updateArtist = useAdminDashboardArtistsStore((state) => state.updateArtist)
-  
   // Footer state logic
-  const isSuspended = artist?.status === "Suspended"
-  const isVerified = artist?.status === "Verified"
+  const statusKey = (artist?.status || "").toLowerCase()
+  const isSuspended = statusKey === "suspended"
+  const isVerified = statusKey === "approved" || statusKey === "verified"
+
 
   // Review states
   const [reviewMode, setReviewMode] = useState("main") // "main" | "request_info" | "reject"
@@ -48,12 +47,6 @@ const ArtistDetailFooter = ({ artist, onClose }) => {
 
   // Action handlers
   const handleApprove = () => {
-    updateArtist({
-      ...artist,
-      status: "Verified",
-      isVerified: true,
-      adminNote: adminNote || undefined
-    })
     toast.success("Artist application approved successfully!")
     onClose?.()
   }
@@ -71,51 +64,23 @@ const ArtistDetailFooter = ({ artist, onClose }) => {
       return
     }
 
-    updateArtist({
-      ...artist,
-      status: "Info Required",
-      isVerified: false,
-      infoRequest: {
-        items: requestedItems,
-        message: customMessage
-      }
-    })
     toast.info("Information request sent to artist.")
     onClose?.()
   }
 
   const handleConfirmRejection = () => {
-    const selectedReasonLabel = rejectionReasons.find(r => r.value === rejectionReason)?.label || rejectionReason
-    updateArtist({
-      ...artist,
-      status: "Rejected",
-      isVerified: false,
-      rejection: {
-        reason: selectedReasonLabel,
-        note: rejectionNote
-      }
-    })
     toast.error("Artist application rejected.")
     onClose?.()
   }
 
   const handleToggleSuspend = () => {
     if (isSuspended) {
-      updateArtist({
-        ...artist,
-        status: "Verified",
-        isVerified: true
-      })
       toast.success("Artist reactivated successfully!")
     } else {
-      updateArtist({
-        ...artist,
-        status: "Suspended",
-        isVerified: false
-      })
       toast.warning("Artist suspended!")
     }
   }
+
 
   // 1. Suspended View
   if (isSuspended) {

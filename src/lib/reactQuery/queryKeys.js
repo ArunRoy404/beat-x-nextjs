@@ -59,4 +59,10 @@ export const queryKeys = {
     all: ["analytics"],
     detail: (params) => [...queryKeys.analytics.all, "detail", params],
   },
+  artists: {
+    all: ["artists"],
+    list: (params) => [...queryKeys.artists.all, "list", params],
+    detail: (id) => [...queryKeys.artists.all, "detail", id],
+  },
 };
+

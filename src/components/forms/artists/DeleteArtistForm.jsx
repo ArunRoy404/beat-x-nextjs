@@ -7,7 +7,6 @@ import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Trash2, Lock } from "lucide-react"
 import { toast } from "sonner"
-import { useAdminDashboardArtistsStore } from "@/zustandStore/admin/adminStore/adminDashboardArtistsStore"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 
@@ -16,8 +15,6 @@ const deleteSchema = z.object({
 })
 
 const DeleteArtistForm = ({ artist, onSuccess, onCancel }) => {
-    const deleteArtist = useAdminDashboardArtistsStore((state) => state.deleteArtist)
-
     const {
         register,
         handleSubmit,
@@ -35,7 +32,6 @@ const DeleteArtistForm = ({ artist, onSuccess, onCancel }) => {
             toast.error("Incorrect password! (Use 'admin' to delete)")
             return
         }
-        deleteArtist(artist.id)
         toast.success("Artist deleted successfully!")
         reset()
         onSuccess?.()

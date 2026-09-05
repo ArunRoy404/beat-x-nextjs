@@ -1,5 +1,6 @@
 import React from "react"
 import { FileText } from "lucide-react"
+import { resolveMediaUrl } from "@/lib/format/resolveMediaUrl"
 
 const MaterialRow = ({ title, detail, status }) => {
   const isUploaded = status === "Uploaded"
@@ -39,9 +40,23 @@ const MaterialRow = ({ title, detail, status }) => {
 }
 
 const ArtistDetailMedia = ({ artist }) => {
-  const initials = artist?.fullName
-    ? artist.fullName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
-    : (artist?.name?.slice(0, 2).toUpperCase() || "TA")
+  const profilePic = artist?.mediaAssets?.profilePictureUrl || artist?.avatar
+  const imageUrl = profilePic ? resolveMediaUrl(profilePic) : ""
+
+  const name =
+    artist?.personalInfo?.stageName ||
+    artist?.personalInfo?.fullName ||
+    artist?.user?.name ||
+    artist?.userId?.name ||
+    artist?.name ||
+    "AR"
+
+  const initials = name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2)
 
   return (
     <div className="p-4 flex flex-col gap-5 overflow-y-auto flex-1 min-h-0 scrollbar-thin">
@@ -52,13 +67,22 @@ const ArtistDetailMedia = ({ artist }) => {
         </h4>
         <div className="flex items-center justify-center p-6 border-dashed border-2 border-[#ADAAAA]/15 bg-white/[0.01] rounded-[16px] w-full min-h-[140px]">
           <div className="flex flex-col items-center gap-2">
-            <div
-              className="w-20 h-20 rounded-full border border-white/10 flex items-center justify-center text-whitetext font-bold text-[24px]"
-              style={{ background: "var(--modal-header-bg)" }}
-            >
-              {initials}
-            </div>
-            <span className="text-light-gray/50 text-[10px]">1080 × 1080 px</span>
+            {imageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={imageUrl}
+                alt={name}
+                className="w-24 h-24 rounded-full border border-white/10 object-cover"
+              />
+            ) : (
+              <div
+                className="w-20 h-20 rounded-full border border-white/10 flex items-center justify-center text-whitetext font-bold text-[24px]"
+                style={{ background: "var(--modal-header-bg)" }}
+              >
+                {initials}
+              </div>
+            )}
+            <span className="text-light-gray/50 text-[10px]">Profile Image</span>
           </div>
         </div>
       </div>
@@ -69,7 +93,7 @@ const ArtistDetailMedia = ({ artist }) => {
           Additional Materials
         </h3>
         <div className="flex flex-col gap-3">
-          <MaterialRow title="Media Kit PDF" detail="1.8 MB" status="Uploaded" />
+          <MaterialRow title="Media Kit PDF" detail="Not provided" status="Optional" />
           <MaterialRow title="Press Release" detail="Not provided" status="Not provided" />
           <MaterialRow title="Promotional Materials" detail="Not provided" status="Optional" />
         </div>
@@ -79,3 +103,4 @@ const ArtistDetailMedia = ({ artist }) => {
 }
 
 export default ArtistDetailMedia
+

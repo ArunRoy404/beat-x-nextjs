@@ -49,6 +49,8 @@ const SocialRow = ({ platform, link, isOptional = false }) => {
 }
 
 const ArtistDetailSocials = ({ artist }) => {
+  const socials = artist?.socialLinks || {}
+
   return (
     <div className="p-4 flex flex-col gap-5 overflow-y-auto flex-1 min-h-0 scrollbar-thin">
       {/* Required Social Profiles */}
@@ -57,10 +59,10 @@ const ArtistDetailSocials = ({ artist }) => {
           Required Social Profiles
         </h3>
         <div className="flex flex-col gap-3">
-          <SocialRow platform="Facebook *" link={`https://facebook.com/${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}.official`} />
-          <SocialRow platform="Instagram *" link={`@${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}.music`} />
-          <SocialRow platform="X (Twitter) *" link={`@${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}official`} />
-          <SocialRow platform="YouTube *" link={`https://youtube.com/@${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}official`} />
+          <SocialRow platform="Facebook *" link={socials.facebook || "Not provided"} />
+          <SocialRow platform="Instagram *" link={socials.instagram || "Not provided"} />
+          <SocialRow platform="X (Twitter) *" link={socials.twitter || "Not provided"} />
+          <SocialRow platform="YouTube *" link={socials.youtube || "Not provided"} />
         </div>
       </div>
 
@@ -70,8 +72,8 @@ const ArtistDetailSocials = ({ artist }) => {
           Optional Social Profiles
         </h3>
         <div className="flex flex-col gap-3">
-          <SocialRow platform="TikTok" link={`@${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}.bd`} isOptional />
-          <SocialRow platform="Official Website" link={`https://${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}.com.bd`} isOptional />
+          <SocialRow platform="TikTok" link={socials.tiktok || "Not provided"} isOptional />
+          <SocialRow platform="Official Website" link={socials.officialWebsite || "Not provided"} isOptional />
         </div>
       </div>
 
@@ -81,10 +83,10 @@ const ArtistDetailSocials = ({ artist }) => {
           Music Platform Links
         </h3>
         <div className="flex flex-col gap-3">
-          <SocialRow platform="Spotify" link={`https://open.spotify.com/artist/${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}`} />
-          <SocialRow platform="Apple Music" link={`https://music.apple.com/artist/${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}`} />
-          <SocialRow platform="YouTube Music" link={`https://music.youtube.com/channel/${artist?.name?.toLowerCase().replace(/\s+/g, "") || "tahsin"}`} />
-          <SocialRow platform="SoundCloud" link="Not provided" isOptional />
+          <SocialRow platform="Spotify" link={socials.spotify || "Not provided"} />
+          <SocialRow platform="Apple Music" link={socials.appleMusic || "Not provided"} />
+          <SocialRow platform="YouTube Music" link={socials.youtubeMusic || "Not provided"} />
+          <SocialRow platform="SoundCloud" link={socials.soundcloud || "Not provided"} isOptional />
         </div>
       </div>
     </div>
@@ -92,3 +94,4 @@ const ArtistDetailSocials = ({ artist }) => {
 }
 
 export default ArtistDetailSocials
+
