@@ -179,7 +179,8 @@ const EditProductForm = ({ product, onSuccess, onCancel }) => {
                 <CommonInput
                     label="Price (৳)"
                     type="number"
-                    placeholder="e.g. 1"
+                    step="any"
+                    placeholder="e.g. 19.99"
                     {...register("price")}
                     error={errors.price?.message}
                 />
