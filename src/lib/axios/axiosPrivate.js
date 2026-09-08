@@ -34,7 +34,8 @@ axiosPrivate.interceptors.response.use(
   async (error) => {
     if (error?.response?.status === 401 && typeof window !== "undefined") {
       const { signOut } = await import("next-auth/react");
-      await signOut({ callbackUrl: "/admin/login" });
+      const { getSignInPath } = await import("@/lib/auth/authRoutes");
+      await signOut({ callbackUrl: getSignInPath(window.location.pathname) });
     }
 
     return Promise.reject(normalizeAxiosError(error));

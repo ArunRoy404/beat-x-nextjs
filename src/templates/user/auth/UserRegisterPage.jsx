@@ -3,38 +3,47 @@
 import React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useForm, Controller } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { SquareUser, Mail, Lock } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
-import FilterPills from "@/components/shared/FilterPills"
 import AuthLayout from "@/components/shared/AuthLayout/AuthLayout"
 import AuthSocialProof from "@/components/shared/AuthLayout/AuthSocialProof"
 import AuthSocialLogins from "@/components/shared/AuthLayout/AuthSocialLogins"
 import { useRegister } from "@/hooks/api/auth/useRegister"
-import { useUserRegisterStore } from "@/zustandStore/user/userStore/userRegisterStore"
+
+// --- SONIC PREFERENCES (kept for future integration) -------------------------
+// POST /auth/register accepts only { name, email, password, role }. Favourite
+// genres are a separate, session-gated call (PATCH /users/me/genres, minimum 3
+// genre ids) and the chip list itself should come from GET /genre. Restore the
+// imports below together with the commented-out field further down once that
+// endpoint is wired into this flow.
+// import { Controller } from "react-hook-form"
+// import FilterPills from "@/components/shared/FilterPills"
+// import { useUserRegisterStore } from "@/zustandStore/user/userStore/userRegisterStore"
+// -----------------------------------------------------------------------------
 
 const registerSchema = z.object({
     name: z.string().min(1, "Full name is required"),
     email: z.string().min(1, "Email is required").email("Enter a valid email address"),
     password: z.string().min(8, "Password must be at least 8 characters"),
-    sonicPreferences: z.array(z.string()),
+    // sonicPreferences: z.array(z.string()),
 })
 
 const inputClassName = "h-14 rounded-full bg-dark-accent border-transparent text-[16px] placeholder:text-[16px]"
 
 const UserRegisterPage = () => {
     const router = useRouter()
-    const sonicPreferences = useUserRegisterStore((state) => state.sonicPreferences)
     const { mutate: registerAccount, isPending } = useRegister()
+    // const sonicPreferences = useUserRegisterStore((state) => state.sonicPreferences)
 
     const {
         register: registerField,
         handleSubmit,
-        control,
+        // control,
         formState: { errors },
     } = useForm({
         resolver: zodResolver(registerSchema),
@@ -42,7 +51,7 @@ const UserRegisterPage = () => {
             name: "",
             email: "",
             password: "",
-            sonicPreferences: [],
+            // sonicPreferences: [],
         },
     })
 
@@ -50,9 +59,9 @@ const UserRegisterPage = () => {
         registerAccount(
             { name, email, password, role: "user" },
             {
-                onSuccess: () => {
-                    toast.success("Account created! Please verify your email to continue.")
-                    router.push("/login")
+                onSuccess: (data) => {
+                    toast.success(data?.message || "Check your email for the verification code.")
+                    router.push(`/verify-email?email=${encodeURIComponent(data?.email || email)}`)
                 },
                 onError: (error) => {
                     toast.error(error.message || "Could not create your account")
@@ -131,6 +140,8 @@ const UserRegisterPage = () => {
                     error={errors.password?.message}
                 />
 
+                {/* SONIC PREFERENCES — no field on POST /auth/register yet. Kept
+                    verbatim for when PATCH /users/me/genres joins this flow.
                 <Controller
                     name="sonicPreferences"
                     control={control}
@@ -152,6 +163,7 @@ const UserRegisterPage = () => {
                         </div>
                     )}
                 />
+                */}
 
                 <Button
                     type="submit"
