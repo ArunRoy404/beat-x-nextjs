@@ -4,9 +4,9 @@ import React from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
+import CommonFormActions from "@/components/shared/CommonFormActions"
 import ProfileAvatarPicker from "@/components/user/profile/ProfileAvatarPicker"
 import { editProfileSchema } from "@/zodSchema/UserProfileZodSchema"
 import { useUpdateProfile } from "@/hooks/api/user/profile/useUpdateProfile"
@@ -81,14 +81,11 @@ const EditProfileForm = ({ profile, onSuccess, onCancel }) => {
                 error={errors.phone?.message}
             />
 
-            <div className="flex shrink-0 items-center justify-end gap-3 pt-2">
-                <Button type="button" variant="outline" size="lg" onClick={onCancel}>
-                    Cancel
-                </Button>
-                <Button type="submit" variant="gradient" size="lg" isLoading={isPending}>
-                    Save Changes
-                </Button>
-            </div>
+            <CommonFormActions
+                onCancel={onCancel}
+                submitLabel="Save Changes"
+                isPending={isPending}
+            />
         </CommonFormContainer>
     )
 }

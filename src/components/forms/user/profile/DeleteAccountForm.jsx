@@ -6,9 +6,9 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Lock } from "lucide-react"
 import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
+import CommonFormActions from "@/components/shared/CommonFormActions"
 import { deleteAccountSchema } from "@/zodSchema/UserProfileZodSchema"
 import { useDeleteAccount } from "@/hooks/api/user/profile/useDeleteAccount"
 
@@ -59,20 +59,13 @@ const DeleteAccountForm = ({ onCancel }) => {
                 error={errors.password?.message}
             />
 
-            <div className="flex shrink-0 items-center justify-end gap-3 pt-2">
-                <Button type="button" variant="outline" size="lg" onClick={onCancel}>
-                    Cancel
-                </Button>
-                <Button
-                    type="submit"
-                    variant="destructive"
-                    size="lg"
-                    isLoading={isPending}
-                    className="bg-red-error/15 text-red-error hover:bg-red-error/25"
-                >
-                    Delete Account
-                </Button>
-            </div>
+            <CommonFormActions
+                onCancel={onCancel}
+                submitLabel="Delete Account"
+                submitVariant="default"
+                submitClassName="border-0 bg-red-error text-whitetext hover:bg-red-error/90"
+                isPending={isPending}
+            />
         </CommonFormContainer>
     )
 }

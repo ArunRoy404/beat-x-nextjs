@@ -5,9 +5,9 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Lock } from "lucide-react"
 import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
+import CommonFormActions from "@/components/shared/CommonFormActions"
 import { changePasswordSchema } from "@/zodSchema/UserProfileZodSchema"
 import { useChangePassword } from "@/hooks/api/user/profile/useChangePassword"
 
@@ -75,14 +75,11 @@ const ChangePasswordForm = ({ onSuccess, onCancel }) => {
                 error={errors.confirmPassword?.message}
             />
 
-            <div className="flex shrink-0 items-center justify-end gap-3 pt-2">
-                <Button type="button" variant="outline" size="lg" onClick={onCancel}>
-                    Cancel
-                </Button>
-                <Button type="submit" variant="gradient" size="lg" isLoading={isPending}>
-                    Change Password
-                </Button>
-            </div>
+            <CommonFormActions
+                onCancel={onCancel}
+                submitLabel="Change Password"
+                isPending={isPending}
+            />
         </CommonFormContainer>
     )
 }
