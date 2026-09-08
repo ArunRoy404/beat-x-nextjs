@@ -23,6 +23,16 @@ export async function updateMyProfileRequest(formData) {
   return res?.data?.data;
 }
 
+/** Changes the caller's password. The API verifies `currentPassword`. */
+export async function changeMyPasswordRequest({ currentPassword, newPassword, confirmPassword }) {
+  const res = await axiosPrivate.patch("/users/change-password", {
+    currentPassword,
+    newPassword,
+    confirmPassword,
+  });
+  return res?.data?.data;
+}
+
 /** Permanently deletes the caller's own account. Password-confirmed. */
 export async function deleteMyAccountRequest({ password }) {
   const res = await axiosPrivate.delete("/users/me", { data: { password } });
