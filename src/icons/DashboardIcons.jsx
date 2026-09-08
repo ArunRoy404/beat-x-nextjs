@@ -17,6 +17,13 @@ export const GridViewIcon = ({ className, width = 20, height = 20, ...props }) =
   </svg>
 )
 
+export const UserProfileIcon = ({ className, width = 20, height = 20, ...props }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} viewBox="0 0 20 20" fill="none" className={className} {...props}>
+    <path d="M10 10.0003C12.3012 10.0003 14.1667 8.13485 14.1667 5.83366C14.1667 3.53247 12.3012 1.66699 10 1.66699C7.69885 1.66699 5.83337 3.53247 5.83337 5.83366C5.83337 8.13485 7.69885 10.0003 10 10.0003Z" fill="currentColor" />
+    <path d="M10.0001 11.4587C5.82508 11.4587 2.42508 14.2587 2.42508 17.7087C2.42508 17.942 2.60841 18.1253 2.84175 18.1253H17.1584C17.3917 18.1253 17.5751 17.942 17.5751 17.7087C17.5751 14.2587 14.1751 11.4587 10.0001 11.4587Z" fill="currentColor" />
+  </svg>
+)
+
 export const Analytics01Icon = ({ className, width = 20, height = 20, ...props }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} viewBox="0 0 24 24" fill="none" className={cn("lucide lucide-file-chart-column-icon lucide-file-chart-column", className)} {...props} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" ><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" /><path d="M14 2v5a1 1 0 0 0 1 1h5" /><path d="M8 18v-1" /><path d="M12 18v-6" /><path d="M16 18v-3" /></svg>
 )
