@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { Heart, SlidersHorizontal, UserRound } from "lucide-react"
+import { Heart, ShieldAlert, SlidersHorizontal, UserRound } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import ProfileIdentityCard from "@/components/user/profile/ProfileIdentityCard"
@@ -9,6 +9,7 @@ import ProfileSidebarNav from "@/components/user/profile/ProfileSidebarNav"
 import ProfileOverviewSection from "@/components/user/profile/ProfileOverviewSection"
 import ProfilePreferencesSection from "@/components/user/profile/ProfilePreferencesSection"
 import ProfileFavoritesSection from "@/components/user/profile/ProfileFavoritesSection"
+import ProfileDangerZoneSection from "@/components/user/profile/ProfileDangerZoneSection"
 import { useMyProfile } from "@/hooks/api/user/profile/useMyProfile"
 import { useUrlListParams } from "@/hooks/useUrlListParams"
 
@@ -16,6 +17,7 @@ const sections = [
     { id: "overview", title: "Account Overview", icon: <UserRound className="size-4" /> },
     { id: "preferences", title: "Preferences", icon: <SlidersHorizontal className="size-4" /> },
     { id: "favorites", title: "Your Favorites", icon: <Heart className="size-4" /> },
+    { id: "danger", title: "Danger Zone", icon: <ShieldAlert className="size-4" /> },
 ]
 
 const UserProfilePage = () => {
@@ -60,8 +62,9 @@ const UserProfilePage = () => {
 
                 <div className="flex min-w-0 flex-1 flex-col gap-4 sm:gap-6">
                     {activeSection === "overview" && <ProfileOverviewSection profile={profile} />}
-                    {activeSection === "preferences" && <ProfilePreferencesSection settings={profile?.settings} />}
+                    {activeSection === "preferences" && <ProfilePreferencesSection />}
                     {activeSection === "favorites" && <ProfileFavoritesSection profile={profile} />}
+                    {activeSection === "danger" && <ProfileDangerZoneSection />}
                 </div>
             </div>
         </div>

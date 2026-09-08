@@ -2,13 +2,10 @@ import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
 
 /**
- * One preference from `/users/me` → `settings`. Read-only: the collection
- * documents PATCH /users/settings, but it isn't wired into this screen yet,
- * so the control is presentational rather than faking a save.
+ * One preference from GET /users/settings, saved through
+ * PATCH /users/settings the moment it is toggled.
  */
-const ProfileSettingRow = ({ label, description, value, className }) => {
-    const isToggle = typeof value === "boolean"
-
+const ProfileSettingRow = ({ label, description, value, onChange, isPending = false, className }) => {
     return (
         <div
             className={cn(
@@ -21,11 +18,12 @@ const ProfileSettingRow = ({ label, description, value, className }) => {
                 {description && <span className="text-[12px] text-light-gray">{description}</span>}
             </div>
 
-            {isToggle ? (
-                <Switch checked={value} disabled className="shrink-0" />
-            ) : (
-                <span className="shrink-0 text-[13px] font-medium text-light-gray uppercase">{value || "-"}</span>
-            )}
+            <Switch
+                checked={Boolean(value)}
+                onCheckedChange={(checked) => onChange?.(checked)}
+                disabled={isPending}
+                className="shrink-0"
+            />
         </div>
     )
 }

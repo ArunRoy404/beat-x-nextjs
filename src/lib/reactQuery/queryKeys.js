@@ -13,6 +13,7 @@ export const queryKeys = {
   user: {
     all: ["user"],
     me: () => [...queryKeys.user.all, "me"],
+    settings: () => [...queryKeys.user.all, "settings"],
   },
   users: {
     all: ["users"],
