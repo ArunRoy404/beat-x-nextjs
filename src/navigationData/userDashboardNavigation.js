@@ -35,5 +35,11 @@ export const userDashboardNavigation = {
         { title: "Tickets", url: "/tickets", iconName: "Ticket2Icon" },
       ],
     },
+    {
+      category: "Account",
+      items: [
+        { title: "Profile", url: "/profile", iconName: "UserProfileIcon" },
+      ],
+    },
   ],
 }

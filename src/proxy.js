@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import {
+  isUserProtectedPath,
+  isUserGuestOnlyPath,
+  getRoleHomePath,
+  USER_SIGN_IN_PATH,
+} from "@/lib/auth/authRoutes";
 
 const ADMIN_LOGIN_PATH = "/admin/login";
 const ADMIN_DASHBOARD_PATH = "/admin/dashboard";
@@ -40,11 +46,63 @@ export async function proxy(request) {
     return redirectNoStore(new URL(ADMIN_DASHBOARD_HOME_PATH, request.url));
   }
 
+  // --- Listener ("user" role) area ------------------------------------------
+  // The user's own auth screens: anyone already signed in goes to their home.
+  if (isUserGuestOnlyPath(pathname)) {
+    if (token) {
+      return redirectNoStore(new URL(getRoleHomePath(token.role), request.url));
+    }
+    return NextResponse.next();
+  }
+
+  if (isUserProtectedPath(pathname)) {
+    if (!token) {
+      const loginUrl = new URL(USER_SIGN_IN_PATH, request.url);
+      loginUrl.searchParams.set("callbackUrl", `${pathname}${request.nextUrl.search}`);
+      return redirectNoStore(loginUrl);
+    }
+
+    // Signed in, but not as a listener — hand them to their own area. The
+    // path comparison stops an unrecognised role from redirecting in a loop.
+    if (token.role !== "user") {
+      const roleHome = getRoleHomePath(token.role);
+      if (roleHome !== pathname) {
+        return redirectNoStore(new URL(roleHome, request.url));
+      }
+    }
+  }
+
   return NextResponse.next();
 }
 
+// Next statically analyses this array, so the paths have to be literals and
+// can't be spread from `@/lib/auth/authRoutes` — keep the two lists in sync.
 // Artist routes have no login flow built yet — add "/artist/:path*" here
 // once /artist/login exists, following the same isAdmin-style role check.
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: [
+    "/admin/:path*",
+    // Listener area (the `(user)` route group).
+    "/",
+    "/albums/:path*",
+    "/audio-books/:path*",
+    "/downloads/:path*",
+    "/explore/:path*",
+    "/library/:path*",
+    "/notifications/:path*",
+    "/podcasts/:path*",
+    "/profile/:path*",
+    "/shop/:path*",
+    "/subscription/:path*",
+    "/tickets/:path*",
+    "/trending/:path*",
+    "/watch/:path*",
+    // Listener auth screens.
+    "/login/:path*",
+    "/register/:path*",
+    "/verify-email/:path*",
+    "/forgot-password/:path*",
+    "/otp-verification/:path*",
+    "/reset-password/:path*",
+  ],
 };

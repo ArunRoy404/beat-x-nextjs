@@ -10,6 +10,11 @@ export const queryKeys = {
     me: () => [...queryKeys.auth.all, "me"],
     loginHistory: () => [...queryKeys.auth.all, "loginHistory"],
   },
+  user: {
+    all: ["user"],
+    me: () => [...queryKeys.user.all, "me"],
+    settings: () => [...queryKeys.user.all, "settings"],
+  },
   users: {
     all: ["users"],
     profile: () => [...queryKeys.users.all, "profile"],

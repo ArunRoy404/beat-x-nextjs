@@ -20,5 +20,6 @@ export const isrPaths = [
   "/admin/dashboard/roles-rbac",
   "/admin/dashboard/profile",
   "/admin/profile",
+  "/profile",
 ];
 
