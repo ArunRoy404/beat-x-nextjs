@@ -130,6 +130,7 @@
   --now-playing-glow: 0px 0px 20px 0px rgba(204, 151, 255, 0.15);
   --play-button-glow: 0px 0px 10px rgba(58, 223, 250, 0.25);
   --gradient-purple-lime: linear-gradient(45deg, #CC97FF 0%, #E7FFC4 100%);
+  --beatx-x-gradient: linear-gradient(90deg, rgba(78, 71, 219, 0.86) 0%, rgba(114, 59, 209, 0.895) 25%, rgba(149, 46, 198, 0.93) 50%, rgba(185, 34, 188, 0.965) 75%, rgba(220, 21, 177, 1) 100%);
   --trending-badge-bg: #E7FFC4;
   --trending-badge-text: #3A5F00;
   --hero-overlay-gradient: linear-gradient(to top, rgba(14, 14, 14, 0.88) 0%, rgba(14, 14, 14, 0.4) 50%, rgba(14, 14, 14, 0) 100%);

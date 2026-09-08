@@ -1,6 +1,8 @@
 import { cn } from "@/lib/utils"
 
-const FilterPills = ({ filters, activeFilter, onChange, className }) => {
+const FilterPills = ({ filters, activeFilter, activeFilters, onChange, className, multiple = false }) => {
+    const isActive = (filter) => (multiple ? activeFilters?.includes(filter) : filter === activeFilter)
+
     return (
         <div className={cn("flex flex-wrap items-center gap-2", className)}>
             {filters.map((filter) => (
@@ -10,7 +12,7 @@ const FilterPills = ({ filters, activeFilter, onChange, className }) => {
                     onClick={() => onChange(filter)}
                     className={cn(
                         "cursor-pointer rounded-full px-4 py-2 text-base transition-colors",
-                        filter === activeFilter ? "bg-secondary text-button-text" : "bg-dark-accent text-light-gray hover:text-whitetext"
+                        isActive(filter) ? "bg-secondary text-button-text" : "bg-dark-accent text-light-gray hover:text-whitetext"
                     )}
                 >
                     {filter}

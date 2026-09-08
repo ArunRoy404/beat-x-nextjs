@@ -44,6 +44,7 @@ const AuthCard = ({
     description,
     titleClassName,
     descriptionClassName,
+    showLogo = true,
     children,
     className,
     gapClassName = "gap-8",
@@ -69,15 +70,19 @@ const AuthCard = ({
             </Link>
         )}
 
-        <motion.div variants={cardItemVariants}>
-            <Logo />
-        </motion.div>
+        {showLogo && (
+            <motion.div variants={cardItemVariants}>
+                <Logo />
+            </motion.div>
+        )}
 
         {icon && <motion.div variants={cardItemVariants}>{icon}</motion.div>}
 
-        <motion.div variants={cardItemVariants} className="w-full">
-            <AuthHeader title={title} description={description} titleClassName={titleClassName} descriptionClassName={descriptionClassName} />
-        </motion.div>
+        {(title || description) && (
+            <motion.div variants={cardItemVariants} className="w-full">
+                <AuthHeader title={title} description={description} titleClassName={titleClassName} descriptionClassName={descriptionClassName} />
+            </motion.div>
+        )}
 
         <motion.div variants={cardItemVariants} className="w-full flex flex-col items-center">
             {children}
@@ -92,6 +97,7 @@ const AuthLayout = ({
     description,
     titleClassName,
     descriptionClassName,
+    showLogo = true,
     children,
     sidePanel,
     cardClassName,
@@ -112,6 +118,7 @@ const AuthLayout = ({
                     description={description}
                     titleClassName={titleClassName}
                     descriptionClassName={descriptionClassName}
+                    showLogo={showLogo}
                     gapClassName={gapClassName}
                     className={cn("mx-4 max-w-162", cardClassName)}
                     style={{ background: "var(--auth-card-bg)", borderColor: "var(--auth-card-border)", borderWidth: 1, borderStyle: "solid" }}
@@ -153,6 +160,7 @@ const AuthLayout = ({
                     description={description}
                     titleClassName={titleClassName}
                     descriptionClassName={descriptionClassName}
+                    showLogo={showLogo}
                     gapClassName={gapClassName}
                     className={cn("w-full", sidePanel ? "max-w-158.25" : "max-w-126", cardClassName)}
                     style={{ background: "var(--auth-wide-inner-bg)", borderColor: "var(--auth-wide-inner-border)", borderWidth: 1, borderStyle: "solid" }}
