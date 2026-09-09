@@ -1,14 +1,18 @@
 "use client"
 
-import { Sparkles } from "lucide-react"
+import { Sparkles, Play, Pause } from "lucide-react"
 import CommonGlassPanel from "@/components/shared/CommonGlassPanel"
 import { useApprovedArtists } from "@/hooks/api/user/artists/useApprovedArtists"
+import { usePlaySong } from "@/hooks/api/user/songs/usePlaySong"
 import ArtistFollowSuggestion from "./ArtistFollowSuggestion"
 
 const RecommendedColumn = ({ dailyDiscovery = [] }) => {
     const { data: approvedArtists } = useApprovedArtists()
+    const { playSong, currentSongId, isPlaying } = usePlaySong()
     const artists = Array.isArray(approvedArtists) ? approvedArtists.slice(0, 4) : []
-    const radarItem = dailyDiscovery?.[0]
+    const rawRadarItem = dailyDiscovery?.[0]
+    const radarItem = rawRadarItem?.song || rawRadarItem
+    const isRadarPlaying = currentSongId === (radarItem?._id || radarItem?.id) && isPlaying
 
     return (
         <section className="flex w-full flex-col gap-4 lg:w-88 lg:shrink-0">
@@ -40,9 +44,11 @@ const RecommendedColumn = ({ dailyDiscovery = [] }) => {
                             </div>
                             <button
                                 type="button"
-                                className="w-full cursor-pointer rounded-full bg-dark-accent py-2 text-sm font-semibold text-whitetext"
+                                onClick={() => playSong(radarItem)}
+                                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-dark-accent py-2 text-sm font-semibold text-whitetext transition-all hover:bg-white/10 active:scale-95"
                             >
-                                Start Listening
+                                {isRadarPlaying ? <Pause className="size-4" /> : <Play className="size-4" fill="currentColor" />}
+                                {isRadarPlaying ? "Pause" : "Start Listening"}
                             </button>
                         </div>
                     </div>

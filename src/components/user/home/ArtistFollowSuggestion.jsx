@@ -1,22 +1,23 @@
 "use client"
 
-// import CommonPill from "@/components/shared/CommonPill"
-// import { useToggleFollow } from "@/hooks/api/user/follow/useToggleFollow"
+import Image from "next/image"
 
 const ArtistFollowSuggestion = ({ artist }) => {
     // Note: hook useToggleFollow is preserved in src/hooks/api/user/follow/useToggleFollow.js
     const displayName = artist?.stageName || artist?.name
     const subtitle = artist?.stageName ? artist?.name : (artist?.subtitle || "")
-    const avatarUrl = artist?.artistAvatar || artist?.avatar || artist?.art || ""
+    const avatarUrl = artist?.artistAvatar || artist?.avatar || ""
 
     return (
         <div className="flex w-full items-center gap-3.5">
-            <div className="size-12 shrink-0 overflow-hidden rounded-[12px] bg-white/5">
+            <div className="relative size-12 shrink-0 overflow-hidden rounded-[12px] bg-white/5">
                 {avatarUrl && (
-                    <img
+                    <Image
                         alt={displayName || "Artist"}
                         src={avatarUrl}
-                        className="h-full w-full object-cover"
+                        fill
+                        sizes="48px"
+                        className="object-cover"
                     />
                 )}
             </div>

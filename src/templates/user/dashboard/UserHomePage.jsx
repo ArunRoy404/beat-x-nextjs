@@ -34,9 +34,10 @@ const UserHomePage = () => {
     const { data: homeData } = useSongsHome()
 
     const heroItems = homeData?.featured?.length ? homeData?.featured : (homeData?.trending?.length ? homeData?.trending : [])
-    const mixItems = homeData?.recentlyPlayed?.data?.length
+    const rawMixItems = homeData?.recentlyPlayed?.data?.length
         ? homeData?.recentlyPlayed?.data
         : (homeData?.onRepeat?.data?.length ? homeData?.onRepeat?.data : (homeData?.trending || []))
+    const mixItems = rawMixItems?.map((item) => item?.song || item) || []
     const releaseItems = homeData?.newReleases || []
     const dailyDiscoveryItems = homeData?.dailyDiscovery || []
 

@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import ReleaseListItem from "./ReleaseListItem"
 
 const NewReleasesColumn = ({ releases = [] }) => {
@@ -9,9 +10,9 @@ const NewReleasesColumn = ({ releases = [] }) => {
         <section className="flex min-w-0 flex-1 flex-col gap-4">
             <div className="flex items-center justify-between">
                 <h2 className="text-2xl text-whitetext sm:text-[32px]">New Releases</h2>
-                <button type="button" className="shrink-0 cursor-pointer text-sm text-secondary sm:text-base">
+                <Link href="/explore" className="shrink-0 cursor-pointer text-sm text-secondary sm:text-base hover:underline">
                     Explore More
-                </button>
+                </Link>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {releases?.map((release, idx) => (
