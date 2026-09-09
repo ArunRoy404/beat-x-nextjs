@@ -64,26 +64,18 @@ const ChapterRow = ({ audiobookId, book, chapter, index }) => {
         }
 
         updateChapter(
-            { audiobookId, chapterId: chapter._id, formData },
+            { audiobookId, chapterId: chapter?._id, formData },
             {
                 onSuccess: () => {
-                    toast.success("Chapter updated successfully!")
                     setIsEditing(false)
                     setNewAudioFile(null)
                 },
-                onError: (error) => toast.error(error?.response?.data?.message || error?.message || "Failed to update chapter."),
             }
         )
     }
 
     const handleDelete = () => {
-        deleteChapter(
-            { audiobookId, chapterId: chapter._id },
-            {
-                onSuccess: () => toast.success("Chapter deleted successfully."),
-                onError: (error) => toast.error(error?.response?.data?.message || error?.message || "Failed to delete chapter."),
-            }
-        )
+        deleteChapter({ audiobookId, chapterId: chapter?._id })
     }
 
     if (isEditing) {

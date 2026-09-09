@@ -28,14 +28,10 @@ const RejectPodcastDialog = ({ podcast, children }) => {
     }
 
     rejectPodcast(
-      { id: podcast._id, reason: reason.trim() },
+      { id: podcast?._id, reason: reason.trim() },
       {
         onSuccess: () => {
-          toast.success("Podcast submission rejected.");
           setOpen(false);
-        },
-        onError: (error) => {
-          toast.error(error?.message || "Failed to reject podcast submission.");
         },
       }
     );

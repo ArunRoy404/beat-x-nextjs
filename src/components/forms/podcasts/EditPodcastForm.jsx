@@ -3,7 +3,6 @@
 import React from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { toast } from "sonner"
 import { CheckCircle2, Clock, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
@@ -74,13 +73,11 @@ const EditPodcastForm = ({ podcast, onSuccess, onCancel }) => {
         }
 
         updatePodcast(
-            { id: podcast._id, body },
+            { id: podcast?._id, body },
             {
                 onSuccess: () => {
-                    toast.success("Podcast updated successfully!")
                     onSuccess?.()
                 },
-                onError: (error) => toast.error(error?.message || "Failed to update podcast."),
             }
         )
     }

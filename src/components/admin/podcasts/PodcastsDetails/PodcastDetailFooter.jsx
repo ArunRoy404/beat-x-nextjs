@@ -1,8 +1,5 @@
-"use client"
-
 import React from "react"
 import { Trash2, CheckCircle, XCircle } from "lucide-react"
-import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { DialogClose } from "@/components/ui/dialog"
 import DeletePodcastDialog from "@/components/dialogs/admin/podcasts/DeletePodcastDialog"
@@ -18,23 +15,11 @@ const PodcastDetailFooter = ({ podcast }) => {
     const isPendingOrDraft = status === "draft" || status === "pending" || podcast?.submittedStatus === "pending"
 
     const handleApprove = () => {
-        approvePodcast(
-            { id: podcast._id },
-            {
-                onSuccess: () => toast.success("Podcast approved!"),
-                onError: (error) => toast.error(error?.message || "Failed to approve podcast."),
-            }
-        )
+        approvePodcast({ id: podcast?._id })
     }
 
     const handleStatusChange = (nextStatus) => {
-        updatePodcastStatus(
-            { id: podcast._id, status: nextStatus },
-            {
-                onSuccess: () => toast.success(nextStatus === "archived" ? "Podcast taken down." : "Podcast restored."),
-                onError: (error) => toast.error(error?.message || "Failed to update podcast status."),
-            }
-        )
+        updatePodcastStatus({ id: podcast?._id, status: nextStatus })
     }
 
     return (

@@ -4,7 +4,6 @@ import React, { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import CommonAudioInput from "@/components/shared/CommonInputs/CommonAudioInput/CommonAudioInput"
@@ -45,12 +44,10 @@ const AddChapterForm = ({ audiobookId, onDone, onCancel }) => {
             { audiobookId, formData },
             {
                 onSuccess: () => {
-                    toast.success("Chapter uploaded — processing audio now.")
                     reset()
                     setAudio(null)
                     onDone?.()
                 },
-                onError: (error) => toast.error(error?.message || "Failed to upload chapter."),
             }
         )
     }

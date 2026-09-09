@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { DialogClose } from "@/components/ui/dialog"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
@@ -106,17 +105,16 @@ const EditAudioBookForm = ({ book, onSuccess, onCancel }) => {
         payload.trendDirection = data.trendDirection
       }
 
-      await updateAudioBook({ id: book._id, data: payload })
+      await updateAudioBook({ id: book?._id, data: payload })
 
       // 2. Update cover image if changed (PATCH /admin/audiobooks/:id/cover)
       if (newCoverFile) {
-        await updateCover({ id: book._id, file: newCoverFile })
+        await updateCover({ id: book?._id, file: newCoverFile })
       }
 
-      toast.success("Audiobook updated successfully!")
       onSuccess?.()
-    } catch (error) {
-      toast.error(error?.response?.data?.message || error?.message || "Failed to update audiobook.")
+    } catch {
+      // Handled in mutation hook
     }
   }
 
