@@ -1,7 +1,8 @@
 import { axiosPrivate } from "@/lib/axios/axiosPrivate";
+import { axiosPublic } from "@/lib/axios/axiosPublic";
 
 /**
- * Raw API calls for user song feeds and discovery.
+ * Raw API calls for user song feeds, playback streaming, details, and discovery.
  */
 export async function getSongsHomeRequest() {
   const res = await axiosPrivate.get("/songs/home");
@@ -29,6 +30,33 @@ export async function getTrendingSongsRequest() {
 
 export async function getFeaturedSongsRequest() {
   const res = await axiosPrivate.get("/songs/featured");
+  return res?.data?.data;
+}
+
+export async function getSongStreamUrlRequest(id) {
+  if (!id) return null;
+  const res = await axiosPrivate.get(`/songs/${id}/stream`);
+  return res?.data?.data;
+}
+
+export async function getSongDetailRequest(id) {
+  if (!id) return null;
+  const res = await axiosPublic.get(`/songs/${id}`);
+  return res?.data?.data;
+}
+
+export async function toggleLikeSongRequest(id) {
+  if (!id) return null;
+  const res = await axiosPrivate.post(`/songs/${id}/like`);
+  return res?.data?.data;
+}
+
+export async function saveSongProgressRequest({ id, positionMs = 0, completed = false }) {
+  if (!id) return null;
+  const res = await axiosPrivate.post(`/songs/${id}/progress`, {
+    positionMs,
+    completed,
+  });
   return res?.data?.data;
 }
 
