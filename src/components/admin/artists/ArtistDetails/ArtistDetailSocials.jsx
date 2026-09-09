@@ -2,7 +2,6 @@
 
 import React from "react"
 import { useUpdateArtistSocialChecklist } from "@/hooks/api/admin/artists/useUpdateArtistSocialChecklist"
-import { toast } from "sonner"
 
 const InternetIcon = () => (
   <div className="flex w-[26.25px] h-[26.25px] justify-center items-center shrink-0 bg-white/5 rounded-full">
@@ -91,9 +90,8 @@ const ArtistDetailSocials = ({ artist }) => {
         id: verificationId,
         data: updatedData,
       })
-      toast.success("Social links checklist updated.")
-    } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || "Failed to update social checklist.")
+    } catch {
+      // Handled by hook
     }
   }
 

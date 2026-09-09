@@ -1,6 +1,5 @@
-"use client"
-
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { toast } from "sonner"
 import { approveArtistRequest } from "@/services/admin/artistsServices"
 import { queryKeys } from "@/lib/reactQuery/queryKeys"
 
@@ -10,10 +9,15 @@ export function useApproveArtist() {
   return useMutation({
     mutationFn: approveArtistRequest,
     onSuccess: (_data, variables) => {
+      toast.success("Artist application approved successfully!")
       queryClient.invalidateQueries({ queryKey: queryKeys.artists.all })
       if (variables?.id) {
         queryClient.invalidateQueries({ queryKey: queryKeys.artists.detail(variables.id) })
       }
     },
+    onError: (err) => {
+      toast.error(err?.response?.data?.message || err?.message || "Failed to approve artist.")
+    },
   })
 }
+

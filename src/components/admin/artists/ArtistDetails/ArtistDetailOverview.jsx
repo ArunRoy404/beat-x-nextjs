@@ -5,18 +5,20 @@ import { CheckCircle2, Check } from "lucide-react"
 import { format } from "date-fns"
 import CommonInfoBox from "@/components/shared/CommonInfoBox/CommonInfoBox"
 import { useReviewOverview } from "@/hooks/api/admin/artists/useReviewOverview"
-import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 
 const ArtistDetailOverview = ({ artist }) => {
   const verificationId = artist?._id || artist?.id
-  const fullName = artist?.personalInfo?.fullName || artist?.fullName || artist?.name || "-"
+  const fullName = artist?.personalInfo?.fullName || artist?.personalInfo?.legalName || artist?.fullName || artist?.name || "-"
   const stageName = artist?.personalInfo?.stageName || artist?.name || "-"
   const dob = artist?.personalInfo?.dateOfBirth
     ? format(new Date(artist.personalInfo.dateOfBirth), "yyyy-MM-dd")
     : artist?.dob || "-"
   const gender = artist?.personalInfo?.gender || artist?.gender || "-"
-  const nationality = artist?.personalInfo?.nationality || artist?.nationality || "-"
+  const nationality = artist?.personalInfo?.nationality || "-"
+  const address = artist?.personalInfo?.address || "-"
+  const phone = artist?.personalInfo?.phoneNumber || artist?.phoneNumber || "-"
+  const email = artist?.personalInfo?.email || artist?.user?.email || artist?.userId?.email || "-"
   const primaryLanguage = artist?.personalInfo?.primaryLanguage || artist?.primaryLanguage || "-"
   const docType = artist?.identityDocs?.documentType || "National ID Card"
   const shortBio = artist?.personalInfo?.shortBio || artist?.shortBio || "-"
@@ -33,9 +35,8 @@ const ArtistDetailOverview = ({ artist }) => {
         id: verificationId,
         reviewed: true,
       })
-      toast.success("Overview tab marked as reviewed.")
-    } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || "Failed to mark overview reviewed.")
+    } catch {
+      // Handled by hook
     }
   }
 

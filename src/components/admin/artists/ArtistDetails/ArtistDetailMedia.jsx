@@ -4,7 +4,6 @@ import React from "react"
 import { FileText, Check } from "lucide-react"
 import { resolveMediaUrl } from "@/lib/format/resolveMediaUrl"
 import { useReviewMediaAssets } from "@/hooks/api/admin/artists/useReviewMediaAssets"
-import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 
 const MaterialRow = ({ title, detail, status }) => {
@@ -59,9 +58,8 @@ const ArtistDetailMedia = ({ artist }) => {
         id: verificationId,
         reviewed: true,
       })
-      toast.success("Media assets tab marked as reviewed.")
-    } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || "Failed to mark media assets reviewed.")
+    } catch {
+      // Handled by hook
     }
   }
 

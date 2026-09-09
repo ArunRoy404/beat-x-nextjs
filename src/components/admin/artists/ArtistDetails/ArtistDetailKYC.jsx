@@ -4,7 +4,6 @@ import React from "react"
 import { FileText, User, Check } from "lucide-react"
 import { resolveMediaUrl } from "@/lib/format/resolveMediaUrl"
 import { useUpdateArtistChecklist } from "@/hooks/api/admin/artists/useUpdateArtistChecklist"
-import { toast } from "sonner"
 
 const KYCCard = ({ title, bg, icon: Icon, iconColor, url }) => {
   const imageUrl = url ? resolveMediaUrl(url) : ""
@@ -81,9 +80,8 @@ const ArtistDetailKYC = ({ artist }) => {
         id: verificationId,
         data: updatedData,
       })
-      toast.success("Document checklist updated.")
-    } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || "Failed to update checklist.")
+    } catch {
+      // Handled by hook
     }
   }
 

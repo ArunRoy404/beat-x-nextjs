@@ -54,10 +54,9 @@ const ArtistDetailHeader = ({ artist, onClose }) => {
         id: verificationId,
         genres: newGenres,
       })
-      toast.success("Genres updated successfully!")
       setIsEditingGenres(false)
-    } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || "Failed to update genres.")
+    } catch {
+      // Handled by hook
     }
   }
 
