@@ -1,12 +1,15 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import Image from "next/image"
 import { motion } from "framer-motion"
-import { Heart, ListMusic, Maximize2, Mic2, Repeat, Shuffle, SkipBack, SkipForward, Volume2, VolumeX } from "lucide-react"
+import { Heart, ListMusic, Maximize2, Mic2, Music, Repeat, Shuffle, SkipBack, SkipForward, Volume2, VolumeX } from "lucide-react"
 import { cn } from "@/lib/utils"
 import GradientPlayButton from "@/components/shared/GradientPlayButton"
 import { useUserPlayerStore } from "@/zustandStore/user/userStore/userPlayerStore"
 import { useVolumeStore } from "@/zustandStore/audio/useVolumeStore"
+import { useToggleLikeSong } from "@/hooks/api/user/songs/useToggleLikeSong"
+import { saveSongProgressRequest } from "@/services/user/songsServices"
 
 const SEEK_SECONDS = 10
 
@@ -19,8 +22,9 @@ const formatTime = (seconds) => {
 }
 
 const FloatingPlayerBar = () => {
-    const { title, artist, artwork, src, liked, toggleLiked } = useUserPlayerStore()
+    const { title, artist, artwork, src, liked, toggleLiked, songId, isPlaying: storeIsPlaying, setIsPlaying: setStoreIsPlaying } = useUserPlayerStore()
     const { volume, isMuted, setVolume, toggleMute } = useVolumeStore()
+    const { toggleLike } = useToggleLikeSong()
     const audioRef = useRef(null)
 
     const [isPlaying, setIsPlaying] = useState(false)
@@ -46,11 +50,44 @@ const FloatingPlayerBar = () => {
         if (audioRef.current) audioRef.current.loop = repeat
     }, [repeat])
 
+    // Auto-play when a new track/src is selected
+    useEffect(() => {
+        const audio = audioRef.current
+        if (src && audio) {
+            audio.play().then(() => {
+                setIsPlaying(true)
+                setStoreIsPlaying?.(true)
+            }).catch(() => {
+                setIsPlaying(false)
+                setStoreIsPlaying?.(false)
+            })
+        }
+    }, [src, setStoreIsPlaying])
+
+    // Sync play state from store if changed externally
+    useEffect(() => {
+        const audio = audioRef.current
+        if (!audio) return
+        if (storeIsPlaying && audio.paused) {
+            audio.play().catch(() => {})
+        } else if (!storeIsPlaying && !audio.paused) {
+            audio.pause()
+        }
+    }, [storeIsPlaying])
+
     const togglePlay = () => {
         const audio = audioRef.current
         if (!audio) return
-        if (isPlaying) audio.pause()
-        else audio.play()
+        if (isPlaying) {
+            audio.pause()
+            setIsPlaying(false)
+            setStoreIsPlaying?.(false)
+        } else {
+            audio.play().then(() => {
+                setIsPlaying(true)
+                setStoreIsPlaying?.(true)
+            }).catch(() => {})
+        }
     }
 
     const seekBy = (delta) => {
@@ -73,6 +110,8 @@ const FloatingPlayerBar = () => {
 
     const progress = duration ? currentTime / duration : 0
 
+    if (!src && !title) return null
+
     return (
         <motion.div
             initial={{ y: 120, x: "-50%", opacity: 0 }}
@@ -89,20 +128,50 @@ const FloatingPlayerBar = () => {
                 ref={audioRef}
                 src={src}
                 preload="metadata"
-                onPlay={() => setIsPlaying(true)}
-                onPause={() => setIsPlaying(false)}
+                onPlay={() => {
+                    setIsPlaying(true)
+                    setStoreIsPlaying?.(true)
+                }}
+                onPause={() => {
+                    setIsPlaying(false)
+                    setStoreIsPlaying?.(false)
+                }}
                 onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
                 onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
-                onEnded={() => setIsPlaying(false)}
+                onEnded={() => {
+                    setIsPlaying(false)
+                    setStoreIsPlaying?.(false)
+                    if (songId) {
+                        saveSongProgressRequest({ id: songId, positionMs: Math.floor(duration * 1000), completed: true }).catch(() => {})
+                    }
+                }}
             />
 
             <div className="flex shrink-0 items-center gap-2">
-                <img alt={title} src={artwork} className="size-10 shrink-0 rounded-full object-cover" />
+                <div className="relative size-10 shrink-0 overflow-hidden rounded-full bg-dark-accent">
+                    {artwork ? (
+                        <Image alt={title || "Track artwork"} src={artwork} fill sizes="40px" className="object-cover" />
+                    ) : (
+                        <div className="flex size-full items-center justify-center bg-white/10 text-light-gray">
+                            <Music className="size-5 text-secondary" />
+                        </div>
+                    )}
+                </div>
                 <div className="hidden flex-col gap-1 sm:flex">
                     <div className="flex items-center gap-2">
                         <span className="whitespace-nowrap text-lg font-semibold text-whitetext">{title}</span>
-                        <button type="button" onClick={toggleLiked} aria-label={liked ? "Unlike" : "Like"}>
-                            <Heart className={cn("size-4", liked ? "fill-red-error text-red-error" : "text-light-gray")} />
+                        <button
+                            type="button"
+                            onClick={() => {
+                                if (songId) {
+                                    toggleLike(songId)
+                                } else {
+                                    toggleLiked()
+                                }
+                            }}
+                            aria-label={liked ? "Unlike" : "Like"}
+                        >
+                            <Heart className={cn("size-4 cursor-pointer transition-colors", liked ? "fill-red-error text-red-error" : "text-light-gray hover:text-whitetext")} />
                         </button>
                     </div>
                     <span className="text-xs text-light-gray">{artist}</span>

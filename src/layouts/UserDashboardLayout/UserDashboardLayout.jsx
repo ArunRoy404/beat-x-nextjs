@@ -1,8 +1,8 @@
 "use client"
 
+import Image from "next/image"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import CommonDashboardSidebar from "@/layouts/CommonDashboardLayout/CommonDashboardSidebar"
-import { userHomeAssets } from "@/dummyData/user/userHomeAssets"
 import { useUserDashboardNavigationStore } from "@/navigationStore/userDashboardNavigationStore"
 import UserNavbar from "./UserNavbar"
 import FloatingPlayerBar from "./FloatingPlayerBar"
@@ -14,8 +14,8 @@ const UserDashboardLayout = ({ children }) => {
     return (
         <SidebarProvider className="h-screen w-full overflow-hidden">
             <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-background">
-                <div className="absolute top-1/2 left-1/2 h-[1400px] w-[1400px] -translate-x-1/2 -translate-y-1/2 opacity-70 blur-[100px]">
-                    <img alt="" className="h-full w-full object-cover" src={userHomeAssets.backgrounds.gradientBlur} />
+                <div className="relative absolute top-1/2 left-1/2 h-[1400px] w-[1400px] -translate-x-1/2 -translate-y-1/2 opacity-70 blur-[100px]">
+                    <Image alt="" fill priority sizes="1400px" className="object-cover" src="/user-home/images/page-glow.png" />
                 </div>
                 <div className="absolute inset-0 bg-black/65" />
             </div>
