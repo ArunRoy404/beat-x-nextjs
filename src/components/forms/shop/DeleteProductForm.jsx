@@ -39,12 +39,8 @@ const DeleteProductForm = ({ product, onSuccess, onCancel }) => {
 
         deleteProduct(productId, {
             onSuccess: () => {
-                toast.success("Product deleted successfully!")
                 reset()
                 onSuccess?.()
-            },
-            onError: (err) => {
-                toast.error(err?.response?.data?.message || err?.message || "Failed to delete product")
             },
         })
     }

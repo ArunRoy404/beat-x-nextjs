@@ -1,6 +1,5 @@
 import React from "react"
 import { Eye, Trash2, SquarePen } from "lucide-react"
-import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import EditAlbumDialog from "@/components/dialogs/admin/albums/EditAlbumDialog"
@@ -12,13 +11,7 @@ const AlbumsTableActions = ({ status, album, className }) => {
     const { mutate: updateAlbumStatus, isPending } = useUpdateAlbumStatus()
 
     const handleStatusChange = (nextStatus) => {
-        updateAlbumStatus(
-            { id: album._id, status: nextStatus },
-            {
-                onSuccess: () => toast.success(nextStatus === "archived" ? "Album taken down." : "Album restored."),
-                onError: (error) => toast.error(error?.message || "Failed to update album status."),
-            }
-        )
+        updateAlbumStatus({ id: album?._id, status: nextStatus })
     }
 
     return (

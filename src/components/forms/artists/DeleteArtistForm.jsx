@@ -41,12 +41,8 @@ const DeleteArtistForm = ({ artist, onSuccess, onCancel }) => {
             { id, password: data.password },
             {
                 onSuccess: () => {
-                    toast.success("Artist deleted successfully!")
                     reset()
                     onSuccess?.()
-                },
-                onError: (err) => {
-                    toast.error(err?.message || "Failed to delete artist. Check admin password.")
                 },
             }
         )

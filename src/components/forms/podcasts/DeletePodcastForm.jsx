@@ -1,10 +1,7 @@
-"use client"
-
 import React from "react"
 import { Button } from "@/components/ui/button"
 import { DialogClose } from "@/components/ui/dialog"
 import { Trash2 } from "lucide-react"
-import { toast } from "sonner"
 import { useDeletePodcast } from "@/hooks/api/admin/podcasts/useDeletePodcast"
 
 const DeletePodcastForm = ({ podcast, onSuccess, onCancel }) => {
@@ -12,13 +9,11 @@ const DeletePodcastForm = ({ podcast, onSuccess, onCancel }) => {
 
     const handleDelete = () => {
         deletePodcast(
-            { id: podcast._id },
+            { id: podcast?._id },
             {
                 onSuccess: () => {
-                    toast.success("Podcast deleted successfully!")
                     onSuccess?.()
                 },
-                onError: (error) => toast.error(error?.message || "Failed to delete podcast."),
             }
         )
     }

@@ -1,10 +1,7 @@
-"use client"
-
 import React from "react"
 import { Button } from "@/components/ui/button"
 import { DialogClose } from "@/components/ui/dialog"
 import { Trash2 } from "lucide-react"
-import { toast } from "sonner"
 import { useDeleteSong } from "@/hooks/api/admin/songs/useDeleteSong"
 
 const DeleteSongForm = ({ song, onSuccess, onCancel }) => {
@@ -12,13 +9,11 @@ const DeleteSongForm = ({ song, onSuccess, onCancel }) => {
 
     const handleDelete = () => {
         deleteSong(
-            { id: song._id },
+            { id: song?._id },
             {
                 onSuccess: () => {
-                    toast.success("Song deleted successfully!")
                     onSuccess?.()
                 },
-                onError: (error) => toast.error(error?.message || "Failed to delete song."),
             }
         )
     }

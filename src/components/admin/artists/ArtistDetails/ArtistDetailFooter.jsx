@@ -70,10 +70,9 @@ const ArtistDetailFooter = ({ artist, onClose }) => {
     if (!verificationId) return
     try {
       await approveMutation.mutateAsync({ id: verificationId })
-      toast.success("Artist application approved successfully!")
       onClose?.()
-    } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || "Failed to approve artist.")
+    } catch {
+      // Handled by hook
     }
   }
 
@@ -98,10 +97,9 @@ const ArtistDetailFooter = ({ artist, onClose }) => {
         items,
         message: customMessage || "Please provide the requested items.",
       })
-      toast.info("Information request sent to artist.")
       onClose?.()
-    } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || "Failed to request info.")
+    } catch {
+      // Handled by hook
     }
   }
 
@@ -113,10 +111,9 @@ const ArtistDetailFooter = ({ artist, onClose }) => {
         reasonCode: rejectionReason,
         note: rejectionNote || "Please re-upload clearer verification documents.",
       })
-      toast.error("Artist application rejected.")
       onClose?.()
-    } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || "Failed to reject artist.")
+    } catch {
+      // Handled by hook
     }
   }
 
@@ -125,17 +122,15 @@ const ArtistDetailFooter = ({ artist, onClose }) => {
     try {
       if (isSuspended) {
         await reactivateMutation.mutateAsync({ id: verificationId })
-        toast.success("Artist reactivated successfully!")
       } else {
         await suspendMutation.mutateAsync({
           id: verificationId,
           reason: "Policy violation or administrative action.",
         })
-        toast.warning("Artist suspended!")
       }
       onClose?.()
-    } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || "Action failed.")
+    } catch {
+      // Handled by hook
     }
   }
 

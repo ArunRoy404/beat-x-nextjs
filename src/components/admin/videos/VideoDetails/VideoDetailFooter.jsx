@@ -10,7 +10,6 @@ import DeleteVideoDialog from "@/components/dialogs/admin/videos/DeleteVideoDial
 import { useApproveVideo } from "@/hooks/api/admin/videos/useApproveVideo"
 import { useRejectVideo } from "@/hooks/api/admin/videos/useRejectVideo"
 import { useUpdateVideo } from "@/hooks/api/admin/videos/useUpdateVideo"
-import { toast } from "sonner"
 
 const REJECTION_REASONS = [
     { value: "Identity Music unclear or unreadable", label: "Identity Music unclear or unreadable" },
@@ -36,13 +35,7 @@ const VideoDetailFooter = ({ video }) => {
 
     const handleApprove = () => {
         if (!video?._id) return
-        approveVideo(
-            { id: video._id },
-            {
-                onSuccess: () => toast.success("Video submission approved!"),
-                onError: (err) => toast.error(err?.message || "Failed to approve video."),
-            }
-        )
+        approveVideo({ id: video._id })
     }
 
     const handleConfirmReject = () => {
@@ -55,23 +48,15 @@ const VideoDetailFooter = ({ video }) => {
             { id: video._id, reason: reasonText },
             {
                 onSuccess: () => {
-                    toast.success("Video submission rejected!")
                     setIsRejecting(false)
                 },
-                onError: (err) => toast.error(err?.message || "Failed to reject video."),
             }
         )
     }
 
     const handleStatusChange = (nextStatus) => {
         if (!video?._id) return
-        updateVideo(
-            { id: video._id, body: { status: nextStatus } },
-            {
-                onSuccess: () => toast.success(nextStatus === "archived" ? "Video taken down." : "Video restored."),
-                onError: (err) => toast.error(err?.message || "Failed to update video status."),
-            }
-        )
+        updateVideo({ id: video._id, body: { status: nextStatus } })
     }
 
     if (isRejecting) {

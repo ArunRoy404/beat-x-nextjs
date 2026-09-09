@@ -14,6 +14,18 @@ export const queryKeys = {
     all: ["user"],
     me: () => [...queryKeys.user.all, "me"],
     settings: () => [...queryKeys.user.all, "settings"],
+    artists: () => [...queryKeys.user.all, "artists"],
+  },
+  songs: {
+    all: ["songs"],
+    home: () => [...queryKeys.songs.all, "home"],
+    dailyDiscovery: (limit) => [...queryKeys.songs.all, "dailyDiscovery", limit],
+    newReleases: (params) => [...queryKeys.songs.all, "newReleases", params],
+    trending: () => [...queryKeys.songs.all, "trending"],
+    featured: () => [...queryKeys.songs.all, "featured"],
+    detail: (id) => [...queryKeys.songs.all, "detail", id],
+    stream: (id) => [...queryKeys.songs.all, "stream", id],
+    like: (id) => [...queryKeys.songs.all, "like", id],
   },
   users: {
     all: ["users"],

@@ -113,10 +113,9 @@ const ArtistEditEventForm = ({ event, onSuccess, onCancel }) => {
 
         try {
             await updateEventMutation.mutateAsync({ eventId, data: payload })
-            toast.success("Event submitted successfully!")
             onSuccess?.()
-        } catch (err) {
-            toast.error(err?.response?.data?.message || err?.message || "Failed to update event")
+        } catch {
+            // Handled by hook
         }
     }
 

@@ -7,7 +7,6 @@ import { DialogClose } from "@/components/ui/dialog"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSelect"
 import DeleteProductDialog from "@/components/dialogs/admin/shop/DeleteProductDialog"
-import { toast } from "sonner"
 import { useUpdateProduct } from "@/hooks/api/admin/products/useUpdateProduct"
 
 const rejectionReasons = [
@@ -39,11 +38,7 @@ const ProductDetailFooter = ({ product, onClose }) => {
       },
       {
         onSuccess: () => {
-          toast.success("Product approved successfully!")
           onClose?.()
-        },
-        onError: (err) => {
-          toast.error(err?.response?.data?.message || err?.message || "Failed to approve product")
         },
       }
     )
@@ -65,11 +60,7 @@ const ProductDetailFooter = ({ product, onClose }) => {
       },
       {
         onSuccess: () => {
-          toast.error("Product rejected.")
           onClose?.()
-        },
-        onError: (err) => {
-          toast.error(err?.response?.data?.message || err?.message || "Failed to reject product")
         },
       }
     )

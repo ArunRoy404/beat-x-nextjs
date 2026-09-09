@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useState } from "react"
-import { toast } from "sonner"
 import CommonGlassPanel from "@/components/shared/CommonGlassPanel"
 import ProfileSectionHeader from "./ProfileSectionHeader"
 import ProfileSettingRow from "./ProfileSettingRow"
@@ -23,12 +22,6 @@ const ProfilePreferencesSection = () => {
         updateSettings(
             { [key]: checked },
             {
-                onSuccess: () => {
-                    toast.success("Preferences updated")
-                },
-                onError: (error) => {
-                    toast.error(error?.message || "Could not update your preferences.")
-                },
                 onSettled: () => setPendingKey(null),
             }
         )

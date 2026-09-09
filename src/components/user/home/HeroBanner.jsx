@@ -1,46 +1,57 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
-import { Info, Play, ChevronLeft, ChevronRight } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import Image from "next/image"
+import { Info, Play, Pause, ChevronLeft, ChevronRight } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import CommonPill from "@/components/shared/CommonPill"
-import { useUserHomeStore } from "@/zustandStore/user/userStore/userHomeStore"
+import { usePlaySong } from "@/hooks/api/user/songs/usePlaySong"
+import SongDetailModal from "./SongDetailModal"
 
-const HeroBanner = () => {
-    const heroContent = useUserHomeStore((state) => state.heroContent)
+const HeroBanner = ({ items = [] }) => {
     const [currentIndex, setCurrentIndex] = useState(0)
+    const [infoOpen, setInfoOpen] = useState(false)
     const isHovered = useRef(false)
+    const { playSong, isPending, currentSongId, isPlaying } = usePlaySong()
 
-    const slides = Array.isArray(heroContent) ? heroContent : (heroContent ? [heroContent] : [])
-    const currentSlide = slides[currentIndex] || {}
+    const slides = Array.isArray(items) ? items : (items ? [items] : [])
+    const totalSlides = slides?.length || 0
+    const rawSlide = slides?.[currentIndex]
+    const currentSlide = rawSlide?.song || rawSlide || {}
+    const isCurrentPlaying = currentSongId === (currentSlide?._id || currentSlide?.id) && isPlaying
+    const badges = currentSlide?.badges || [
+        currentSlide?.isFeatured ? "FEATURED" : null,
+        currentSlide?.isTrending ? "TRENDING NOW" : null,
+        currentSlide?.genre?.name || null,
+    ].filter(Boolean)
 
-    const handleNext = useCallback(() => {
-        if (slides.length <= 1) return
-        setCurrentIndex((prev) => (prev + 1) % slides.length)
-    }, [slides.length])
+    const handleNext = () => {
+        if (totalSlides <= 1) return
+        setCurrentIndex((prev) => (prev + 1) % totalSlides)
+    }
 
-    const handlePrev = useCallback(() => {
-        if (slides.length <= 1) return
-        setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length)
-    }, [slides.length])
+    const handlePrev = () => {
+        if (totalSlides <= 1) return
+        setCurrentIndex((prev) => (prev - 1 + totalSlides) % totalSlides)
+    }
 
     useEffect(() => {
-        if (slides.length <= 1) return
+        if (totalSlides <= 1) return
 
         const timer = setInterval(() => {
             if (!isHovered.current) {
-                handleNext()
+                setCurrentIndex((prev) => (prev + 1) % totalSlides)
             }
         }, 5000)
 
         return () => clearInterval(timer)
-    }, [slides.length, handleNext])
+    }, [totalSlides])
 
-    if (slides.length === 0) return null
+    if (totalSlides === 0) return null
 
     return (
         <div
-            className="group relative h-64 w-full shrink-0 overflow-hidden rounded-[16px] sm:h-80 lg:h-[460px]"
+            className="group relative h-64 w-full shrink-0 overflow-hidden rounded-[16px] sm:h-80 lg:h-115"
             onMouseEnter={() => {
                 isHovered.current = true
             }}
@@ -50,16 +61,25 @@ const HeroBanner = () => {
         >
             {/* Background Image Carousel with smooth crossfade */}
             <AnimatePresence initial={false}>
-                <motion.img
+                <motion.div
                     key={currentIndex}
-                    alt=""
-                    src={currentSlide.artwork}
                     initial={{ opacity: 0, scale: 1.02 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.8, ease: "easeInOut" }}
-                    className="absolute inset-0 h-full w-full object-cover"
-                />
+                    className="absolute inset-0 h-full w-full"
+                >
+                    {currentSlide?.coverUrl ? (
+                        <Image
+                            alt={currentSlide?.title || "Featured banner"}
+                            src={currentSlide?.coverUrl}
+                            fill
+                            priority={currentIndex === 0}
+                            sizes="(max-width: 1024px) 100vw, 1200px"
+                            className="object-cover"
+                        />
+                    ) : null}
+                </motion.div>
             </AnimatePresence>
 
             {/* Overlay Gradient (stays constant on top) */}
@@ -76,21 +96,23 @@ const HeroBanner = () => {
                         transition={{ duration: 0.4, ease: "easeOut" }}
                         className="flex flex-col gap-2.5"
                     >
-                        <div className="flex items-center gap-2">
-                            {currentSlide.badges?.map((badge, index) => (
-                                <CommonPill key={badge} variant={index === 0 ? "filled" : "glass"} className="uppercase">
-                                    {badge}
-                                </CommonPill>
-                            ))}
-                        </div>
-                        {currentSlide.title && (
+                        {badges?.length > 0 && (
+                            <div className="flex items-center gap-2">
+                                {badges?.map((badge, index) => (
+                                    <CommonPill key={badge} variant={index === 0 ? "filled" : "glass"} className="uppercase">
+                                        {badge}
+                                    </CommonPill>
+                                ))}
+                            </div>
+                        )}
+                        {currentSlide?.title && (
                             <div className="flex flex-col gap-0.5">
                                 <h2 className="text-2xl font-bold text-whitetext sm:text-3xl lg:text-4xl tracking-tight leading-tight">
-                                    {currentSlide.title}
+                                    {currentSlide?.title}
                                 </h2>
-                                {currentSlide.subtitle && (
+                                {(currentSlide?.artist || currentSlide?.subtitle) && (
                                     <p className="text-xs font-semibold text-light-gray/80 sm:text-sm">
-                                        {currentSlide.subtitle}
+                                        {currentSlide?.artist ? `By ${currentSlide?.artist}` : currentSlide?.subtitle}
                                     </p>
                                 )}
                             </div>
@@ -102,13 +124,21 @@ const HeroBanner = () => {
                 <div className="flex items-center gap-2">
                     <button
                         type="button"
-                        className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-secondary px-8 py-4 font-semibold text-button-text transition-transform active:scale-95"
+                        disabled={isPending}
+                        onClick={() => playSong(currentSlide)}
+                        className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-secondary px-8 py-4 font-semibold text-button-text transition-transform active:scale-95 disabled:opacity-75"
                     >
-                        <Play className="size-5" fill="currentColor" />
-                        Play Now
+                        {isCurrentPlaying ? (
+                            <Pause className="size-5" fill="currentColor" />
+                        ) : (
+                            <Play className="size-5" fill="currentColor" />
+                        )}
+                        {isCurrentPlaying ? "Pause" : "Play Now"}
                     </button>
                     <button
                         type="button"
+                        onClick={() => setInfoOpen(true)}
+                        aria-label="Track Information"
                         className="flex size-13 shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/10 bg-(--glass-panel-bg) backdrop-blur-md transition-all hover:bg-white/5 active:scale-95"
                     >
                         <Info className="size-4 text-whitetext" />
@@ -116,8 +146,15 @@ const HeroBanner = () => {
                 </div>
             </div>
 
+            {/* Song Detail Modal for Info CTA */}
+            <SongDetailModal
+                song={currentSlide}
+                open={infoOpen}
+                onOpenChange={setInfoOpen}
+            />
+
             {/* Manual Navigation Controls (Fade in on hover) */}
-            {slides.length > 1 && (
+            {totalSlides > 1 && (
                 <>
                     <button
                         type="button"

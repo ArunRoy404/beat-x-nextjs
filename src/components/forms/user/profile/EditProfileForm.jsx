@@ -3,7 +3,6 @@
 import React from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { toast } from "sonner"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
 import CommonFormActions from "@/components/shared/CommonFormActions"
@@ -40,11 +39,7 @@ const EditProfileForm = ({ profile, onSuccess, onCancel }) => {
 
         updateProfile(formData, {
             onSuccess: () => {
-                toast.success("Profile updated successfully!")
                 onSuccess?.()
-            },
-            onError: (error) => {
-                toast.error(error?.message || "Failed to update your profile.")
             },
         })
     }

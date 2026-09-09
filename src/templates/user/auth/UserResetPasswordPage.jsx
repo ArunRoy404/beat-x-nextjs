@@ -43,18 +43,7 @@ const UserResetPasswordPage = () => {
     }, [email, otp, router])
 
     const onSubmit = ({ newPassword }) => {
-        resetPassword(
-            { email, otp, newPassword },
-            {
-                onSuccess: () => {
-                    toast.success("Password changed successfully!")
-                    router.push("/reset-password/success")
-                },
-                onError: (error) => {
-                    toast.error(error.message || "Could not reset password")
-                },
-            }
-        )
+        resetPassword({ email, otp, newPassword })
     }
 
     const onInvalid = (validationErrors) => {

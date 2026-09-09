@@ -1,7 +1,4 @@
-"use client"
-
 import React from "react"
-import { toast } from "sonner"
 import { RefreshCw } from "lucide-react"
 import { format } from "date-fns"
 import { Button } from "@/components/ui/button"
@@ -17,13 +14,7 @@ const SchedulerStatusWidget = () => {
     const job = status?.registeredJobs?.find((registeredJob) => registeredJob.name === JOB_NAME)
 
     const handleRunNow = () => {
-        triggerJob(
-            { jobName: JOB_NAME },
-            {
-                onSuccess: () => toast.success("Scheduled-publish check triggered."),
-                onError: (error) => toast.error(error?.message || "Failed to trigger scheduler job."),
-            }
-        )
+        triggerJob({ jobName: JOB_NAME })
     }
 
     return (

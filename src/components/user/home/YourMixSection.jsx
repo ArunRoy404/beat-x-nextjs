@@ -1,9 +1,9 @@
 "use client"
 
+import Link from "next/link"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { useUserHomeStore } from "@/zustandStore/user/userStore/userHomeStore"
 import { Carousel, CarouselContent, CarouselItem, useCarousel } from "@/components/ui/carousel"
+import { cn } from "@/lib/utils"
 import MixCard from "./MixCard"
 
 const NavButton = ({ direction, onClick, disabled }) => (
@@ -32,17 +32,17 @@ const MixCarouselNav = () => {
     )
 }
 
-const YourMixSection = () => {
-    const mixes = useUserHomeStore((state) => state.mixes)
+const YourMixSection = ({ mixes = [] }) => {
+    if (!mixes || mixes.length === 0) return null
 
     return (
         <section className="flex w-full flex-col gap-4">
             <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                     <h2 className="text-2xl text-whitetext sm:text-[32px]">Your Mix</h2>
-                    <button type="button" className="shrink-0 cursor-pointer text-sm text-secondary sm:text-base">
+                    <Link href="/library" className="shrink-0 cursor-pointer text-sm text-secondary sm:text-base hover:underline">
                         View All
-                    </button>
+                    </Link>
                 </div>
                 <p className="text-sm text-light-gray sm:text-base">Personalized rhythms for your unique flow.</p>
             </div>
@@ -53,11 +53,14 @@ const YourMixSection = () => {
             >
                 <MixCarouselNav />
                 <CarouselContent className="-ml-4 sm:-ml-6">
-                    {mixes.map((mix) => (
-                        <CarouselItem key={mix.id} className="basis-40 pl-4 sm:basis-56 sm:pl-6 md:basis-64">
-                            <MixCard mix={mix} />
-                        </CarouselItem>
-                    ))}
+                    {mixes?.map((mix, idx) => {
+                        const song = mix?.song || mix
+                        return (
+                            <CarouselItem key={song?._id || song?.id || mix?._id || idx} className="basis-40 pl-4 sm:basis-56 sm:pl-6 md:basis-64">
+                                <MixCard mix={song} />
+                            </CarouselItem>
+                        )
+                    })}
                 </CarouselContent>
             </Carousel>
         </section>

@@ -1,17 +1,12 @@
 import React from "react"
 import Link from "next/link"
 import { LogOut, ChevronRight } from "lucide-react"
-import { toast } from "sonner"
 import CommonAvatar from "@/components/shared/CommonAvatar"
 import { Spinner } from "@/components/ui/spinner"
 
 const SidebarUserFooter = ({ name, role, avatar, href, onLogout, isLoggingOut = false }) => {
     const handleLogout = () => {
-        if (onLogout) {
-            onLogout()
-            return
-        }
-        toast.success("Logged out")
+        onLogout?.()
     }
 
     const ProfileWrapper = href ? Link : "div"

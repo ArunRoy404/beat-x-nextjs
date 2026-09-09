@@ -74,11 +74,9 @@ const CreateAlbumForm = ({ onSuccess, onCancel }) => {
 
         createAlbum(formData, {
             onSuccess: () => {
-                toast.success("Album created successfully!")
                 reset()
                 onSuccess?.()
             },
-            onError: (error) => toast.error(error?.message || "Failed to create album."),
         })
     }
 

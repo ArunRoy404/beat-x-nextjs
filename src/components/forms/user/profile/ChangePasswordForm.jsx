@@ -4,7 +4,6 @@ import React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Lock } from "lucide-react"
-import { toast } from "sonner"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
 import CommonFormActions from "@/components/shared/CommonFormActions"
@@ -33,12 +32,8 @@ const ChangePasswordForm = ({ onSuccess, onCancel }) => {
     const onSubmit = (values) => {
         changePassword(values, {
             onSuccess: () => {
-                toast.success("Password changed successfully!")
                 reset()
                 onSuccess?.()
-            },
-            onError: (error) => {
-                toast.error(error?.message || "Failed to change your password.")
             },
         })
     }

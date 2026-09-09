@@ -1,11 +1,9 @@
 "use client"
 
 import React from "react"
-import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Lock } from "lucide-react"
-import { toast } from "sonner"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
 import CommonFormActions from "@/components/shared/CommonFormActions"
@@ -13,7 +11,6 @@ import { deleteAccountSchema } from "@/zodSchema/UserProfileZodSchema"
 import { useDeleteAccount } from "@/hooks/api/user/profile/useDeleteAccount"
 
 const DeleteAccountForm = ({ onCancel }) => {
-    const router = useRouter()
     const { mutate: deleteAccount, isPending } = useDeleteAccount()
 
     const {
@@ -26,19 +23,7 @@ const DeleteAccountForm = ({ onCancel }) => {
     })
 
     const onSubmit = ({ password }) => {
-        deleteAccount(
-            { password },
-            {
-                onSuccess: () => {
-                    toast.success("Your account has been deleted.")
-                    router.push("/register")
-                    router.refresh()
-                },
-                onError: (error) => {
-                    toast.error(error?.message || "Failed to delete your account.")
-                },
-            }
-        )
+        deleteAccount({ password })
     }
 
     return (

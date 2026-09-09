@@ -89,16 +89,15 @@ const EditVideoDialog = ({ video: summary, children }) => {
         isTrending,
       }
 
-      await updateVideo({ id: video._id, body })
+      await updateVideo({ id: video?._id, body })
 
       if (newCoverFile) {
-        await updateCover({ id: video._id, file: newCoverFile })
+        await updateCover({ id: video?._id, file: newCoverFile })
       }
 
-      toast.success("Video changes saved successfully!")
       setOpen(false)
-    } catch (error) {
-      toast.error(error?.response?.data?.message || error?.message || "Failed to update video.")
+    } catch {
+      // Handled by hook
     }
   }
 

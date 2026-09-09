@@ -3,7 +3,6 @@
 import React, { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
 import { useCreateAudioBook } from "@/hooks/api/admin/audiobooks/useCreateAudioBook"
@@ -54,12 +53,10 @@ const AddAudioBookForm = ({ onSuccess, onCancel }) => {
 
         createAudioBook(formData, {
             onSuccess: () => {
-                toast.success("Audiobook created successfully!")
                 reset()
                 setCover(null)
                 onSuccess?.()
             },
-            onError: (error) => toast.error(error?.message || "Failed to create audiobook."),
         })
     }
 

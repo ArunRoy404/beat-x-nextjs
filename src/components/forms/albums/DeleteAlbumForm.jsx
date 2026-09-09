@@ -1,10 +1,7 @@
-"use client"
-
 import React from "react"
 import { Button } from "@/components/ui/button"
 import { DialogClose } from "@/components/ui/dialog"
 import { Trash2 } from "lucide-react"
-import { toast } from "sonner"
 import { useDeleteAlbum } from "@/hooks/api/admin/albums/useDeleteAlbum"
 
 const DeleteAlbumForm = ({ album, onSuccess, onCancel }) => {
@@ -12,13 +9,11 @@ const DeleteAlbumForm = ({ album, onSuccess, onCancel }) => {
 
     const handleDelete = () => {
         deleteAlbum(
-            { id: album._id },
+            { id: album?._id },
             {
                 onSuccess: () => {
-                    toast.success("Album deleted successfully!")
                     onSuccess?.()
                 },
-                onError: (error) => toast.error(error?.message || "Failed to delete album."),
             }
         )
     }

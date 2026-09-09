@@ -1,10 +1,7 @@
-"use client"
-
 import React from "react"
 import { Button } from "@/components/ui/button"
 import { DialogClose } from "@/components/ui/dialog"
 import { Trash2 } from "lucide-react"
-import { toast } from "sonner"
 import { useDeleteAudioBook } from "@/hooks/api/admin/audiobooks/useDeleteAudioBook"
 
 const DeleteAudioBookForm = ({ book, onSuccess, onCancel }) => {
@@ -12,13 +9,11 @@ const DeleteAudioBookForm = ({ book, onSuccess, onCancel }) => {
 
     const handleDelete = () => {
         deleteAudioBook(
-            { id: book._id },
+            { id: book?._id },
             {
                 onSuccess: () => {
-                    toast.success("Audiobook deleted successfully!")
                     onSuccess?.()
                 },
-                onError: (error) => toast.error(error?.message || "Failed to delete audiobook."),
             }
         )
     }

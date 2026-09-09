@@ -87,11 +87,9 @@ const UploadVideoDialog = ({ children }) => {
 
     createVideo(formData, {
       onSuccess: () => {
-        toast.success("Video uploaded successfully! Processing video now.")
         handleReset()
         setOpen(false)
       },
-      onError: (error) => toast.error(error?.response?.data?.message || error?.message || "Failed to upload video."),
     })
   }
 

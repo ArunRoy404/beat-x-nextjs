@@ -1,6 +1,5 @@
 import React from "react"
 import { Eye, Trash2, SquarePen, CheckCircle, XCircle } from "lucide-react"
-import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import EditPodcastDialog from "@/components/dialogs/admin/podcasts/EditPodcastDialog"
@@ -17,23 +16,11 @@ const PodcastsTableActions = ({ status, podcast, className }) => {
     const isPendingOrDraft = status === "draft" || status === "pending" || podcast?.submittedStatus === "pending" || podcast?.status === "pending"
 
     const handleApprove = () => {
-        approvePodcast(
-            { id: podcast._id },
-            {
-                onSuccess: () => toast.success("Podcast approved!"),
-                onError: (error) => toast.error(error?.message || "Failed to approve podcast."),
-            }
-        )
+        approvePodcast({ id: podcast?._id })
     }
 
     const handleStatusChange = (nextStatus) => {
-        updatePodcastStatus(
-            { id: podcast._id, status: nextStatus },
-            {
-                onSuccess: () => toast.success(nextStatus === "archived" ? "Podcast taken down." : "Podcast restored."),
-                onError: (error) => toast.error(error?.message || "Failed to update podcast status."),
-            }
-        )
+        updatePodcastStatus({ id: podcast?._id, status: nextStatus })
     }
 
     return (

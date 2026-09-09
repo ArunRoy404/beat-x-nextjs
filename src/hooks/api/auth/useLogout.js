@@ -1,7 +1,9 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { signOut } from "next-auth/react"
+import { toast } from "sonner"
 import { logoutRequest } from "@/services/auth/authServices"
 
 /**
@@ -9,13 +11,16 @@ import { logoutRequest } from "@/services/auth/authServices"
  * session (even if the backend call fails — a flaky logout request should
  * never trap the user in a signed-in state) and wipes every cached query,
  * since all of it belonged to the session that just ended.
- *   const { mutate: logout, isPending } = useLogout()
- *   logout(undefined, { onSuccess, onError })
+ *
+ * All side-effects (toast.promise, navigation, query invalidation) are encapsulated here:
+ *   const { logout, isPending } = useLogout({ redirectTo: "/admin/login" })
+ *   logout()
  */
-export function useLogout() {
+export function useLogout({ redirectTo = "/login" } = {}) {
+  const router = useRouter()
   const queryClient = useQueryClient()
 
-  return useMutation({
+  const mutation = useMutation({
     mutationFn: async () => {
       try {
         await logoutRequest()
@@ -27,4 +32,33 @@ export function useLogout() {
       queryClient.clear()
     },
   })
+
+  const logout = (options) => {
+    const targetRedirect =
+      typeof options?.redirectTo === "string" ? options.redirectTo : redirectTo
+
+    const promise = mutation.mutateAsync().then(() => {
+      if (targetRedirect) {
+        router.push(targetRedirect)
+        // Force fresh check in case proxy/middleware cached redirect
+        router.refresh()
+      }
+    })
+
+    toast.promise(promise, {
+      loading: "Logging out...",
+      success: "Logged out successfully",
+      error: (err) => err?.response?.data?.message || "Something went wrong while logging out",
+    })
+
+    return promise
+  }
+
+  return {
+    ...mutation,
+    mutate: logout,
+    mutateAsync: logout,
+    logout,
+  }
 }
+

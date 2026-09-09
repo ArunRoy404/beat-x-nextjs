@@ -2,7 +2,7 @@
 
 import React from "react"
 import Link from "next/link"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -22,9 +22,9 @@ const loginSchema = z.object({
 })
 
 const AdminLoginPage = () => {
-    const router = useRouter()
     const searchParams = useSearchParams()
-    const { mutate: login, isPending } = useLogin()
+    const callbackUrl = getSafeCallbackUrl(searchParams.get("callbackUrl"), "/admin/dashboard/overview")
+    const { mutate: login, isPending } = useLogin({ redirectTo: callbackUrl })
 
     const {
         register,
@@ -41,22 +41,7 @@ const AdminLoginPage = () => {
     })
 
     const onSubmit = ({ email, password }) => {
-        login(
-            { email, password },
-            {
-                onSuccess: () => {
-                    toast.success("Logged in successfully!")
-                    router.push(getSafeCallbackUrl(searchParams.get("callbackUrl"), "/admin/dashboard/overview"))
-                    // The destination may have been cached client-side as an
-                    // unauthenticated redirect (proxy.js) before login — force
-                    // a fresh server round-trip so it isn't served stale.
-                    router.refresh()
-                },
-                onError: (error) => {
-                    toast.error(error.message || "Invalid email or password")
-                },
-            }
-        )
+        login({ email, password })
     }
 
     const onInvalid = (validationErrors) => {
