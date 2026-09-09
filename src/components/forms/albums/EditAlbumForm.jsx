@@ -3,7 +3,6 @@
 import React, { useState } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { toast } from "sonner"
 import { CheckCircle2, Clock, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
@@ -84,18 +83,17 @@ const EditAlbumForm = ({ album, onSuccess, onCancel }) => {
         }
 
         try {
-            await updateAlbum({ id: album._id, body })
+            await updateAlbum({ id: album?._id, body })
 
             if (cover instanceof File) {
                 const coverFormData = new FormData()
                 coverFormData.append("file", cover)
-                await replaceCover({ id: album._id, formData: coverFormData })
+                await replaceCover({ id: album?._id, formData: coverFormData })
             }
 
-            toast.success("Album updated successfully!")
             onSuccess?.()
-        } catch (error) {
-            toast.error(error?.message || "Failed to update album.")
+        } catch {
+            // Hook handles onError toast
         }
     }
 

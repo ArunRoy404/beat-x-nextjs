@@ -3,7 +3,6 @@
 import React, { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { DialogClose } from "@/components/ui/dialog"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
@@ -60,13 +59,11 @@ const EditSongForm = ({ song, onSuccess, onCancel }) => {
         if (cover instanceof File) formData.append("cover", cover)
 
         updateSong(
-            { id: song._id, formData },
+            { id: song?._id, formData },
             {
-                onSuccess: (result) => {
-                    toast.success(result?.trackingId ? "Song updated — processing new audio now." : "Song updated successfully!")
+                onSuccess: () => {
                     onSuccess?.()
                 },
-                onError: (error) => toast.error(error?.message || "Failed to update song."),
             }
         )
     }

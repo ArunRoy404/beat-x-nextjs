@@ -3,7 +3,6 @@
 import React from "react"
 import { Button } from "@/components/ui/button"
 import { Trash2 } from "lucide-react"
-import { toast } from "sonner"
 import { useDeleteGenre } from "@/hooks/api/admin/genre/useDeleteGenre"
 
 const DeleteGenreForm = ({ genre, onSuccess, onCancel }) => {
@@ -11,14 +10,10 @@ const DeleteGenreForm = ({ genre, onSuccess, onCancel }) => {
 
     const handleDelete = () => {
         deleteGenre(
-            { id: genre._id },
+            { id: genre?._id },
             {
                 onSuccess: () => {
-                    toast.success("Genre deleted successfully!")
                     onSuccess?.()
-                },
-                onError: (error) => {
-                    toast.error(error?.message || "Failed to delete genre.")
                 },
             }
         )

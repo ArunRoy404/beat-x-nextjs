@@ -1,6 +1,5 @@
 import React from "react"
 import { Eye, Trash2, SquarePen, CheckCircle, XCircle } from "lucide-react"
-import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import EditSongDialog from "@/components/dialogs/admin/music/EditSongDialog"
@@ -17,23 +16,11 @@ const SongsTableActions = ({ status, song, className }) => {
     const isPendingSubmission = status === "pending" || song?.submittedStatus === "pending" || song?.status === "pending"
 
     const handleApprove = () => {
-        approveSong(
-            { id: song._id },
-            {
-                onSuccess: () => toast.success("Song submission approved!"),
-                onError: (error) => toast.error(error?.message || "Failed to approve song."),
-            }
-        )
+        approveSong({ id: song?._id })
     }
 
     const handleStatusChange = (nextStatus) => {
-        updateSongStatus(
-            { id: song._id, status: nextStatus },
-            {
-                onSuccess: () => toast.success(nextStatus === "archived" ? "Song taken down." : "Song restored."),
-                onError: (error) => toast.error(error?.message || "Failed to update song status."),
-            }
-        )
+        updateSongStatus({ id: song?._id, status: nextStatus })
     }
 
     return (

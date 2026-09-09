@@ -28,14 +28,10 @@ const RejectSongDialog = ({ song, children }) => {
     }
 
     rejectSong(
-      { id: song._id, reason: reason.trim() },
+      { id: song?._id, reason: reason.trim() },
       {
         onSuccess: () => {
-          toast.success("Song submission rejected.");
           setOpen(false);
-        },
-        onError: (error) => {
-          toast.error(error?.message || "Failed to reject song submission.");
         },
       }
     );

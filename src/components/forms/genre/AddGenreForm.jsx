@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
-import { toast } from "sonner"
 import { useCreateGenre } from "@/hooks/api/admin/genre/useCreateGenre"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
@@ -34,12 +33,8 @@ const AddGenreForm = ({ onSuccess, onCancel }) => {
             { name: data.name },
             {
                 onSuccess: () => {
-                    toast.success("Genre added successfully!")
                     reset()
                     onSuccess?.()
-                },
-                onError: (error) => {
-                    toast.error(error?.message || "Failed to add genre.")
                 },
             }
         )

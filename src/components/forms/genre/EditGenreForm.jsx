@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
-import { toast } from "sonner"
 import { useUpdateGenre } from "@/hooks/api/admin/genre/useUpdateGenre"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
@@ -38,14 +37,10 @@ const EditGenreForm = ({ genre, onSuccess, onCancel }) => {
 
     const onSubmit = (data) => {
         updateGenre(
-            { id: genre._id, name: data.name },
+            { id: genre?._id, name: data.name },
             {
                 onSuccess: () => {
-                    toast.success("Genre updated successfully!")
                     onSuccess?.()
-                },
-                onError: (error) => {
-                    toast.error(error?.message || "Failed to update genre.")
                 },
             }
         )
