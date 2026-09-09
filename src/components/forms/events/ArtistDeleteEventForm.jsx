@@ -21,10 +21,9 @@ const ArtistDeleteEventForm = ({ event, onSuccess, onCancel }) => {
 
         try {
             await deleteEventMutation.mutateAsync(eventId)
-            toast.success("Event deleted successfully!")
             onSuccess?.()
-        } catch (err) {
-            toast.error(err?.response?.data?.message || err?.message || "Failed to delete event")
+        } catch {
+            // Handled by hook
         }
     }
 

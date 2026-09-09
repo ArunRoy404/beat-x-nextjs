@@ -105,11 +105,7 @@ const EditProductForm = ({ product, onSuccess, onCancel }) => {
             { id: productId, data: payload },
             {
                 onSuccess: () => {
-                    toast.success("Product updated successfully!")
                     onSuccess?.()
-                },
-                onError: (err) => {
-                    toast.error(err?.response?.data?.message || err?.message || "Failed to update product")
                 },
             }
         )

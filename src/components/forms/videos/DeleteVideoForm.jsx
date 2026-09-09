@@ -1,10 +1,7 @@
-"use client"
-
 import React from "react"
 import { Button } from "@/components/ui/button"
 import { DialogClose } from "@/components/ui/dialog"
 import { Trash2 } from "lucide-react"
-import { toast } from "sonner"
 import { useDeleteVideo } from "@/hooks/api/admin/videos/useDeleteVideo"
 
 const DeleteVideoForm = ({ video, onSuccess, onCancel }) => {
@@ -16,10 +13,8 @@ const DeleteVideoForm = ({ video, onSuccess, onCancel }) => {
             { id: video._id },
             {
                 onSuccess: () => {
-                    toast.success("Video deleted successfully!")
                     onSuccess?.()
                 },
-                onError: (error) => toast.error(error?.message || "Failed to delete video."),
             }
         )
     }

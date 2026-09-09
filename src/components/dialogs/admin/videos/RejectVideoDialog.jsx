@@ -31,11 +31,7 @@ const RejectVideoDialog = ({ video, children }) => {
       { id: video?._id, reason: reason.trim() },
       {
         onSuccess: () => {
-          toast.success("Video submission rejected successfully.")
           setOpen(false)
-        },
-        onError: (error) => {
-          toast.error(error?.message || "Failed to reject video submission.")
         },
       }
     )

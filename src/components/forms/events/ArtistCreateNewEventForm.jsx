@@ -61,11 +61,10 @@ const ArtistCreateNewEventForm = ({ onSuccess, onCancel }) => {
 
         try {
             await createEventMutation.mutateAsync(formData)
-            toast.success("Event submitted successfully!")
             reset()
             onSuccess?.()
-        } catch (err) {
-            toast.error(err?.response?.data?.message || err?.message || "Failed to create event")
+        } catch {
+            // Handled by hook
         }
     }
 
