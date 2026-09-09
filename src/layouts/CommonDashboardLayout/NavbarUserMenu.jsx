@@ -43,6 +43,7 @@ const NavbarUserMenu = ({ name, role, avatar, href, onLogout, isLoggingOut = fal
                     variant="destructive"
                     onClick={onLogout}
                     disabled={isLoggingOut}
+                    closeOnClick={false}
                     className="gap-3 px-2 py-2 rounded-[8px]"
                 >
                     {isLoggingOut ? (

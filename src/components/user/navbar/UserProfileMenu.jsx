@@ -1,8 +1,6 @@
 "use client"
 
-import { useRouter } from "next/navigation"
 import { Bell, Download, Gem, Library, UserRound } from "lucide-react"
-import { toast } from "sonner"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -28,29 +26,16 @@ const menuIcons = {
 }
 
 const UserProfileMenu = () => {
-    const router = useRouter()
     const { data: profile } = useMyProfile()
-    const { mutate: logout, isPending: isLoggingOut } = useLogout()
-
-    const handleLogout = () => {
-        logout(undefined, {
-            onSuccess: () => {
-                toast.success("Logged out successfully")
-                router.push("/login")
-                // proxy.js may have cached an authenticated redirect for
-                // /login from before logout — force a fresh check.
-                router.refresh()
-            },
-            onError: () => {
-                toast.error("Something went wrong while logging out")
-            },
-        })
-    }
+    const { logout, isPending: isLoggingOut } = useLogout({ redirectTo: "/login" })
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger className="cursor-pointer rounded-[8px] outline-none focus-visible:ring-2 focus-visible:ring-secondary/60">
-                <UserProfileMenuTrigger name={profile?.name} />
+                <UserProfileMenuTrigger
+                    name={profile?.name}
+                    avatar={profile?.avatar || profile?.image || profile?.profileImage}
+                />
             </DropdownMenuTrigger>
 
             <DropdownMenuContent
@@ -61,6 +46,7 @@ const UserProfileMenu = () => {
                 <UserProfileMenuHeader
                     name={profile?.name}
                     email={profile?.email}
+                    avatar={profile?.avatar || profile?.image || profile?.profileImage}
                     isVerified={profile?.isVerified}
                 />
 
@@ -83,7 +69,7 @@ const UserProfileMenu = () => {
 
                 <DropdownMenuSeparator />
 
-                <UserProfileMenuLogoutItem onLogout={handleLogout} isLoggingOut={isLoggingOut} />
+                <UserProfileMenuLogoutItem onLogout={logout} isLoggingOut={isLoggingOut} />
             </DropdownMenuContent>
         </DropdownMenu>
     )
