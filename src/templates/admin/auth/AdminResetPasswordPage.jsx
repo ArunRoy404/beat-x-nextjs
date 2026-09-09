@@ -25,7 +25,7 @@ const AdminResetPasswordPage = () => {
     const searchParams = useSearchParams()
     const email = searchParams.get("email")
     const otp = searchParams.get("otp")
-    const { mutate: resetPassword, isPending } = useResetPassword()
+    const { mutate: resetPassword, isPending } = useResetPassword({ redirectTo: "/admin/reset-password/success" })
 
     const {
         register,
@@ -43,18 +43,7 @@ const AdminResetPasswordPage = () => {
     }, [email, otp, router])
 
     const onSubmit = ({ newPassword }) => {
-        resetPassword(
-            { email, otp, newPassword },
-            {
-                onSuccess: () => {
-                    toast.success("Password changed successfully!")
-                    router.push("/admin/reset-password/success")
-                },
-                onError: (error) => {
-                    toast.error(error.message || "Could not reset password")
-                },
-            }
-        )
+        resetPassword({ email, otp, newPassword })
     }
 
     const onInvalid = (validationErrors) => {

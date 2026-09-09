@@ -1,7 +1,6 @@
 "use client"
 
 import React from "react"
-import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -17,8 +16,7 @@ const forgotPasswordSchema = z.object({
 })
 
 const AdminForgotPasswordPage = () => {
-    const router = useRouter()
-    const { mutate: sendResetCode, isPending } = useForgotPassword()
+    const { mutate: sendResetCode, isPending } = useForgotPassword({ redirectTo: "/admin/otp-verification" })
 
     const {
         register,
@@ -30,18 +28,7 @@ const AdminForgotPasswordPage = () => {
     })
 
     const onSubmit = ({ email }) => {
-        sendResetCode(
-            { email },
-            {
-                onSuccess: () => {
-                    toast.success("Verification code sent to your email!")
-                    router.push(`/admin/otp-verification?email=${encodeURIComponent(email)}`)
-                },
-                onError: (error) => {
-                    toast.error(error.message || "Could not send verification code")
-                },
-            }
-        )
+        sendResetCode({ email })
     }
 
     const onInvalid = (validationErrors) => {

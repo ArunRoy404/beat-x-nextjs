@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import CommonOtpInput from "@/components/shared/CommonInputs/CommonOtpInput/CommonOtpInput"
 import AuthLayout from "@/components/shared/AuthLayout/AuthLayout"
@@ -36,14 +35,10 @@ const AdminOtpVerificationPage = () => {
 
     const handleResend = () => {
         sendResetCode(
-            { email },
+            { email, isResend: true },
             {
                 onSuccess: () => {
                     setSecondsLeft(RESEND_SECONDS)
-                    toast.success("Verification code resent!")
-                },
-                onError: (error) => {
-                    toast.error(error.message || "Could not resend verification code")
                 },
             }
         )

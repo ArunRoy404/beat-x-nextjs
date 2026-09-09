@@ -2,7 +2,6 @@
 
 import React from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -36,7 +35,6 @@ const registerSchema = z.object({
 const inputClassName = "h-14 rounded-full bg-dark-accent border-transparent text-[16px] placeholder:text-[16px]"
 
 const UserRegisterPage = () => {
-    const router = useRouter()
     const { mutate: registerAccount, isPending } = useRegister()
     // const sonicPreferences = useUserRegisterStore((state) => state.sonicPreferences)
 
@@ -56,18 +54,7 @@ const UserRegisterPage = () => {
     })
 
     const onSubmit = ({ name, email, password }) => {
-        registerAccount(
-            { name, email, password, role: "user" },
-            {
-                onSuccess: (data) => {
-                    toast.success(data?.message || "Check your email for the verification code.")
-                    router.push(`/verify-email?email=${encodeURIComponent(data?.email || email)}`)
-                },
-                onError: (error) => {
-                    toast.error(error.message || "Could not create your account")
-                },
-            }
-        )
+        registerAccount({ name, email, password, role: "user" })
     }
 
     const onInvalid = (validationErrors) => {

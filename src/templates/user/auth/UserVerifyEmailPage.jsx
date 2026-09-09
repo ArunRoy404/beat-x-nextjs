@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Mail } from "lucide-react"
-import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import CommonOtpInput from "@/components/shared/CommonInputs/CommonOtpInput/CommonOtpInput"
 import AuthLayout from "@/components/shared/AuthLayout/AuthLayout"
@@ -44,10 +43,6 @@ const UserVerifyEmailPage = () => {
             {
                 onSuccess: () => {
                     setSecondsLeft(RESEND_SECONDS)
-                    toast.success("Verification code resent!")
-                },
-                onError: (error) => {
-                    toast.error(error.message || "Could not resend verification code")
                 },
             }
         )
@@ -62,19 +57,7 @@ const UserVerifyEmailPage = () => {
         }
 
         setError("")
-        verifyEmail(
-            { email, otp },
-            {
-                onSuccess: () => {
-                    toast.success("Email verified! Welcome to BeatX.")
-                    router.push("/")
-                    router.refresh()
-                },
-                onError: (error) => {
-                    toast.error(error.message || "Invalid or expired verification code")
-                },
-            }
-        )
+        verifyEmail({ email, otp })
     }
 
     return (
