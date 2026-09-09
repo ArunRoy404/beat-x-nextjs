@@ -4,36 +4,38 @@ import React, { useRef, useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Play,
-  Pause,
-  RotateCcw,
-  RotateCw,
+  ListMusic,
+  Maximize2,
+  Mic2,
+  Music,
+  Repeat,
+  Shuffle,
+  SkipBack,
+  SkipForward,
+  Video,
   Volume2,
-  Volume1,
   VolumeX,
   X,
-  Minimize2,
-  Maximize2,
-  GripHorizontal,
-  Music,
-  Video,
 } from "lucide-react";
+import GradientPlayButton from "@/components/shared/GradientPlayButton";
 import { useGlobalMediaPlayerStore } from "@/zustandStore/media/useGlobalMediaPlayerStore";
 import { useVolumeStore } from "@/zustandStore/audio/useVolumeStore";
 import { resolveMediaUrl } from "@/lib/format/resolveMediaUrl";
 import { toast } from "sonner";
 
+const SEEK_SECONDS = 10;
+
 const formatTime = (seconds) => {
-  if (!seconds || isNaN(seconds)) return "0:00";
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  if (!Number.isFinite(seconds)) return "00:00";
+  const total = Math.max(0, Math.floor(seconds));
+  const minutes = Math.floor(total / 60);
+  const secs = total % 60;
+  return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 };
 
 const GlobalFloatingMediaPlayer = () => {
   const {
     isOpen,
-    isMinimized,
     isPlaying,
     mediaType,
     src: rawSrc,
@@ -46,7 +48,6 @@ const GlobalFloatingMediaPlayer = () => {
     pauseMedia,
     setCurrentTime,
     setDuration,
-    toggleMinimize,
     closePlayer,
   } = useGlobalMediaPlayerStore();
 
@@ -56,7 +57,7 @@ const GlobalFloatingMediaPlayer = () => {
   const { volume, isMuted, setVolume, toggleMute } = useVolumeStore();
 
   const mediaRef = useRef(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [repeat, setRepeat] = useState(false);
 
   // Helper to reliably apply volume to the HTML5 media element
   const applyVolume = useCallback(() => {
@@ -72,6 +73,21 @@ const GlobalFloatingMediaPlayer = () => {
     applyVolume();
   }, [applyVolume, src]);
 
+  // Load duration if already available on element
+  useEffect(() => {
+    const el = mediaRef.current;
+    if (el && Number.isFinite(el.duration) && el.duration > 0) {
+      setDuration(el.duration);
+    }
+  }, [src, setDuration]);
+
+  // Sync loop/repeat
+  useEffect(() => {
+    if (mediaRef.current) {
+      mediaRef.current.loop = repeat;
+    }
+  }, [repeat]);
+
   // Sync HTML5 media play/pause state with Zustand store
   useEffect(() => {
     const el = mediaRef.current;
@@ -86,7 +102,7 @@ const GlobalFloatingMediaPlayer = () => {
           console.warn("Global media playback error:", err);
           pauseMedia();
           if (err?.name === "NotSupportedError") {
-            toast.error("Audio stream source is unavailable or still processing on backend.");
+            toast.error("Media stream source is unavailable or still processing on backend.");
           } else {
             toast.error("Playback error. Please check media source.");
           }
@@ -96,50 +112,38 @@ const GlobalFloatingMediaPlayer = () => {
     }
   }, [isPlaying, src, pauseMedia, applyVolume]);
 
-  const handleSeek = (e) => {
-    const newTime = parseFloat(e.target.value);
+  const seekBy = (delta) => {
+    const media = mediaRef.current;
+    if (!media) return;
+    const max = Number.isFinite(media.duration) ? media.duration : Infinity;
+    const newTime = Math.min(Math.max(media.currentTime + delta, 0), max);
+    media.currentTime = newTime;
+    setCurrentTime(newTime);
+  };
+
+  const handleSeekChange = (e) => {
+    const time = Number(e.target.value);
     if (mediaRef.current) {
-      mediaRef.current.currentTime = newTime;
+      mediaRef.current.currentTime = time;
     }
-    setCurrentTime(newTime);
-  };
-
-  const handleRewind = () => {
-    if (!mediaRef.current) return;
-    const newTime = Math.max(mediaRef.current.currentTime - 10, 0);
-    mediaRef.current.currentTime = newTime;
-    setCurrentTime(newTime);
-  };
-
-  const handleForward = () => {
-    if (!mediaRef.current) return;
-    const totalDuration = duration || mediaRef.current.duration || 0;
-    const newTime = Math.min(mediaRef.current.currentTime + 10, totalDuration);
-    mediaRef.current.currentTime = newTime;
-    setCurrentTime(newTime);
+    setCurrentTime(time);
   };
 
   const handleVolumeChange = (e) => {
-    const newVol = parseFloat(e.target.value);
-    setVolume(newVol);
+    const value = Number(e.target.value);
+    setVolume(value);
     if (mediaRef.current) {
-      mediaRef.current.volume = Math.max(0, Math.min(1, isMuted ? 0 : newVol));
+      mediaRef.current.volume = Math.max(0, Math.min(1, isMuted ? 0 : value));
     }
   };
 
   const toggleFullscreenVideo = () => {
     if (!mediaRef.current) return;
     if (!document.fullscreenElement) {
-      mediaRef.current.requestFullscreen?.().then(() => setIsFullscreen(true)).catch(() => {});
+      mediaRef.current.requestFullscreen?.().catch(() => {});
     } else {
-      document.exitFullscreen?.().then(() => setIsFullscreen(false)).catch(() => {});
+      document.exitFullscreen?.().catch(() => {});
     }
-  };
-
-  const renderVolumeIcon = () => {
-    if (isMuted || volume === 0) return <VolumeX className="w-3.5 h-3.5 text-red-error" />;
-    if (volume < 0.5) return <Volume1 className="w-3.5 h-3.5 text-light-gray" />;
-    return <Volume2 className="w-3.5 h-3.5 text-light-gray" />;
   };
 
   const handleMediaLoaded = () => {
@@ -149,50 +153,217 @@ const GlobalFloatingMediaPlayer = () => {
     }
   };
 
+  const progress = duration ? currentTime / duration : 0;
+
   return (
     <AnimatePresence mode="wait">
       {isOpen && src && (
-        /* Draggable Floating Container fixed at bottom right by default */
-        <motion.div
-          key="global-floating-media-player"
-          drag
-          dragMomentum={false}
-          layout
-          initial={{ opacity: 0, scale: 0.15, y: 30 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.15, y: 30 }}
-          transition={{
-            type: "spring",
-            stiffness: 360,
-            damping: 24,
-            mass: 0.75,
-          }}
-          className="fixed bottom-6 right-6 z-[999999] shadow-2xl rounded-[20px] bg-[#0E0E0E]/95 backdrop-blur-xl border border-white/15 text-whitetext overflow-hidden select-none cursor-default"
-          style={{ touchAction: "none", transformOrigin: "bottom right" }}
-        >
-          {/* Hidden / Visible Media HTML5 Element */}
-          {mediaType === "video" ? (
-            <video
-              ref={mediaRef}
-              src={src}
-              onTimeUpdate={() => mediaRef.current && setCurrentTime(mediaRef.current.currentTime)}
-              onLoadedMetadata={handleMediaLoaded}
-              onCanPlay={applyVolume}
-              onPlay={applyVolume}
-              onEnded={() => pauseMedia()}
-              onError={() => {
-                pauseMedia();
-                toast.error("Video stream source failed to load.");
-              }}
-              className={isMinimized ? "hidden" : "w-full h-44 object-cover bg-black"}
-              playsInline
-            />
-          ) : (
+        mediaType === "video" ? (
+          /* DEDICATED SLEEK FLOATING VIDEO PLAYER */
+          <motion.div
+            key="global-floating-video-player"
+            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 30, scale: 0.95 }}
+            transition={{
+              type: "spring",
+              stiffness: 280,
+              damping: 22,
+            }}
+            className="fixed bottom-6 right-6 z-[999999] w-[340px] sm:w-[410px] md:w-[450px] rounded-xl border border-border bg-(--player-bar-bg) shadow-2xl backdrop-blur-xl overflow-hidden select-none"
+          >
+            {/* 16:9 Video Canvas */}
+            <div className="relative aspect-video w-full bg-black group overflow-hidden">
+              <video
+                ref={mediaRef}
+                src={src}
+                poster={coverUrl}
+                onLoadedMetadata={handleMediaLoaded}
+                onTimeUpdate={() => {
+                  if (mediaRef.current) setCurrentTime(mediaRef.current.currentTime);
+                }}
+                onCanPlay={applyVolume}
+                onPlay={applyVolume}
+                onEnded={() => pauseMedia()}
+                onError={() => {
+                  pauseMedia();
+                  toast.error("Video stream source failed to load.");
+                }}
+                className="size-full object-contain bg-black cursor-pointer"
+                onClick={togglePlay}
+                playsInline
+              />
+
+              {/* Top Hover Header Overlay */}
+              <div className="absolute top-0 inset-x-0 p-3 flex items-center justify-between bg-gradient-to-b from-black/85 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-auto">
+                <div className="flex items-center gap-2 min-w-0 pr-2">
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-black/60 border border-white/10 text-[10px] font-semibold uppercase tracking-wider text-secondary backdrop-blur-sm shrink-0">
+                    <Video className="size-3" />
+                    Video
+                  </span>
+                  <span className="text-xs font-medium text-whitetext truncate drop-shadow-md">
+                    {title || "Video Stream"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={toggleFullscreenVideo}
+                    className="p-1.5 rounded-md bg-black/50 text-white/80 hover:text-white hover:bg-black/80 backdrop-blur-sm transition-colors cursor-pointer"
+                    title="Fullscreen"
+                  >
+                    <Maximize2 className="size-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={closePlayer}
+                    className="p-1.5 rounded-md bg-black/50 text-white/80 hover:text-red-error hover:bg-black/80 backdrop-blur-sm transition-colors cursor-pointer"
+                    title="Close"
+                  >
+                    <X className="size-3.5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Center Play Indicator when Paused */}
+              {!isPlaying && (
+                <div
+                  onClick={togglePlay}
+                  className="absolute inset-0 flex items-center justify-center bg-black/35 cursor-pointer z-10 transition-opacity"
+                >
+                  <div className="size-12 rounded-full bg-secondary/90 text-black flex items-center justify-center shadow-lg shadow-black/60 hover:scale-110 active:scale-95 transition-all">
+                    <svg viewBox="0 0 14 18" className="w-4 h-4 text-black ml-0.5" fill="currentColor">
+                      <path d="M1 1.6c0-.9 1-1.4 1.7-.9l10 7.4c.6.4.6 1.3 0 1.8l-10 7.4c-.7.5-1.7 0-1.7-.9V1.6Z" />
+                    </svg>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Seamless Scrub / Seek Bar */}
+            <div className="relative h-1.5 w-full bg-dark-gray/60 cursor-pointer">
+              <div
+                className="h-full bg-(image:--button-bg) transition-all"
+                style={{ width: `${progress * 100}%` }}
+              />
+              <input
+                type="range"
+                min={0}
+                max={duration || 0}
+                step={0.1}
+                value={currentTime}
+                onChange={handleSeekChange}
+                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                aria-label="Seek video"
+              />
+            </div>
+
+            {/* Compact Control Deck */}
+            <div className="px-4 py-3 flex items-center justify-between gap-3 bg-black/60 backdrop-blur-md">
+              {/* Left: Metadata */}
+              <div className="flex flex-col min-w-0 max-w-[150px] sm:max-w-[180px]">
+                <span className="text-xs font-semibold text-whitetext truncate">{title || "Video Track"}</span>
+                <span className="text-[11px] text-light-gray truncate">
+                  {artist || "BeatX"} &middot; <span className="font-mono">{formatTime(currentTime)} / {formatTime(duration)}</span>
+                </span>
+              </div>
+
+              {/* Center: Playback Buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => seekBy(-SEEK_SECONDS)}
+                  className="text-light-gray hover:text-whitetext transition-colors p-1 cursor-pointer"
+                  title="Rewind 10s"
+                >
+                  <SkipBack className="size-4" fill="currentColor" />
+                </button>
+                <GradientPlayButton size="sm" playing={isPlaying} onClick={togglePlay} />
+                <button
+                  type="button"
+                  onClick={() => seekBy(SEEK_SECONDS)}
+                  className="text-light-gray hover:text-whitetext transition-colors p-1 cursor-pointer"
+                  title="Forward 10s"
+                >
+                  <SkipForward className="size-4" fill="currentColor" />
+                </button>
+              </div>
+
+              {/* Right: Volume & Actions */}
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={toggleMute}
+                    aria-label={isMuted ? "Unmute" : "Mute"}
+                    className="text-light-gray hover:text-whitetext transition-colors cursor-pointer"
+                  >
+                    {isMuted || volume === 0 ? (
+                      <VolumeX className="size-4 text-light-gray" />
+                    ) : (
+                      <Volume2 className="size-4 text-light-gray" />
+                    )}
+                  </button>
+                  <div className="relative h-1 w-14 sm:w-16">
+                    <div className="absolute inset-0 overflow-hidden rounded-full bg-dark-gray">
+                      <div
+                        className="h-full rounded-full bg-light-gray"
+                        style={{ width: `${(isMuted ? 0 : volume) * 100}%` }}
+                      />
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={1}
+                      step={0.01}
+                      value={isMuted ? 0 : volume}
+                      onChange={handleVolumeChange}
+                      className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                      aria-label="Volume"
+                    />
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={toggleFullscreenVideo}
+                  className="text-light-gray hover:text-whitetext transition-colors p-1 cursor-pointer hidden sm:block"
+                  title="Fullscreen"
+                >
+                  <Maximize2 className="size-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={closePlayer}
+                  className="text-light-gray hover:text-red-error transition-colors p-1 cursor-pointer"
+                  title="Close"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        ) : (
+          /* FLOATING AUDIO STREAM BAR (IDENTICAL TO USER STREAM BAR) */
+          <motion.div
+            key="global-floating-audio-bar"
+            initial={{ y: 120, x: "-50%", opacity: 0 }}
+            animate={{ y: 0, x: "-50%", opacity: 1 }}
+            exit={{ y: 120, x: "-50%", opacity: 0 }}
+            transition={{
+              type: "spring",
+              stiffness: 90,
+              damping: 15,
+            }}
+            className="fixed bottom-6 left-1/2 z-[999999] flex w-[calc(100%-48px)] max-w-4xl items-center gap-6 rounded-full border border-border bg-(--player-bar-bg) px-6 py-3.5 shadow-(--now-playing-glow) backdrop-blur-md md:gap-12"
+          >
             <audio
               ref={mediaRef}
               src={src}
-              onTimeUpdate={() => mediaRef.current && setCurrentTime(mediaRef.current.currentTime)}
+              preload="metadata"
               onLoadedMetadata={handleMediaLoaded}
+              onTimeUpdate={() => {
+                if (mediaRef.current) setCurrentTime(mediaRef.current.currentTime);
+              }}
               onCanPlay={applyVolume}
               onPlay={applyVolume}
               onEnded={() => pauseMedia()}
@@ -202,195 +373,162 @@ const GlobalFloatingMediaPlayer = () => {
               }}
               className="hidden"
             />
-          )}
 
-          {/* MINIMIZED VIEW */}
-          {isMinimized ? (
-            <motion.div
-              key="minimized-view"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="flex items-center gap-3 p-2.5 px-3 w-72"
-            >
-              {/* Drag Handle */}
-              <div className="cursor-grab active:cursor-grabbing text-white/40 hover:text-white/80 transition-colors">
-                <GripHorizontal className="w-4 h-4" />
-              </div>
-
-              {/* Thumbnail */}
-              <div className="relative w-8 h-8 rounded-[8px] overflow-hidden bg-white/10 shrink-0 border border-white/10">
+            {/* Left: Thumbnail & Info */}
+            <div className="flex shrink-0 items-center gap-2">
+              <div className="relative size-10 shrink-0 overflow-hidden rounded-full bg-dark-accent">
                 {coverUrl ? (
-                  <Image src={coverUrl} alt={title} fill className="object-cover" sizes="32px" />
+                  <Image
+                    alt={title || "Track artwork"}
+                    src={coverUrl}
+                    fill
+                    sizes="40px"
+                    className="object-cover"
+                  />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    {mediaType === "video" ? <Video className="w-3.5 h-3.5 text-secondary" /> : <Music className="w-3.5 h-3.5 text-secondary" />}
+                  <div className="flex size-full items-center justify-center bg-white/10 text-light-gray">
+                    <Music className="size-5 text-secondary" />
                   </div>
                 )}
               </div>
-
-              {/* Meta */}
-              <div className="flex flex-col min-w-0 flex-1">
-                <span className="text-[12px] font-medium text-whitetext truncate">{title || "Playing..."}</span>
-                <span className="text-[10px] text-light-gray truncate">{artist || formatTime(currentTime)}</span>
-              </div>
-
-              {/* Controls */}
-              <button
-                onClick={togglePlay}
-                className="w-7 h-7 rounded-full bg-secondary text-black flex items-center justify-center shrink-0 hover:scale-105 active:scale-95 transition-all cursor-pointer shadow-md"
-              >
-                {isPlaying ? <Pause className="w-3.5 h-3.5 fill-current" /> : <Play className="w-3.5 h-3.5 fill-current ml-0.5" />}
-              </button>
-
-              <button
-                onClick={toggleMinimize}
-                className="text-light-gray hover:text-whitetext transition-colors p-1 cursor-pointer"
-                title="Expand"
-              >
-                <Maximize2 className="w-3.5 h-3.5" />
-              </button>
-
-              <button
-                onClick={closePlayer}
-                className="text-light-gray hover:text-red-error transition-colors p-1 cursor-pointer"
-                title="Close"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </motion.div>
-          ) : (
-            /* EXPANDED FULL FLOATING PLAYER VIEW */
-            <motion.div
-              key="expanded-view"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="w-80 sm:w-88 p-3.5 flex flex-col gap-3"
-            >
-              {/* Header Drag Bar & Quick Actions */}
-              <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                <div className="flex items-center gap-1.5 cursor-grab active:cursor-grabbing text-light-gray hover:text-whitetext transition-colors">
-                  <GripHorizontal className="w-4 h-4 text-secondary" />
-                  <span className="text-[11px] font-medium uppercase tracking-wider text-light-gray flex items-center gap-1">
-                    {mediaType === "video" ? <Video className="w-3 h-3 text-secondary" /> : <Music className="w-3 h-3 text-secondary" />}
-                    {mediaType === "video" ? "Video Player" : "Audio Player"}
+              <div className="hidden flex-col gap-1 sm:flex min-w-0 max-w-[180px]">
+                <div className="flex items-center gap-2">
+                  <span className="whitespace-nowrap text-lg font-semibold text-whitetext truncate">
+                    {title || "Audio Track"}
                   </span>
                 </div>
-
-                <div className="flex items-center gap-1">
-                  {mediaType === "video" && (
-                    <button
-                      onClick={toggleFullscreenVideo}
-                      className="p-1 text-light-gray hover:text-whitetext hover:bg-white/10 rounded-[6px] transition-colors cursor-pointer"
-                      title="Fullscreen"
-                    >
-                      <Maximize2 className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                  <button
-                    onClick={toggleMinimize}
-                    className="p-1 text-light-gray hover:text-whitetext hover:bg-white/10 rounded-[6px] transition-colors cursor-pointer"
-                    title="Minimize"
-                  >
-                    <Minimize2 className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={closePlayer}
-                    className="p-1 text-light-gray hover:text-red-error hover:bg-white/10 rounded-[6px] transition-colors cursor-pointer"
-                    title="Close"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </div>
+                <span className="text-xs text-light-gray truncate">{artist || "BeatX"}</span>
               </div>
+            </div>
 
-              {/* Audio Album Art / Poster (If audio mode) */}
-              {mediaType === "audio" && (
-                <div className="flex items-center gap-3 bg-white/5 border border-white/10 p-2.5 rounded-[14px]">
-                  <div className="relative w-12 h-12 rounded-[10px] overflow-hidden bg-black/40 shrink-0 border border-white/10">
-                    {coverUrl ? (
-                      <Image src={coverUrl} alt={title || "Cover"} fill className="object-cover" sizes="48px" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Music className="w-5 h-5 text-secondary animate-pulse" />
-                      </div>
-                    )}
+            {/* Center: Playback Controls & Seekbar */}
+            <div className="flex flex-1 flex-col items-center gap-2">
+              <div className="flex items-center gap-4">
+                <button
+                  type="button"
+                  className="hidden text-light-gray sm:block hover:text-whitetext transition-colors cursor-pointer"
+                  aria-label="Shuffle"
+                >
+                  <Shuffle className="size-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => seekBy(-SEEK_SECONDS)}
+                  className="text-whitetext hover:text-secondary transition-colors cursor-pointer"
+                  aria-label="Rewind 10 seconds"
+                >
+                  <SkipBack className="size-5" fill="currentColor" />
+                </button>
+                <GradientPlayButton size="md" playing={isPlaying} onClick={togglePlay} />
+                <button
+                  type="button"
+                  onClick={() => seekBy(SEEK_SECONDS)}
+                  className="text-whitetext hover:text-secondary transition-colors cursor-pointer"
+                  aria-label="Forward 10 seconds"
+                >
+                  <SkipForward className="size-5" fill="currentColor" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRepeat((prev) => !prev)}
+                  className={repeat ? "text-secondary cursor-pointer" : "text-light-gray hover:text-whitetext transition-colors cursor-pointer"}
+                  aria-label="Repeat"
+                  aria-pressed={repeat}
+                >
+                  <Repeat className="size-5" />
+                </button>
+              </div>
+              <div className="hidden w-full items-center gap-2 sm:flex">
+                <span className="w-9 shrink-0 text-xs text-light-gray">{formatTime(currentTime)}</span>
+                <div className="relative h-2 w-full flex-1">
+                  <div className="absolute inset-0 overflow-hidden rounded-full bg-dark-gray">
+                    <div
+                      className="h-full rounded-full bg-(image:--button-bg)"
+                      style={{ width: `${progress * 100}%` }}
+                    />
                   </div>
-
-                  <div className="flex flex-col min-w-0 flex-1">
-                    <span className="text-[13px] font-semibold text-whitetext truncate">{title || "Audio Track"}</span>
-                    <span className="text-[11px] text-light-gray truncate mt-0.5">{artist || "BeatX Media"}</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Controls Row (Rewind -10s, Play/Pause, Forward +10s & Volume) */}
-              <div className="flex items-center justify-between px-1">
-                <div className="flex items-center gap-3.5 mx-auto">
-                  <button
-                    onClick={handleRewind}
-                    className="text-light-gray hover:text-secondary active:scale-90 transition-all p-1 cursor-pointer"
-                    title="Rewind 10 seconds"
-                  >
-                    <RotateCcw className="w-4 h-4" />
-                  </button>
-
-                  <button
-                    onClick={togglePlay}
-                    className="w-10 h-10 rounded-full bg-secondary text-black flex items-center justify-center shrink-0 hover:scale-105 active:scale-95 transition-all shadow-md shadow-secondary/20 cursor-pointer"
-                    title={isPlaying ? "Pause" : "Play"}
-                  >
-                    {isPlaying ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current ml-0.5" />}
-                  </button>
-
-                  <button
-                    onClick={handleForward}
-                    className="text-light-gray hover:text-secondary active:scale-90 transition-all p-1 cursor-pointer"
-                    title="Forward 10 seconds"
-                  >
-                    <RotateCw className="w-4 h-4" />
-                  </button>
-                </div>
-
-                {/* Volume Slider Option */}
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <button onClick={toggleMute} className="p-1 hover:bg-white/10 rounded-full cursor-pointer" title={isMuted ? "Unmute" : "Mute"}>
-                    {renderVolumeIcon()}
-                  </button>
                   <input
                     type="range"
                     min={0}
-                    max={1}
-                    step={0.05}
-                    value={isMuted ? 0 : volume}
-                    onChange={handleVolumeChange}
-                    className="w-14 h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-secondary focus:outline-none"
-                    title={`Volume: ${Math.round((isMuted ? 0 : volume) * 100)}%`}
+                    max={duration || 0}
+                    step={0.1}
+                    value={currentTime}
+                    onChange={handleSeekChange}
+                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                    aria-label="Seek"
                   />
+                </div>
+                <span className="w-9 shrink-0 text-xs text-light-gray">{formatTime(duration)}</span>
+              </div>
+            </div>
+
+            {/* Right: Tools, Volume & Close */}
+            <div className="flex shrink-0 items-center gap-3">
+              <div className="hidden shrink-0 items-center gap-4 lg:flex">
+                <button
+                  type="button"
+                  className="text-light-gray hover:text-whitetext transition-colors cursor-pointer"
+                  aria-label="Lyrics"
+                >
+                  <Mic2 className="size-4" />
+                </button>
+                <button
+                  type="button"
+                  className="text-light-gray hover:text-whitetext transition-colors cursor-pointer"
+                  aria-label="Queue"
+                >
+                  <ListMusic className="size-4" />
+                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={toggleMute}
+                    aria-label={isMuted ? "Unmute" : "Mute"}
+                    className="cursor-pointer hover:text-whitetext transition-colors"
+                  >
+                    {isMuted || volume === 0 ? (
+                      <VolumeX className="size-4 text-light-gray" />
+                    ) : (
+                      <Volume2 className="size-4 text-light-gray" />
+                    )}
+                  </button>
+                  <div className="relative h-1 w-20">
+                    <div className="absolute inset-0 overflow-hidden rounded-full bg-dark-gray">
+                      <div
+                        className="h-full rounded-full bg-light-gray"
+                        style={{ width: `${(isMuted ? 0 : volume) * 100}%` }}
+                      />
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={1}
+                      step={0.01}
+                      value={isMuted ? 0 : volume}
+                      onChange={handleVolumeChange}
+                      className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                      aria-label="Volume"
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* Seek Bar & Progress */}
-              <div className="w-full flex items-center gap-2 px-1">
-                <span className="text-[10px] text-light-gray font-mono min-w-[28px] text-right">{formatTime(currentTime)}</span>
-                <input
-                  type="range"
-                  min={0}
-                  max={duration || 100}
-                  step={0.1}
-                  value={currentTime}
-                  onChange={handleSeek}
-                  className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-secondary focus:outline-none"
-                />
-                <span className="text-[10px] text-light-gray font-mono min-w-[28px] text-left">{formatTime(duration)}</span>
-              </div>
-            </motion.div>
-          )}
-        </motion.div>
+              <button
+                type="button"
+                onClick={closePlayer}
+                className="text-light-gray hover:text-red-error transition-colors p-1 cursor-pointer"
+                aria-label="Close"
+                title="Close player"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+          </motion.div>
+        )
       )}
     </AnimatePresence>
   );
 };
 
 export default GlobalFloatingMediaPlayer;
+
