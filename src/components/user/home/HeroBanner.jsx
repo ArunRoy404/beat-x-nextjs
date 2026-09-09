@@ -4,28 +4,31 @@ import { useState, useEffect, useCallback, useRef } from "react"
 import { Info, Play, ChevronLeft, ChevronRight } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import CommonPill from "@/components/shared/CommonPill"
-import { useUserHomeStore } from "@/zustandStore/user/userStore/userHomeStore"
 
-const HeroBanner = () => {
-    const heroContent = useUserHomeStore((state) => state.heroContent)
+const HeroBanner = ({ items = [] }) => {
     const [currentIndex, setCurrentIndex] = useState(0)
     const isHovered = useRef(false)
 
-    const slides = Array.isArray(heroContent) ? heroContent : (heroContent ? [heroContent] : [])
-    const currentSlide = slides[currentIndex] || {}
+    const slides = Array.isArray(items) ? items : (items ? [items] : [])
+    const currentSlide = slides?.[currentIndex] || {}
+    const badges = currentSlide?.badges || [
+        currentSlide?.isFeatured ? "FEATURED" : null,
+        currentSlide?.isTrending ? "TRENDING NOW" : null,
+        currentSlide?.genre?.name || null,
+    ].filter(Boolean)
 
     const handleNext = useCallback(() => {
-        if (slides.length <= 1) return
+        if (slides?.length <= 1) return
         setCurrentIndex((prev) => (prev + 1) % slides.length)
-    }, [slides.length])
+    }, [slides?.length])
 
     const handlePrev = useCallback(() => {
-        if (slides.length <= 1) return
+        if (slides?.length <= 1) return
         setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length)
-    }, [slides.length])
+    }, [slides?.length])
 
     useEffect(() => {
-        if (slides.length <= 1) return
+        if (slides?.length <= 1) return
 
         const timer = setInterval(() => {
             if (!isHovered.current) {
@@ -34,9 +37,9 @@ const HeroBanner = () => {
         }, 5000)
 
         return () => clearInterval(timer)
-    }, [slides.length, handleNext])
+    }, [slides?.length, handleNext])
 
-    if (slides.length === 0) return null
+    if (slides?.length === 0) return null
 
     return (
         <div
@@ -52,8 +55,8 @@ const HeroBanner = () => {
             <AnimatePresence initial={false}>
                 <motion.img
                     key={currentIndex}
-                    alt=""
-                    src={currentSlide.artwork}
+                    alt={currentSlide?.title || "Featured banner"}
+                    src={currentSlide?.coverUrl || currentSlide?.artwork || ""}
                     initial={{ opacity: 0, scale: 1.02 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0 }}
@@ -76,21 +79,23 @@ const HeroBanner = () => {
                         transition={{ duration: 0.4, ease: "easeOut" }}
                         className="flex flex-col gap-2.5"
                     >
-                        <div className="flex items-center gap-2">
-                            {currentSlide.badges?.map((badge, index) => (
-                                <CommonPill key={badge} variant={index === 0 ? "filled" : "glass"} className="uppercase">
-                                    {badge}
-                                </CommonPill>
-                            ))}
-                        </div>
-                        {currentSlide.title && (
+                        {badges?.length > 0 && (
+                            <div className="flex items-center gap-2">
+                                {badges?.map((badge, index) => (
+                                    <CommonPill key={badge} variant={index === 0 ? "filled" : "glass"} className="uppercase">
+                                        {badge}
+                                    </CommonPill>
+                                ))}
+                            </div>
+                        )}
+                        {currentSlide?.title && (
                             <div className="flex flex-col gap-0.5">
                                 <h2 className="text-2xl font-bold text-whitetext sm:text-3xl lg:text-4xl tracking-tight leading-tight">
-                                    {currentSlide.title}
+                                    {currentSlide?.title}
                                 </h2>
-                                {currentSlide.subtitle && (
+                                {(currentSlide?.artist || currentSlide?.subtitle) && (
                                     <p className="text-xs font-semibold text-light-gray/80 sm:text-sm">
-                                        {currentSlide.subtitle}
+                                        {currentSlide?.artist ? `By ${currentSlide?.artist}` : currentSlide?.subtitle}
                                     </p>
                                 )}
                             </div>

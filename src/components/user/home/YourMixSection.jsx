@@ -2,7 +2,6 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useUserHomeStore } from "@/zustandStore/user/userStore/userHomeStore"
 import { Carousel, CarouselContent, CarouselItem, useCarousel } from "@/components/ui/carousel"
 import MixCard from "./MixCard"
 
@@ -32,8 +31,8 @@ const MixCarouselNav = () => {
     )
 }
 
-const YourMixSection = () => {
-    const mixes = useUserHomeStore((state) => state.mixes)
+const YourMixSection = ({ mixes = [] }) => {
+    if (!mixes || mixes.length === 0) return null
 
     return (
         <section className="flex w-full flex-col gap-4">
@@ -53,8 +52,8 @@ const YourMixSection = () => {
             >
                 <MixCarouselNav />
                 <CarouselContent className="-ml-4 sm:-ml-6">
-                    {mixes.map((mix) => (
-                        <CarouselItem key={mix.id} className="basis-40 pl-4 sm:basis-56 sm:pl-6 md:basis-64">
+                    {mixes?.map((mix, idx) => (
+                        <CarouselItem key={mix?._id || mix?.id || idx} className="basis-40 pl-4 sm:basis-56 sm:pl-6 md:basis-64">
                             <MixCard mix={mix} />
                         </CarouselItem>
                     ))}

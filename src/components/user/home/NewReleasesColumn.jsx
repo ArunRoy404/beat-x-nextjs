@@ -1,10 +1,9 @@
 "use client"
 
-import { useUserHomeStore } from "@/zustandStore/user/userStore/userHomeStore"
 import ReleaseListItem from "./ReleaseListItem"
 
-const NewReleasesColumn = () => {
-    const newReleases = useUserHomeStore((state) => state.newReleases)
+const NewReleasesColumn = ({ releases = [] }) => {
+    if (!releases || releases.length === 0) return null
 
     return (
         <section className="flex min-w-0 flex-1 flex-col gap-4">
@@ -15,8 +14,8 @@ const NewReleasesColumn = () => {
                 </button>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {newReleases.map((release) => (
-                    <ReleaseListItem key={release.id} release={release} />
+                {releases?.map((release, idx) => (
+                    <ReleaseListItem key={release?._id || release?.id || idx} release={release} />
                 ))}
             </div>
         </section>
