@@ -1,11 +1,10 @@
 "use client"
 
-import CommonPill from "@/components/shared/CommonPill"
-import { useToggleFollow } from "@/hooks/api/user/follow/useToggleFollow"
+// import CommonPill from "@/components/shared/CommonPill"
+// import { useToggleFollow } from "@/hooks/api/user/follow/useToggleFollow"
 
 const ArtistFollowSuggestion = ({ artist }) => {
-    const { toggleFollow, isPending } = useToggleFollow()
-
+    // Note: hook useToggleFollow is preserved in src/hooks/api/user/follow/useToggleFollow.js
     const displayName = artist?.stageName || artist?.name
     const subtitle = artist?.stageName ? artist?.name : (artist?.subtitle || "")
     const avatarUrl = artist?.artistAvatar || artist?.avatar || artist?.art || ""
@@ -25,20 +24,16 @@ const ArtistFollowSuggestion = ({ artist }) => {
                 <span className="truncate text-lg text-whitetext">{displayName}</span>
                 {subtitle && <span className="truncate text-xs text-light-gray">{subtitle}</span>}
             </div>
+            {/* Follow button commented out: /users/artists does not provide following status
             <CommonPill
                 as="button"
                 type="button"
                 variant="outline"
                 className="shrink-0 px-3.25 py-1.75 cursor-pointer disabled:opacity-50"
-                disabled={isPending}
-                onClick={() => {
-                    if (artist?._id) {
-                        toggleFollow({ id: artist._id })
-                    }
-                }}
             >
-                {isPending ? "..." : "FOLLOW"}
+                FOLLOW
             </CommonPill>
+            */}
         </div>
     )
 }
