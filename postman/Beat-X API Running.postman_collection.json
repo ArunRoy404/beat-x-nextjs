@@ -1,15 +1,15 @@
 {
   "info": {
-    "_postman_id": "da9e326a-3955-4065-ba47-b0c504dfcb57",
-    "name": "Beat-X API — Role Based (Auth / User / Artist / Admin)",
-    "description": "Complete, step-by-step Postman collection for the Beat-X backend, organized by WHO calls the endpoint instead of by resource:\n\n• **Auth** — public register/login/password-reset flows shared by every role.\n• **User** — everything a logged-in regular user can do, plus every public browsing endpoint (songs, albums, videos, podcasts, audiobooks, events, products, genres, categories).\n• **Artist** — verification onboarding + creator tools (create/update/delete your own songs, videos, podcasts, merch); events are now admin-created — request one via a Support Ticket and manage limited fields with the access code you're given.\\n• **Support Tickets** — artists reach admins through category-based tickets (e.g. Event Management) with a realtime, two-way message thread; admins triage tickets and, for event requests, create the event and hand back an access code.\n• **Admin** — full moderation & management: approve artists, manage taxonomy, moderate every content type, run the scheduler.\n\nHow to use:\n1. Run **Auth** top-to-bottom once for the User role and once for the Artist role (register → verify email with the OTP from your server logs/email).\n2. For Admin, register a normal account, then manually set its role to \"admin\" in MongoDB (no public admin-signup route exists).\n3. Open **User**, **Artist**, and **Admin** and run each folder's own \"Login\" request first — it stores that role's token into its own collection variable (userAccessToken / artistAccessToken / adminAccessToken), so all three roles can stay logged in at the same time without overwriting each other.\n4. Inside each resource folder, requests are ordered as a workflow (e.g. Create → List → Get → Update → Delete) and automatically capture the IDs they create into collection variables for you — just run them in order.\n\nAll collection variables (tokens + resource ids) auto-populate as you go; edit the credential variables at the top if you want different test accounts.",
+    "_postman_id": "c28a2406-4f23-453b-a2bc-6172b22c8690",
+    "name": "Beat-X API Running",
+    "description": "Complete, step-by-step Postman collection for the Beat-X backend, organized by WHO calls the endpoint instead of by resource:\n\n• **Auth** — public register/login/password-reset flows shared by every role.  \n• **User** — everything a logged-in regular user can do, plus every public browsing endpoint (songs, albums, videos, podcasts, audiobooks, events, products, genres, categories).  \n• **Artist** — verification onboarding + creator tools (create/update/delete your own songs, videos, podcasts, merch); events are now admin-created — request one via a Support Ticket and manage limited fields with the access code you're given.\\\\n• **Support Tickets** — artists reach admins through category-based tickets (e.g. Event Management) with a realtime, two-way message thread; admins triage tickets and, for event requests, create the event and hand back an access code.  \n• **Admin** — full moderation & management: approve artists, manage taxonomy, moderate every content type, run the scheduler.\n\nHow to use:\n\n1. Run **Auth** top-to-bottom once for the User role and once for the Artist role (register → verify email with the OTP from your server logs/email).\n    \n2. For Admin, register a normal account, then manually set its role to \"admin\" in MongoDB (no public admin-signup route exists).\n    \n3. Open **User**, **Artist**, and **Admin** and run each folder's own \"Login\" request first — it stores that role's token into its own collection variable (userAccessToken / artistAccessToken / adminAccessToken), so all three roles can stay logged in at the same time without overwriting each other.\n    \n4. Inside each resource folder, requests are ordered as a workflow (e.g. Create → List → Get → Update → Delete) and automatically capture the IDs they create into collection variables for you — just run them in order.\n    \n\nAll collection variables (tokens + resource ids) auto-populate as you go; edit the credential variables at the top if you want different test accounts.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "43194784",
-    "_collection_link": "https://go.postman.co/collection/43194784-da9e326a-3955-4065-ba47-b0c504dfcb57?source=collection_link"
+    "_exporter_id": "45172240",
+    "_collection_link": "https://go.postman.co/collection/45172240-c28a2406-4f23-453b-a2bc-6172b22c8690?source=collection_link"
   },
   "item": [
     {
-      "name": "Auth (All Roles — Register, Login, Password Reset)",
+      "name": "✅  Auth (All Roles — Register, Login, Password Reset)",
       "item": [
         {
           "name": "1. Register - User",
@@ -21,13 +21,12 @@
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/json",
-                "type": "text"
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"{{userEmail}}\",\n  \"password\": \"{{userPassword}}\",\n  \"name\": \"Noyon User\",\n  \"role\": \"user\"\n}",
+              "raw": "{\n  \"email\": \"{{userEmail}}\",\n  \"password\": \"{{userPassword}}\",\n  \"name\": \"test User\",\n  \"role\": \"user\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -56,16 +55,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "try {",
-                  "  const res = pm.response.json();",
-                  "  if (res.status === true && res.data) {",
-                  "    pm.collectionVariables.set('userAccessToken', res.data.accessToken);",
-                  "    pm.collectionVariables.set('userRefreshToken', res.data.refreshToken);",
-                  "    console.log('user tokens saved. role =', res.data.role);",
-                  "  } else {",
-                  "    console.warn('Login/verify failed — tokens not stored. Check the response body.');",
-                  "  }",
-                  "} catch (e) { console.warn(\"Could not parse token response\", e); }"
+                  "try {\n  const res = pm.response.json();\n  if (res.status === true && res.data) {\n    pm.collectionVariables.set('userAccessToken', res.data.accessToken);\n    pm.collectionVariables.set('userRefreshToken', res.data.refreshToken);\n    console.log('user tokens saved. role =', res.data.role);\n  } else {\n    console.warn('Login/verify failed — tokens not stored. Check the response body.');\n  }\n} catch (e) { console.warn(\"Could not parse token response\", e); }"
                 ]
               }
             }
@@ -78,13 +68,12 @@
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/json",
-                "type": "text"
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"{{userEmail}}\",\n  \"otp\": \"PASTE_OTP_HERE\"\n}",
+              "raw": "{\n  \"email\": \"{{userEmail}}\",\n  \"otp\": \"992111\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -318,13 +307,12 @@
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/json",
-                "type": "text"
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"{{userEmail}}\",\n  \"otp\": \"PASTE_OTP_HERE\",\n  \"newPassword\": \"NewPassword123\"\n}",
+              "raw": "{\n  \"email\": \"{{userEmail}}\",\n  \"otp\": \"826508\",\n  \"newPassword\": \"Password123\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -436,23 +424,14 @@
           "name": "0. Login & Profile",
           "item": [
             {
-              "name": "Login (User)",
+              "name": "✅ Login (User)",
               "event": [
                 {
                   "listen": "test",
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "try {",
-                      "  const res = pm.response.json();",
-                      "  if (res.status === true && res.data) {",
-                      "    pm.collectionVariables.set('userAccessToken', res.data.accessToken);",
-                      "    pm.collectionVariables.set('userRefreshToken', res.data.refreshToken);",
-                      "    console.log('user tokens saved. role =', res.data.role);",
-                      "  } else {",
-                      "    console.warn('Login/verify failed — tokens not stored. Check the response body.');",
-                      "  }",
-                      "} catch (e) { console.warn(\"Could not parse token response\", e); }"
+                      "try {\n  const res = pm.response.json();\n  if (res.status === true && res.data) {\n    pm.collectionVariables.set('userAccessToken', res.data.accessToken);\n    pm.collectionVariables.set('userRefreshToken', res.data.refreshToken);\n    console.log('user tokens saved. role =', res.data.role);\n  } else {\n    console.warn('Login/verify failed — tokens not stored. Check the response body.');\n  }\n} catch (e) { console.warn(\"Could not parse token response\", e); }"
                     ]
                   }
                 }
@@ -465,8 +444,7 @@
                 "header": [
                   {
                     "key": "Content-Type",
-                    "value": "application/json",
-                    "type": "text"
+                    "value": "application/json"
                   }
                 ],
                 "body": {
@@ -493,18 +471,14 @@
               "response": []
             },
             {
-              "name": "Get My Profile (User)",
+              "name": "✅ Get My Profile (User)",
               "event": [
                 {
                   "listen": "test",
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "try {",
-                      "  const res = pm.response.json();",
-                      "  const value = res.data._id;",
-                      "  if (value) { pm.collectionVariables.set(\"userId\", value); console.log(\"userId saved:\", value); }",
-                      "} catch (e) { console.warn(\"Could not auto-capture userId\", e); }"
+                      "try {\n  const res = pm.response.json();\n  const value = res.data._id;\n  if (value) { pm.collectionVariables.set(\"userId\", value); console.log(\"userId saved:\", value); }\n} catch (e) { console.warn(\"Could not auto-capture userId\", e); }"
                     ]
                   }
                 }
@@ -514,8 +488,7 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{userAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{userAccessToken}}"
                   }
                 ],
                 "url": {
@@ -533,14 +506,13 @@
               "response": []
             },
             {
-              "name": "Update Profile",
+              "name": "✅ Update Profile",
               "request": {
                 "method": "PATCH",
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{userAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{userAccessToken}}"
                   }
                 ],
                 "body": {
@@ -560,7 +532,10 @@
                       "key": "avatar",
                       "type": "file",
                       "description": "optional, jpg/jpeg/png/webp, max 5MB",
-                      "value": null
+                      "src": [
+                        "",
+                        "/home/roy/Downloads/DP.jpg"
+                      ]
                     }
                   ]
                 },
@@ -578,19 +553,17 @@
               "response": []
             },
             {
-              "name": "Change Password",
+              "name": "✅ Change Password",
               "request": {
                 "method": "PATCH",
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{userAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{userAccessToken}}"
                   },
                   {
                     "key": "Content-Type",
-                    "value": "application/json",
-                    "type": "text"
+                    "value": "application/json"
                   }
                 ],
                 "body": {
@@ -617,14 +590,13 @@
               "response": []
             },
             {
-              "name": "Get Settings",
+              "name": "✅ Get Settings",
               "request": {
                 "method": "GET",
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{userAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{userAccessToken}}"
                   }
                 ],
                 "url": {
@@ -641,19 +613,17 @@
               "response": []
             },
             {
-              "name": "Update Settings",
+              "name": "✅  Update Settings",
               "request": {
                 "method": "PATCH",
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{userAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{userAccessToken}}"
                   },
                   {
                     "key": "Content-Type",
-                    "value": "application/json",
-                    "type": "text"
+                    "value": "application/json"
                   }
                 ],
                 "body": {
@@ -679,14 +649,13 @@
               "response": []
             },
             {
-              "name": "Get Approved Artists",
+              "name": "✅ Get Approved Artists",
               "request": {
                 "method": "GET",
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{userAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{userAccessToken}}"
                   }
                 ],
                 "url": {
@@ -885,19 +854,17 @@
               "response": []
             },
             {
-              "name": "Delete My Account (destructive)",
+              "name": "✅  Delete My Account (destructive)",
               "request": {
                 "method": "DELETE",
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{userAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{userAccessToken}}"
                   },
                   {
                     "key": "Content-Type",
-                    "value": "application/json",
-                    "type": "text"
+                    "value": "application/json"
                   }
                 ],
                 "body": {
@@ -1077,14 +1044,13 @@
           "name": "Follow",
           "item": [
             {
-              "name": "Follow/Unfollow Artist (Toggle)",
+              "name": "✅ Follow/Unfollow Artist (Toggle)",
               "request": {
                 "method": "POST",
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{userAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{userAccessToken}}"
                   }
                 ],
                 "url": {
@@ -5692,7 +5658,7 @@
       "name": "ADMIN (full platform management)",
       "item": [
         {
-          "name": "0. Login & Users",
+          "name": "✅ 0. Login & Users",
           "item": [
             {
               "name": "Login (Admin)",
@@ -5823,8 +5789,7 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{adminAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{adminAccessToken}}"
                   }
                 ],
                 "url": {
@@ -5834,6 +5799,18 @@
                   ],
                   "path": [
                     "users"
+                  ],
+                  "query": [
+                    {
+                      "key": "isVerified",
+                      "value": "false",
+                      "disabled": true
+                    },
+                    {
+                      "key": "q",
+                      "value": "aaaaasadwd",
+                      "disabled": true
+                    }
                   ]
                 }
               },
@@ -5843,7 +5820,7 @@
           "description": "There is no public \"register as admin\" endpoint. Register + verify a normal account (Auth folder), manually set its role to \"admin\" in the MongoDB users collection, then log in here."
         },
         {
-          "name": "Artist Verification (review queue)",
+          "name": "Artist Verification (review queue) ✅",
           "item": [
             {
               "name": "List Artists (queue)",
@@ -5853,12 +5830,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "try {",
-                      "  const res = pm.response.json();",
-                      "  const d = res.data;",
-                      "  const found = d.data?.items?.[0]?._id || d.data?.data?.[0]?._id || d.data?.[0]?._id;",
-                      "  if (found) { pm.collectionVariables.set(\"verificationId\", found); console.log(\"verificationId saved:\", found); }",
-                      "} catch (e) { console.warn(\"Could not auto-capture verificationId\", e); }"
+                      "try {\n  const res = pm.response.json();\n  const d = res.data;\n  const found = d.data?.items?.[0]?._id || d.data?.data?.[0]?._id || d.data?.[0]?._id;\n  if (found) { pm.collectionVariables.set(\"verificationId\", found); console.log(\"verificationId saved:\", found); }\n} catch (e) { console.warn(\"Could not auto-capture verificationId\", e); }"
                     ]
                   }
                 }
@@ -5868,12 +5840,11 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{adminAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{adminAccessToken}}"
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/admin/artist-verification?tab=pending&page=1&limit=20",
+                  "raw": "{{baseUrl}}/admin/artist-verification",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -5884,15 +5855,18 @@
                   "query": [
                     {
                       "key": "tab",
-                      "value": "pending"
+                      "value": "pending",
+                      "disabled": true
                     },
                     {
                       "key": "page",
-                      "value": "1"
+                      "value": "1",
+                      "disabled": true
                     },
                     {
                       "key": "limit",
-                      "value": "20"
+                      "value": "20",
+                      "disabled": true
                     }
                   ]
                 },
@@ -6346,48 +6320,22 @@
           "description": "Run \"List Artists\" first to capture a real verificationId, then approve/reject/etc. Approving is required before an artist account can use the creator folders."
         },
         {
-          "name": "Genres",
+          "name": "Genres ✅",
           "item": [
             {
-              "name": "Create Genre",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "try {",
-                      "  const res = pm.response.json();",
-                      "  const value = res.data._id;",
-                      "  if (value) { pm.collectionVariables.set(\"genreId\", value); console.log(\"genreId saved:\", value); }",
-                      "} catch (e) { console.warn(\"Could not auto-capture genreId\", e); }"
-                    ]
-                  }
-                }
-              ],
+              "name": "Genre",
               "request": {
-                "method": "POST",
+                "method": "GET",
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{adminAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{adminAccessToken}}"
                   },
                   {
                     "key": "Content-Type",
-                    "value": "application/json",
-                    "type": "text"
+                    "value": "application/json"
                   }
                 ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"name\": \"Pop\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
                 "url": {
                   "raw": "{{baseUrl}}/genre",
                   "host": [
@@ -6401,24 +6349,75 @@
               "response": []
             },
             {
+              "name": "Create Genre",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "try {\n  const res = pm.response.json();\n  const value = res.data._id;\n  if (value) { pm.collectionVariables.set(\"genreId\", value); console.log(\"genreId saved:\", value); }\n} catch (e) { console.warn(\"Could not auto-capture genreId\", e); }"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminAccessToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"TEST\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/genre",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "genre"
+                  ],
+                  "query": [
+                    {
+                      "key": "",
+                      "value": "",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
               "name": "Update Genre",
               "request": {
                 "method": "PATCH",
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{adminAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{adminAccessToken}}"
                   },
                   {
                     "key": "Content-Type",
-                    "value": "application/json",
-                    "type": "text"
+                    "value": "application/json"
                   }
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"name\": \"Pop Music\"\n}",
+                  "raw": "{\n  \"name\": \"Test 2\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -6466,7 +6465,7 @@
           "description": "Read-only genre browsing (List/Search/Get) lives in the User folder — genres are public GETs. Create/Update/Delete are admin-only, hence they live here."
         },
         {
-          "name": "Categories (podcast categories)",
+          "name": "❌ Categories (podcast categories)",
           "item": [
             {
               "name": "Create Category",
@@ -6595,7 +6594,7 @@
           "description": "Read-only browsing (List/Get) lives in the User folder — categories are public GETs."
         },
         {
-          "name": "Albums (admin-only, no artist create route)",
+          "name": "✅ Albums (admin-only, no artist create route)",
           "item": [
             {
               "name": "List Albums",
@@ -6828,22 +6827,20 @@
           ]
         },
         {
-          "name": "Songs",
+          "name": "Songs ✅",
           "item": [
             {
-              "name": "Get Upload URL (presigned)",
+              "name": "Get Upload URL (presigned) (not done_",
               "request": {
                 "method": "POST",
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{adminAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{adminAccessToken}}"
                   },
                   {
                     "key": "Content-Type",
-                    "value": "application/json",
-                    "type": "text"
+                    "value": "application/json"
                   }
                 ],
                 "body": {
@@ -6877,12 +6874,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "try {",
-                      "  const res = pm.response.json();",
-                      "  const d = res.data;",
-                      "  const found = d.data?.items?.[0]?._id || d.data?.data?.[0]?._id || d.data?.[0]?._id;",
-                      "  if (found) { pm.collectionVariables.set(\"songId\", found); console.log(\"songId saved:\", found); }",
-                      "} catch (e) { console.warn(\"Could not auto-capture songId\", e); }"
+                      "try {\n  const res = pm.response.json();\n  const d = res.data;\n  const found = d.data?.items?.[0]?._id || d.data?.data?.[0]?._id || d.data?.[0]?._id;\n  if (found) { pm.collectionVariables.set(\"songId\", found); console.log(\"songId saved:\", found); }\n} catch (e) { console.warn(\"Could not auto-capture songId\", e); }"
                     ]
                   }
                 }
@@ -6892,8 +6884,7 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{adminAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{adminAccessToken}}"
                   }
                 ],
                 "url": {
@@ -6904,6 +6895,18 @@
                   "path": [
                     "admin",
                     "songs"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "q",
+                      "value": "korona",
+                      "disabled": true
+                    }
                   ]
                 }
               },
@@ -6916,8 +6919,7 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{adminAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{adminAccessToken}}"
                   }
                 ],
                 "body": {
@@ -6925,7 +6927,7 @@
                   "formdata": [
                     {
                       "key": "title",
-                      "value": "Admin Upload",
+                      "value": "test",
                       "type": "text"
                     },
                     {
@@ -6947,13 +6949,18 @@
                       "key": "cover",
                       "type": "file",
                       "description": "image, required",
-                      "value": null
+                      "src": [
+                        "",
+                        "/C:/Users/ROY/Downloads/morty.jpg"
+                      ]
                     },
                     {
                       "key": "audio",
                       "type": "file",
                       "description": "mp3/wav/flac, required",
-                      "value": null
+                      "src": [
+                        "/C:/Users/ROY/Downloads/alexguz-funk-amp-breakbeat-upbeat-advertising-happy-cook-541097.mp3"
+                      ]
                     }
                   ]
                 },
@@ -7138,7 +7145,7 @@
           ]
         },
         {
-          "name": "Videos (moderation only — creation is artist/admin via /creator/videos)",
+          "name": "✅ Videos (moderation only — creation is artist/admin via /creator/videos)",
           "item": [
             {
               "name": "List Videos (all statuses)",
@@ -7339,7 +7346,7 @@
           "description": "Note: admins create videos the same way artists do — via ARTIST > Videos > Create Video (admin also passes that controller's role check)."
         },
         {
-          "name": "Podcasts",
+          "name": "Podcasts ✅",
           "item": [
             {
               "name": "List Podcasts (all statuses)",
@@ -7537,19 +7544,14 @@
               "response": []
             },
             {
-              "name": "List Reviews",
+              "name": "List Reviews (not completed)",
               "event": [
                 {
                   "listen": "test",
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "try {",
-                      "  const res = pm.response.json();",
-                      "  const d = res.data;",
-                      "  const found = d.data?.items?.[0]?._id || d.data?.data?.[0]?._id || d.data?.[0]?._id;",
-                      "  if (found) { pm.collectionVariables.set(\"podcastReviewId\", found); console.log(\"podcastReviewId saved:\", found); }",
-                      "} catch (e) { console.warn(\"Could not auto-capture podcastReviewId\", e); }"
+                      "try {\n  const res = pm.response.json();\n  const d = res.data;\n  const found = d.data?.items?.[0]?._id || d.data?.data?.[0]?._id || d.data?.[0]?._id;\n  if (found) { pm.collectionVariables.set(\"podcastReviewId\", found); console.log(\"podcastReviewId saved:\", found); }\n} catch (e) { console.warn(\"Could not auto-capture podcastReviewId\", e); }"
                     ]
                   }
                 }
@@ -7559,12 +7561,11 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{adminAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{adminAccessToken}}"
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/admin/podcasts/reviews?podcastId={{podcastId}}&page=1&limit=20",
+                  "raw": "{{baseUrl}}/admin/podcasts/reviews",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -7576,15 +7577,18 @@
                   "query": [
                     {
                       "key": "podcastId",
-                      "value": "{{podcastId}}"
+                      "value": "{{podcastId}}",
+                      "disabled": true
                     },
                     {
                       "key": "page",
-                      "value": "1"
+                      "value": "1",
+                      "disabled": true
                     },
                     {
                       "key": "limit",
-                      "value": "20"
+                      "value": "20",
+                      "disabled": true
                     }
                   ]
                 }
@@ -7592,19 +7596,17 @@
               "response": []
             },
             {
-              "name": "Moderate Review (hide/unhide)",
+              "name": "Moderate Review (hide/unhide) (not completed)",
               "request": {
                 "method": "PATCH",
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{adminAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{adminAccessToken}}"
                   },
                   {
                     "key": "Content-Type",
-                    "value": "application/json",
-                    "type": "text"
+                    "value": "application/json"
                   }
                 ],
                 "body": {
@@ -7633,14 +7635,13 @@
               "response": []
             },
             {
-              "name": "Delete Review",
+              "name": "Delete Review (not completed)",
               "request": {
                 "method": "DELETE",
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{adminAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{adminAccessToken}}"
                   }
                 ],
                 "url": {
@@ -7662,22 +7663,20 @@
           "description": "Podcasts (and episodes) are created by artists/admins via ARTIST > Podcasts. This folder covers admin moderation: list/get/update/approve/reject/delete + review moderation."
         },
         {
-          "name": "Audiobooks (admin-only, no artist create route)",
+          "name": "✅ Audiobooks (admin-only, no artist create route)",
           "item": [
             {
-              "name": "Get Chapter Upload URL (presigned, optional flow)",
+              "name": "Get Chapter Upload URL (not completed) (presigned, optional flow)",
               "request": {
                 "method": "POST",
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{adminAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{adminAccessToken}}"
                   },
                   {
                     "key": "Content-Type",
-                    "value": "application/json",
-                    "type": "text"
+                    "value": "application/json"
                   }
                 ],
                 "body": {
@@ -7922,11 +7921,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "try {",
-                      "  const res = pm.response.json();",
-                      "  const value = res.data.trackingId;",
-                      "  if (value) { pm.collectionVariables.set(\"trackingId\", value); console.log(\"trackingId saved:\", value); }",
-                      "} catch (e) { console.warn(\"Could not auto-capture trackingId\", e); }"
+                      "try {\n  const res = pm.response.json();\n  const value = res.data.trackingId;\n  if (value) { pm.collectionVariables.set(\"trackingId\", value); console.log(\"trackingId saved:\", value); }\n} catch (e) { console.warn(\"Could not auto-capture trackingId\", e); }"
                     ]
                   }
                 }
@@ -7936,8 +7931,7 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{adminAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{adminAccessToken}}"
                   }
                 ],
                 "body": {
@@ -7952,7 +7946,7 @@
                       "key": "audio",
                       "type": "file",
                       "description": "mp3/mp4/aac/ogg, required, max 2GB",
-                      "value": null
+                      "value": ""
                     }
                   ]
                 },
@@ -7979,8 +7973,7 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{adminAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{adminAccessToken}}"
                   }
                 ],
                 "body": {
@@ -7995,7 +7988,7 @@
                       "key": "audio",
                       "type": "file",
                       "description": "optional replacement",
-                      "value": null
+                      "value": ""
                     }
                   ]
                 },
@@ -8069,19 +8062,14 @@
               "response": []
             },
             {
-              "name": "List Reviews",
+              "name": "List Reviews (not completed)",
               "event": [
                 {
                   "listen": "test",
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "try {",
-                      "  const res = pm.response.json();",
-                      "  const d = res.data;",
-                      "  const found = d.data?.items?.[0]?._id || d.data?.data?.[0]?._id || d.data?.[0]?._id;",
-                      "  if (found) { pm.collectionVariables.set(\"audiobookReviewId\", found); console.log(\"audiobookReviewId saved:\", found); }",
-                      "} catch (e) { console.warn(\"Could not auto-capture audiobookReviewId\", e); }"
+                      "try {\n  const res = pm.response.json();\n  const d = res.data;\n  const found = d.data?.items?.[0]?._id || d.data?.data?.[0]?._id || d.data?.[0]?._id;\n  if (found) { pm.collectionVariables.set(\"audiobookReviewId\", found); console.log(\"audiobookReviewId saved:\", found); }\n} catch (e) { console.warn(\"Could not auto-capture audiobookReviewId\", e); }"
                     ]
                   }
                 }
@@ -8091,12 +8079,11 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{adminAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{adminAccessToken}}"
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/admin/audiobooks/reviews?audiobookId={{audiobookId}}&page=1&limit=20",
+                  "raw": "{{baseUrl}}/admin/audiobooks/reviews?page=1&limit=20",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -8108,7 +8095,8 @@
                   "query": [
                     {
                       "key": "audiobookId",
-                      "value": "{{audiobookId}}"
+                      "value": "{{audiobookId}}",
+                      "disabled": true
                     },
                     {
                       "key": "page",
@@ -8124,19 +8112,17 @@
               "response": []
             },
             {
-              "name": "Moderate Review (hide/unhide)",
+              "name": "Moderate Review (hide/unhide) (not completed)",
               "request": {
                 "method": "PATCH",
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{adminAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{adminAccessToken}}"
                   },
                   {
                     "key": "Content-Type",
-                    "value": "application/json",
-                    "type": "text"
+                    "value": "application/json"
                   }
                 ],
                 "body": {
@@ -8165,14 +8151,13 @@
               "response": []
             },
             {
-              "name": "Delete Review",
+              "name": "Delete Review (not completed)",
               "request": {
                 "method": "DELETE",
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{adminAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{adminAccessToken}}"
                   }
                 ],
                 "url": {
@@ -8194,7 +8179,7 @@
           "description": "Step-by-step: Create Audiobook → Create Chapter(s) → List/Get → Update → Delete Chapter → Delete Audiobook. Reviews are written by users (User > Audiobooks) — this folder only moderates them."
         },
         {
-          "name": "Events",
+          "name": "✅ Events",
           "item": [
             {
               "name": "Create Event",
@@ -8390,19 +8375,17 @@
               "response": []
             },
             {
-              "name": "Update Event (also reassign owner)",
+              "name": "❌ Update Event (also reassign owner)",
               "request": {
                 "method": "PATCH",
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{adminAccessToken}}",
-                    "type": "text"
+                    "value": "Bearer {{adminAccessToken}}"
                   },
                   {
                     "key": "Content-Type",
-                    "value": "application/json",
-                    "type": "text"
+                    "value": "application/json"
                   }
                 ],
                 "body": {
@@ -8483,7 +8466,7 @@
           "description": "Events are created via ARTIST > Events (admins pass that same creator controller's role check too). This folder is for oversight: dashboard, list-all, moderate, delete."
         },
         {
-          "name": "Merch Products",
+          "name": "✅ Merch Products",
           "item": [
             {
               "name": "Dashboard",
@@ -8669,7 +8652,7 @@
           "description": "Products are created via ARTIST > Merch Products (admins pass that same creator controller's role check too). This folder is for oversight: dashboard, list-all, moderate, delete."
         },
         {
-          "name": "Dashboard",
+          "name": "Dashboard ✅",
           "item": [
             {
               "name": "Get Dashboard",
@@ -8698,7 +8681,7 @@
           ]
         },
         {
-          "name": "Analytics",
+          "name": "Analytics ✅",
           "item": [
             {
               "name": "Get Analytics (7d)",
