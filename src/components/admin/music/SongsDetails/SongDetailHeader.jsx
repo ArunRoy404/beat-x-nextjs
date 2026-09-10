@@ -1,7 +1,8 @@
 import React from "react"
-import Image from "next/image"
+import CommonCoverImage from "@/components/shared/CommonCoverImage/CommonCoverImage"
 import { formatDurationMs } from "@/lib/format/formatDuration"
 import { SONG_STATUS, SONG_STATUS_LABELS, normalizeSongStatus } from "@/lib/constants/songStatus"
+import { getSongCoverUrl } from "@/lib/format/resolveMediaUrl"
 
 const STATUS_COLORS = {
     [SONG_STATUS.ACTIVE]: "bg-green-success/15 text-green-success border-green-success/20",
@@ -33,15 +34,10 @@ const SongDetailHeader = ({ song }) => {
             <div className="flex items-start gap-3 sm:gap-4 w-full">
                 {/* Cover Art */}
                 <div className="relative w-[60px] h-[60px] sm:w-[80px] sm:h-[80px] rounded-[12px] sm:rounded-[16px] bg-white/5 border border-white/10 overflow-hidden shrink-0">
-                    {song?.coverUrl && (
-                        <Image
-                            src={song.coverUrl}
-                            alt={song?.title || "Song Cover"}
-                            fill
-                            sizes="(max-width: 640px) 60px, 80px"
-                            className="object-cover"
-                        />
-                    )}
+                    <CommonCoverImage
+                        src={getSongCoverUrl(song)}
+                        alt={song?.title || "Song Cover"}
+                    />
                 </div>
 
                 {/* Metadata */}
