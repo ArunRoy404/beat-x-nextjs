@@ -36,10 +36,10 @@ const RevenueStreams = ({ data }) => {
                 if (active && payload && payload.length) {
                   return (
                     <div className="bg-[#0E0E0E] border border-border p-2.5 rounded-[8px] shadow-lg flex flex-col gap-1 text-xs">
-                      <p className="text-light-gray font-medium">{payload[0].payload.name}</p>
-                      {payload.map((p, idx) => (
-                        <p key={idx} style={{ color: p.color }} className="font-semibold">
-                          {p.name}: ৳{p.value}K
+                      <p className="text-light-gray font-medium">{payload?.[0]?.payload?.name}</p>
+                      {payload?.map((p, idx) => (
+                        <p key={idx} style={{ color: p?.color }} className="font-semibold">
+                          {p?.name}: ৳{p?.value}K
                         </p>
                       ))}
                     </div>
