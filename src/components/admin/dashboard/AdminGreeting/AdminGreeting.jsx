@@ -54,7 +54,16 @@ const AdminGreeting = ({ greetingData }) => {
                             <span className="text-light-gray">{greetingData?.pendingReportsLabel || "pending"}</span>
                         </>
                     )}
-                    {greetingData?.pendingReportsText && greetingData?.operationalText && (
+                    {greetingData?.pendingReportsText && greetingData?.pendingReviewsText && (
+                        <span className="text-dark-gray">•</span>
+                    )}
+                    {greetingData?.pendingReviewsText && (
+                        <>
+                            <span className="text-yellow-warning">{greetingData.pendingReviewsText}</span>
+                            <span className="text-light-gray">{greetingData?.pendingReviewsLabel || "reviews"}</span>
+                        </>
+                    )}
+                    {(greetingData?.pendingReportsText || greetingData?.pendingReviewsText || greetingData?.activeUsersText) && greetingData?.operationalText && (
                         <span className="text-dark-gray">•</span>
                     )}
                     {greetingData?.operationalText && (
