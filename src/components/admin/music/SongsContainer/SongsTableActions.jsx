@@ -8,12 +8,17 @@ import SongDetailsDialog from "@/components/dialogs/admin/music/SongDetailsDialo
 import RejectSongDialog from "@/components/dialogs/admin/music/RejectSongDialog"
 import { useUpdateSongStatus } from "@/hooks/api/admin/songs/useUpdateSongStatus"
 import { useApproveSong } from "@/hooks/api/admin/songs/useApproveSong"
+import { SONG_STATUS, isSongAwaitingReview, normalizeSongStatus } from "@/lib/constants/songStatus"
 
 const SongsTableActions = ({ status, song, className }) => {
     const { mutate: updateSongStatus, isPending: isStatusPending } = useUpdateSongStatus()
     const { mutate: approveSong, isPending: isApprovePending } = useApproveSong()
 
-    const isPendingSubmission = status === "pending" || song?.submittedStatus === "pending" || song?.status === "pending"
+    const currentStatus = normalizeSongStatus(status || song?.status)
+    const isPendingSubmission = isSongAwaitingReview({ ...song, status: status ?? song?.status })
+
+    const isLive = currentStatus === SONG_STATUS.ACTIVE
+    const isArchived = currentStatus === SONG_STATUS.ARCHIVED
 
     const handleApprove = () => {
         approveSong({ id: song?._id })
@@ -52,9 +57,9 @@ const SongsTableActions = ({ status, song, className }) => {
                 </>
             )}
 
-            {!isPendingSubmission && status === "active" && (
+            {!isPendingSubmission && isLive && (
                 <Button
-                    onClick={() => handleStatusChange("archived")}
+                    onClick={() => handleStatusChange(SONG_STATUS.ARCHIVED)}
                     disabled={isStatusPending}
                     variant="outline"
                     className="text-yellow-warning border border-yellow-warning/20 bg-yellow-warning/10 rounded-full px-3! py-3!"
@@ -63,9 +68,9 @@ const SongsTableActions = ({ status, song, className }) => {
                 </Button>
             )}
 
-            {!isPendingSubmission && status === "archived" && (
+            {!isPendingSubmission && isArchived && (
                 <Button
-                    onClick={() => handleStatusChange("active")}
+                    onClick={() => handleStatusChange(SONG_STATUS.ACTIVE)}
                     disabled={isStatusPending}
                     variant="outline"
                     className="text-green-success border border-green-success/20 bg-green-success/10 rounded-full px-3! py-3!"

@@ -6,6 +6,7 @@ import CommonTableStat from "@/components/shared/CommonTable/CommonTableStat"
 import CommonTableStatus from "@/components/shared/CommonTable/CommonTableStatus"
 import SongsTableActions from "@/components/admin/music/SongsContainer/SongsTableActions"
 import { formatDurationMs } from "@/lib/format/formatDuration"
+import { normalizeSongStatus } from "@/lib/constants/songStatus"
 
 const SongsCard = ({ song }) => {
     if (!song) return null
@@ -19,14 +20,18 @@ const SongsCard = ({ song }) => {
                     duration={formatDurationMs(song?.durationMs)}
                     cover={song?.coverUrl}
                 />
-                <CommonTableStatus status={song?.status} className="shrink-0" />
+                <CommonTableStatus status={normalizeSongStatus(song?.status)} className="shrink-0" />
             </div>
 
             {/* Metadata list */}
             <div className="grid grid-cols-2 gap-y-3 gap-x-4 border-t border-b border-whitetext/5 py-3 text-sm">
                 <div className="flex flex-col gap-1">
                     <span className="text-light-whitetext text-[12px] font-normal uppercase tracking-wider">Artist</span>
-                    <span className="text-whitetext font-medium truncate">{song?.artist || "-"}</span>
+                    <span className="text-whitetext font-medium truncate">
+                        {typeof song?.artist === "object" && song?.artist !== null
+                            ? song?.artist?.name || song?.artist?.title || "-"
+                            : song?.artist || "-"}
+                    </span>
                 </div>
 
                 <div className="flex flex-col gap-1">
@@ -42,7 +47,11 @@ const SongsCard = ({ song }) => {
                 <div className="flex flex-col gap-1">
                     <span className="text-light-whitetext text-[12px] font-normal uppercase tracking-wider">Released</span>
                     <span className="text-whitetext font-medium truncate">
-                        {song?.publishedAt ? format(new Date(song.publishedAt), "MMM d, yyyy") : "-"}
+                        {(() => {
+                            if (!song?.publishedAt) return "-"
+                            const d = new Date(song.publishedAt)
+                            return !isNaN(d.getTime()) ? format(d, "MMM d, yyyy") : "-"
+                        })()}
                     </span>
                 </div>
             </div>

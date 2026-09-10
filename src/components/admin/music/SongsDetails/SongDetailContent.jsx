@@ -6,11 +6,36 @@ import { format } from "date-fns";
 import { Play, Pause, Music, RotateCcw, RotateCw, Volume2, Volume1, VolumeX } from "lucide-react";
 import CommonInfoBox from "@/components/shared/CommonInfoBox/CommonInfoBox";
 import { formatDurationMs } from "@/lib/format/formatDuration";
+import { SONG_STATUS_LABELS, normalizeSongStatus } from "@/lib/constants/songStatus";
 import { useVolumeStore } from "@/zustandStore/audio/useVolumeStore";
 import { useGlobalMediaPlayerStore } from "@/zustandStore/media/useGlobalMediaPlayerStore";
 
 import { getSongAudioUrl, getSongCoverUrl } from "@/lib/format/resolveMediaUrl";
 import { toast } from "sonner";
+
+/**
+ * `album`, `ownerId` and `reviewedBy` are Mongo refs: sometimes populated
+ * objects, sometimes bare ObjectIds. Either way they must be reduced to a
+ * string — rendering the object itself throws "Objects are not valid as a
+ * React child".
+ */
+const refToText = (ref, ...fields) => {
+  if (!ref) return "";
+  if (typeof ref === "string") return ref;
+  if (typeof ref === "object") {
+    for (const field of fields) {
+      if (ref?.[field]) return ref[field];
+    }
+    return ref?._id || "";
+  }
+  return "";
+};
+
+const formatDate = (value) => {
+  if (!value) return "";
+  const date = new Date(value);
+  return isNaN(date.getTime()) ? "" : format(date, "MMM d, yyyy");
+};
 
 const formatTime = (seconds) => {
   if (!seconds || isNaN(seconds)) return "0:00";
@@ -230,27 +255,35 @@ const SongDetailContent = ({ song }) => {
       {/* Details Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <CommonInfoBox label="Artist" value={song?.artist} />
-        <CommonInfoBox label="Album" value={song?.album?.name || song?.album} />
+        <CommonInfoBox label="Album" value={refToText(song?.album, "title", "name")} />
         <CommonInfoBox label="Genre" value={song?.genre?.name} />
         <CommonInfoBox label="Duration" value={formatDurationMs(song?.durationMs)} />
-        <CommonInfoBox
-          label="Release Date"
-          value={song?.publishedAt ? format(new Date(song.publishedAt), "MMM d, yyyy") : "-"}
-        />
+        <CommonInfoBox label="Release Date" value={formatDate(song?.publishedAt)} />
+        <CommonInfoBox label="Scheduled For" value={formatDate(song?.scheduledAt)} />
         <CommonInfoBox label="Total Streams" value={song?.playCount ?? 0} />
         <CommonInfoBox label="Weekly Streams" value={song?.playCountWeek ?? 0} />
         <CommonInfoBox label="Likes" value={song?.likeCount ?? 0} />
         <CommonInfoBox label="Explicit" value={song?.explicit ? "Yes" : "No"} />
         <CommonInfoBox
           label="Trending"
-          value={song?.isTrending ? `Yes (${song?.trendDirection || "stable"})` : "No"}
+          value={song?.isTrending ? (song?.trendDirection ? `Yes (${song.trendDirection})` : "Yes") : "No"}
         />
         <CommonInfoBox label="Featured" value={song?.isFeatured ? "Yes" : "No"} />
-        <CommonInfoBox label="Owner ID" value={song?.ownerId || "-"} />
+        <CommonInfoBox label="Owner" value={refToText(song?.ownerId, "name", "email")} />
+      </div>
+
+      {/* Moderation / review trail — populated once a song goes through the
+          artist submission queue (approve/reject). */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <CommonInfoBox
-          label="Reviewed At"
-          value={song?.reviewedAt ? format(new Date(song.reviewedAt), "MMM d, yyyy") : "-"}
+          label="Submitted Status"
+          value={SONG_STATUS_LABELS[normalizeSongStatus(song?.submittedStatus)] || ""}
         />
+        <CommonInfoBox label="Submitted At" value={formatDate(song?.submittedAt)} />
+        <CommonInfoBox label="Reviewed By" value={refToText(song?.reviewedBy, "name", "email")} />
+        <CommonInfoBox label="Reviewed At" value={formatDate(song?.reviewedAt)} />
+        <CommonInfoBox label="Rejection Reason" value={song?.rejectionReason} />
+        <CommonInfoBox label="Transcode Status" value={song?.transcodeStatus} />
       </div>
     </div>
   );

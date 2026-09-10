@@ -51,8 +51,24 @@ const CommonTableStatus = ({ status, className }) => {
         </span>
       )}
       {status === "scheduled" && (
-        <span className="border border-[#CC97FF]/20 bg-[#CC97FF]/10 text-[#CC97FF] text-[12px] font-normal px-2.5 py-0.5 rounded-full select-none capitalize">
+        <span className="border border-primary/20 bg-primary/10 text-primary text-[12px] font-normal px-2.5 py-0.5 rounded-full select-none capitalize">
           Scheduled
+        </span>
+      )}
+      {status === "published" && (
+        <span className="border border-green-success/20 bg-green-success/10 text-green-success text-[12px] font-normal px-2.5 py-0.5 rounded-full select-none capitalize">
+          Published
+        </span>
+      )}
+      {status === "pending" && (
+        <span className="border border-yellow-warning/20 bg-yellow-warning/10 text-yellow-warning text-[12px] font-normal px-2.5 py-0.5 rounded-full flex items-center gap-1.5 select-none capitalize">
+          <span className="w-1.5 h-1.5 rounded-full bg-yellow-warning animate-pulse" />
+          Pending
+        </span>
+      )}
+      {status === "rejected" && (
+        <span className="border border-red-error/20 bg-red-error/10 text-red-error text-[12px] font-normal px-2.5 py-0.5 rounded-full select-none capitalize">
+          Rejected
         </span>
       )}
     </div>

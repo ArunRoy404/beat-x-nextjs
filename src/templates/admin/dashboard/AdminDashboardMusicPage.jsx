@@ -5,22 +5,11 @@ import DashboardStats from "@/components/shared/Dashboard/DashboardStats/Dashboa
 import UploadNewSong from "@/components/admin/music/UploadNewSong";
 import SongsContainer from "@/components/admin/music/SongsContainer/SongsContainer";
 import { useSongs } from "@/hooks/api/admin/songs/useSongs";
-import { buildSongsParams } from "@/hooks/api/admin/songs/songsParams";
-import { useUrlListParams } from "@/hooks/useUrlListParams";
+import { useSongsListParams } from "@/hooks/api/admin/songs/useSongsListParams";
 
 const AdminDashboardMusicPage = () => {
-  const { get } = useUrlListParams();
-  const selectedStatus = get("status", "all");
-  const selectedGenre = get("genre", "all");
-  const urlSearch = get("q", "");
-  const currentPage = Number(get("page", "1")) || 1;
-
-  const params = buildSongsParams({
-    status: selectedStatus,
-    genre: selectedGenre,
-    q: urlSearch,
-    page: currentPage,
-  });
+  // Same derivation as SongsContainer, so both read one cache entry.
+  const { params } = useSongsListParams();
 
   const { data: allData } = useSongs(params);
 
@@ -31,32 +20,32 @@ const AdminDashboardMusicPage = () => {
         title: "Total Songs",
         value: (allData?.stats?.total ?? allData?.total ?? 0).toLocaleString(),
         icon: "Music",
-        iconColor: "#3ADFFA",
-        iconBg: "rgba(58, 223, 250, 0.15)",
+        iconColor: "var(--secondary)",
+        iconBg: "color-mix(in srgb, var(--secondary) 15%, transparent)",
       },
       {
         id: 2,
         title: "Total Streams",
         value: (allData?.stats?.totalStreams ?? 0).toLocaleString(),
         icon: "Activity",
-        iconColor: "#CC97FF",
-        iconBg: "rgba(204, 151, 255, 0.15)",
+        iconColor: "var(--primary)",
+        iconBg: "color-mix(in srgb, var(--primary) 15%, transparent)",
       },
       {
         id: 3,
         title: "Published",
         value: (allData?.stats?.published ?? 0).toLocaleString(),
         icon: "CheckCircle",
-        iconColor: "#E5F9CF",
-        iconBg: "rgba(229, 249, 207, 0.15)",
+        iconColor: "var(--green-success)",
+        iconBg: "color-mix(in srgb, var(--green-success) 15%, transparent)",
       },
       {
         id: 4,
         title: "Drafts",
         value: (allData?.stats?.draft ?? 0).toLocaleString(),
         icon: "FileText",
-        iconColor: "#FFC864",
-        iconBg: "rgba(255, 200, 100, 0.15)",
+        iconColor: "var(--yellow-warning)",
+        iconBg: "color-mix(in srgb, var(--yellow-warning) 15%, transparent)",
       },
     ];
   }, [allData]);

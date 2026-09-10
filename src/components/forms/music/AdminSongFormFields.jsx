@@ -12,6 +12,8 @@ import CommonSelectCards from "@/components/shared/CommonInputs/CommonInput/Comm
 import CommonAudioInput from "@/components/shared/CommonInputs/CommonAudioInput/CommonAudioInput"
 import CommonImageUpload from "@/components/shared/CommonInputs/CommonImageUpload/CommonImageUpload"
 import { useGenres } from "@/hooks/api/admin/genre/useGenres"
+import { useAlbums } from "@/hooks/api/admin/albums/useAlbums"
+import { TAXONOMY_OPTIONS_PARAMS } from "@/lib/constants/taxonomyOptions"
 
 const VISIBILITY_OPTIONS = [
     { value: "publish", label: "Publish Now", icon: CheckCircle2 },
@@ -30,8 +32,10 @@ const AdminSongFormFields = ({
     cover,
     onCoverChange,
     coverError,
+    // AdminUpdateSongDto only — the create endpoint has no such fields.
+    showAdminFlags = false,
 }) => {
-    const genresQuery = useGenres()
+    const genresQuery = useGenres(TAXONOMY_OPTIONS_PARAMS)
     const genresData = genresQuery?.data
     const genresList =
         genresData?.genre ??
@@ -43,6 +47,22 @@ const AdminSongFormFields = ({
         value: genre?._id || genre?.id,
         label: genre?.name || "Unnamed Genre",
     }))
+
+    const albumsQuery = useAlbums(TAXONOMY_OPTIONS_PARAMS)
+    const albumsData = albumsQuery?.data
+    const albumsList =
+        albumsData?.album ??
+        albumsData?.albums ??
+        albumsData?.data ??
+        (Array.isArray(albumsData) ? albumsData : [])
+
+    const albumOptions = [
+        { value: "none", label: "No Album (Single)" },
+        ...albumsList.map((album) => ({
+            value: album?._id || album?.id,
+            label: album?.title || album?.name || "Untitled Album",
+        })),
+    ]
 
     const visibility = watch("visibility")
 
@@ -80,6 +100,21 @@ const AdminSongFormFields = ({
                     )}
                 />
             </CommonInputContainer>
+
+            <Controller
+                name="album"
+                control={control}
+                render={({ field }) => (
+                    <CommonSelect
+                        label="Album"
+                        placeholder="Select album"
+                        value={field.value}
+                        onChange={field.onChange}
+                        options={albumOptions}
+                        error={errors.album?.message}
+                    />
+                )}
+            />
 
             <Controller
                 name="visibility"
@@ -121,6 +156,32 @@ const AdminSongFormFields = ({
                     </div>
                 )}
             />
+
+            {showAdminFlags && (
+                <>
+                    <Controller
+                        name="isFeatured"
+                        control={control}
+                        render={({ field }) => (
+                            <div className="flex items-center justify-between py-2 border-b border-white/5">
+                                <span className="text-whitetext text-[13px] font-medium">Featured</span>
+                                <Switch checked={Boolean(field.value)} onCheckedChange={field.onChange} />
+                            </div>
+                        )}
+                    />
+
+                    <Controller
+                        name="isTrending"
+                        control={control}
+                        render={({ field }) => (
+                            <div className="flex items-center justify-between py-2 border-b border-white/5">
+                                <span className="text-whitetext text-[13px] font-medium">Trending</span>
+                                <Switch checked={Boolean(field.value)} onCheckedChange={field.onChange} />
+                            </div>
+                        )}
+                    />
+                </>
+            )}
         </>
     )
 }

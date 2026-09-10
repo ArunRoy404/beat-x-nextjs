@@ -17805,7 +17805,7 @@
           "name": "[AD05] Songs (Moderation & Management) ✅",
           "item": [
             {
-              "name": "AD05.01 Get Upload URL (presigned) (not done_",
+              "name": "AD05.01 Get Upload URL (presigned) ❌ NOT INTEGRATED — unused, upload goes inline via AD05.03",
               "request": {
                 "method": "POST",
                 "header": [
@@ -17839,7 +17839,7 @@
                   ],
                   "query": []
                 },
-                "description": "[Updated] Fully verified with Beat-X API docs (http://13.200.168.40:3000/api/docs)\nOperation: Get a presigned upload URL for song audio"
+                "description": "[Verified against http://13.200.168.40:3000/api/docs]\nOperation: Get a presigned upload URL for song audio\n\n❌ NOT INTEGRATED. The admin UI does not use this presigned flow at all — Upload New Song posts the audio + cover inline as multipart/form-data to POST /admin/songs (AD05.03). This request stays here for reference; nothing in the frontend calls it.\n\nRequest body matches UploadUrlDto (fileName, contentType — both required).\nResponse: SongUploadUrlResponseDto { uploadUrl, key }."
               },
               "response": [
                 {
@@ -17896,7 +17896,7 @@
               ]
             },
             {
-              "name": "AD05.02 List Songs (all statuses)",
+              "name": "AD05.02 List Songs (all statuses) ⚠️ no submittedStatus filter — review queue not filterable",
               "event": [
                 {
                   "listen": "test",
@@ -17930,41 +17930,41 @@
                       "key": "page",
                       "value": "1",
                       "disabled": true,
-                      "description": "(Type: number) [Default: 1]"
+                      "description": "(Type: number) [Default: 1] [Min: 1]"
                     },
                     {
                       "key": "q",
                       "value": "korona",
                       "disabled": true,
-                      "description": "(Type: string)"
+                      "description": "(Type: string) Free-text search"
                     },
                     {
                       "key": "genre",
                       "value": "",
                       "disabled": true,
-                      "description": "[New] Query parameter (string)"
+                      "description": "(Type: string) Genre ObjectId"
                     },
                     {
                       "key": "album",
                       "value": "",
                       "disabled": true,
-                      "description": "[New] Query parameter (string)"
+                      "description": "(Type: string) Album ObjectId"
                     },
                     {
                       "key": "limit",
                       "value": "20",
                       "disabled": true,
-                      "description": "[New] Query parameter (number)"
+                      "description": "(Type: number) [Default: 20] [Min: 1, Max: 50 — larger values are rejected]"
                     },
                     {
                       "key": "status",
                       "value": "",
                       "disabled": true,
-                      "description": "[New] Query parameter (string)"
+                      "description": "(Type: string) Song lifecycle status — active | draft | scheduled | archived. Does NOT filter the artist review queue (see submittedStatus note in the description)."
                     }
                   ]
                 },
-                "description": "[Updated] Fully verified with Beat-X API docs (http://13.200.168.40:3000/api/docs)\nOperation: List all songs (admin oversight)"
+                "description": "[Verified against http://13.200.168.40:3000/api/docs]\nOperation: List all songs (admin oversight)\n\n✅ Integrated: powers the admin Music table — status tabs, genre filter, search, pagination, and the stat cards above the table.\n\n⚠️ ISSUE — the review queue cannot be filtered. Pending-review state lives on the song's `submittedStatus` field, not `status`, and no query param is documented for it. The UI's \"Pending\" tab therefore sends `status=pending`, which is not a documented `status` value and may return an empty list. A `submittedStatus` query param is needed on this endpoint.\n\nResponse shape (AdminSongListResponseDto) — note the list key is `song`, NOT `data`:\n{ song: Song[], stats: { total, totalStreams, published, awaitingApproval, rejected, draft, scheduled }, total, page, limit }\n\nParam notes: `limit` is capped at 50 (min 1, default 20) — a larger value is a 400. `page` min 1, default 1. `genre` / `album` take an ObjectId."
               },
               "response": [
                 {
@@ -18044,7 +18044,7 @@
               ]
             },
             {
-              "name": "AD05.03 Create Song",
+              "name": "AD05.03 Create Song ⚠️ status value ambiguous — active vs published",
               "request": {
                 "method": "POST",
                 "header": [
@@ -18072,48 +18072,43 @@
                       "key": "album",
                       "type": "text",
                       "value": "album_sample",
-                      "description": "[New] album"
+                      "description": "Album ObjectId (optional — omit for a single)"
                     },
                     {
                       "key": "genre",
                       "type": "text",
                       "value": "{{genreId}}",
-                      "description": ""
+                      "description": "Genre ObjectId (required)"
                     },
                     {
                       "key": "explicit",
                       "type": "text",
-                      "value": false,
-                      "description": "[New] explicit"
+                      "value": "false",
+                      "description": "(boolean as text) true | false"
                     },
                     {
                       "key": "status",
                       "type": "text",
                       "value": "active",
-                      "description": ""
+                      "description": "Lifecycle status. ⚠️ Docs disagree: SongDetailResponseDto documents \"active\", SongAdminStatsDto labels the same bucket \"published\". Frontend sends \"active\"."
                     },
                     {
                       "key": "scheduledAt",
                       "type": "text",
                       "value": "2026-09-10T12:00:00.000Z",
-                      "description": "[New] scheduledAt"
+                      "description": "ISO 8601 date-time. Only meaningful when status is scheduled."
                     },
                     {
                       "key": "cover",
                       "type": "file",
-                      "description": "image, required",
-                      "src": [
-                        "",
-                        "/C:/Users/ROY/Downloads/morty.jpg"
-                      ]
+                      "description": "image, required by the endpoint (not part of CreateSongDto)",
+                      "src": "/C:/Users/ROY/Downloads/morty.jpg"
                     },
                     {
                       "key": "audio",
                       "type": "file",
-                      "description": "mp3/wav/flac, required",
-                      "src": [
-                        "/C:/Users/ROY/Downloads/alexguz-funk-amp-breakbeat-upbeat-advertising-happy-cook-541097.mp3"
-                      ]
+                      "description": "mp3/wav/flac, required by the endpoint (not part of CreateSongDto)",
+                      "src": "/C:/Users/ROY/Downloads/alexguz-funk-amp-breakbeat-upbeat-advertising-happy-cook-541097.mp3"
                     }
                   ]
                 },
@@ -18128,7 +18123,7 @@
                   ],
                   "query": []
                 },
-                "description": "[Updated] Fully verified with Beat-X API docs (http://13.200.168.40:3000/api/docs)\nOperation: Create a song as admin (multipart/form-data, cover + audio)\n\nAdmin uploads bypass the review queue and publish immediately."
+                "description": "[Verified against http://13.200.168.40:3000/api/docs]\nOperation: Create a song as admin (multipart/form-data, cover + audio)\n\n✅ Integrated: the Upload New Song dialog.\n\n⚠️ ISSUE — the value for a live song is ambiguous in the docs. SongDetailResponseDto documents status \"active\"; SongAdminStatsDto calls the same bucket \"published\". The frontend sends \"active\" (matching the admin albums module). Please confirm which one the backend validates.\n\nCreateSongDto: title*, artist*, genre* (required); album, explicit, status, scheduledAt (optional). cover + audio are multipart files required by the endpoint but absent from the DTO.\n\nAdmin uploads bypass the review queue and publish immediately.\nResponse: SongTrackingIdResponseDto { trackingId } — the song row exists right away, audio transcoding finishes server-side."
               },
               "response": [
                 {
@@ -18235,7 +18230,7 @@
               ]
             },
             {
-              "name": "AD05.04 Get Song by Id",
+              "name": "AD05.04 Get Song by Id ✅",
               "request": {
                 "method": "GET",
                 "header": [
@@ -18257,7 +18252,7 @@
                   ],
                   "query": []
                 },
-                "description": "[Updated] Fully verified with Beat-X API docs (http://13.200.168.40:3000/api/docs)\nOperation: Get any song by id"
+                "description": "[Verified against http://13.200.168.40:3000/api/docs]\nOperation: Get any song by id\n\n✅ Integrated: the song detail modal (Details tab). Consistent with the docs, no issues.\n\nNote: this returns the song record only — there is no per-song analytics endpoint in the API, so the modal's Analytics tab is an empty state pending backend support."
               },
               "response": [
                 {
@@ -18302,7 +18297,7 @@
               ]
             },
             {
-              "name": "AD05.05 Update Song (also take-down/restore)",
+              "name": "AD05.05 Update Song (also take-down/restore) ⚠️ docs DTO omits status + title it accepts",
               "request": {
                 "method": "PATCH",
                 "header": [
@@ -18318,37 +18313,45 @@
                     {
                       "key": "isFeatured",
                       "type": "text",
-                      "value": true,
-                      "description": "[New] isFeatured"
+                      "value": "true",
+                      "description": "(boolean as text) true | false"
                     },
                     {
                       "key": "isTrending",
                       "type": "text",
-                      "value": true,
-                      "description": "[New] isTrending"
+                      "value": "true",
+                      "description": "(boolean as text) true | false"
                     },
                     {
                       "key": "trendDirection",
                       "type": "text",
                       "value": "trendDirection_sample",
-                      "description": "[New] trendDirection"
+                      "description": "⚠️ Accepted values are not documented anywhere in the spec, so the UI does not expose this field."
                     },
                     {
                       "key": "title",
                       "value": "Admin Upload (updated)",
-                      "type": "text"
+                      "type": "text",
+                      "description": "⚠️ Accepted by the endpoint but NOT present in AdminUpdateSongDto."
+                    },
+                    {
+                      "key": "status",
+                      "type": "text",
+                      "value": "archived",
+                      "disabled": true,
+                      "description": "Take-down / restore: archived = take down, active = restore. ⚠️ Not present in AdminUpdateSongDto even though this endpoint's own summary documents it as the take-down/restore route."
                     },
                     {
                       "key": "cover",
                       "type": "file",
-                      "description": "optional",
-                      "value": null
+                      "description": "optional — attaching a new audio file makes the response { trackingId }",
+                      "src": null
                     },
                     {
                       "key": "audio",
                       "type": "file",
-                      "description": "optional",
-                      "value": null
+                      "description": "optional — attaching a new audio file makes the response { trackingId }",
+                      "src": null
                     }
                   ]
                 },
@@ -18364,7 +18367,7 @@
                   ],
                   "query": []
                 },
-                "description": "[Updated] Fully verified with Beat-X API docs (http://13.200.168.40:3000/api/docs)\nOperation: Update any song (multipart/form-data). Also the take-down/restore endpoint. Returns the updated song, or { trackingId } when a new audio file is attached"
+                "description": "[Verified against http://13.200.168.40:3000/api/docs]\nOperation: Update any song (multipart/form-data). Also the take-down/restore endpoint. Returns the updated song, or { trackingId } when a new audio file is attached\n\n✅ Integrated: the Edit Song dialog, plus the Take Down / Restore row actions (which send status only).\n\n⚠️ ISSUE — the documented DTO is incomplete. AdminUpdateSongDto lists only isFeatured, isTrending and trendDirection, yet this endpoint's own summary describes it as the take-down/restore route (needs `status`) and it accepts title/album/genre/explicit/scheduledAt too. The frontend relies on those undocumented fields. Please publish the full DTO.\n\n⚠️ ISSUE — `trendDirection` is a bare string with no documented allowed values, so the UI cannot offer a control for it without guessing."
               },
               "response": [
                 {
@@ -18449,7 +18452,7 @@
               ]
             },
             {
-              "name": "AD05.06 Approve Song (artist submission)",
+              "name": "AD05.06 Approve Song (artist submission) ✅",
               "request": {
                 "method": "PATCH",
                 "header": [
@@ -18472,7 +18475,7 @@
                   ],
                   "query": []
                 },
-                "description": "[Updated] Fully verified with Beat-X API docs (http://13.200.168.40:3000/api/docs)\nOperation: Approve an artist-submitted song pending review"
+                "description": "[Verified against http://13.200.168.40:3000/api/docs]\nOperation: Approve an artist-submitted song pending review\n\n✅ Integrated: the Approve button on rows awaiting review. No body, no params beyond :id. Consistent with the docs, no issues."
               },
               "response": [
                 {
@@ -18518,7 +18521,7 @@
               ]
             },
             {
-              "name": "AD05.07 Reject Song (artist submission)",
+              "name": "AD05.07 Reject Song (artist submission) ✅",
               "request": {
                 "method": "PATCH",
                 "header": [
@@ -18555,7 +18558,7 @@
                   ],
                   "query": []
                 },
-                "description": "[Updated] Fully verified with Beat-X API docs (http://13.200.168.40:3000/api/docs)\nOperation: Reject an artist-submitted song pending review"
+                "description": "[Verified against http://13.200.168.40:3000/api/docs]\nOperation: Reject an artist-submitted song pending review\n\n✅ Integrated: the Reject dialog. Body matches RejectSongDto { reason } (reason required). Consistent with the docs, no issues."
               },
               "response": [
                 {
@@ -18615,7 +18618,7 @@
               ]
             },
             {
-              "name": "AD05.08 Delete Song",
+              "name": "AD05.08 Delete Song ✅",
               "request": {
                 "method": "DELETE",
                 "header": [
@@ -18637,7 +18640,7 @@
                   ],
                   "query": []
                 },
-                "description": "[Updated] Fully verified with Beat-X API docs (http://13.200.168.40:3000/api/docs)\nOperation: Delete a song (cascades playlists, likes, play history, storage)\n\nCascades: removes from playlists/favorites, deletes play-history, updates parent album stats, deletes files from storage."
+                "description": "[Verified against http://13.200.168.40:3000/api/docs]\nOperation: Delete a song (cascades playlists, likes, play history, storage)\n\n✅ Integrated: the Delete dialog (row action and detail-modal footer). Consistent with the docs, no issues.\n\nCascades: removes from playlists/favorites, deletes play-history, updates parent album stats, deletes files from storage.\nResponse: SongDeleteResponseDto { success, message, id }."
               },
               "response": [
                 {

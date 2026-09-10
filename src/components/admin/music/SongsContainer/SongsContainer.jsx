@@ -11,21 +11,22 @@ import CommonTableContainer from "@/components/shared/CommonTable/CommonTableCon
 import SongsCardsContainer from "./SongsCardsContainer"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
-import { useUrlListParams } from "@/hooks/useUrlListParams"
 import { useSongs } from "@/hooks/api/admin/songs/useSongs"
-import { SONGS_PAGE_SIZE, buildSongsParams } from "@/hooks/api/admin/songs/songsParams"
+import { SONGS_PAGE_SIZE } from "@/hooks/api/admin/songs/songsParams"
+import { useSongsListParams } from "@/hooks/api/admin/songs/useSongsListParams"
 import { useGenres } from "@/hooks/api/admin/genre/useGenres"
+import { TAXONOMY_OPTIONS_PARAMS } from "@/lib/constants/taxonomyOptions"
+import { normalizeSongStatus } from "@/lib/constants/songStatus"
 
 const STATUS_TABS = ["All", "Draft", "Pending", "Active", "Archived"]
 const SEARCH_DEBOUNCE_MS = 300
 
 const SongsContainer = () => {
-  const { get, setParams } = useUrlListParams()
+  const { filters, params, page: currentPage, setParams } = useSongsListParams()
 
-  const selectedStatus = get("status", "all")
-  const selectedGenre = get("genre", "all")
-  const urlSearch = get("q", "")
-  const currentPage = Number(get("page", "1")) || 1
+  const selectedStatus = filters.status
+  const selectedGenre = filters.genre
+  const urlSearch = filters.q
 
   const [searchInput, setSearchInput] = useState(urlSearch)
 
@@ -39,7 +40,7 @@ const SongsContainer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchInput])
 
-  const genresQuery = useGenres()
+  const genresQuery = useGenres(TAXONOMY_OPTIONS_PARAMS)
   const genresData = genresQuery?.data
   const genresList =
     genresData?.genre ??
@@ -55,13 +56,6 @@ const SongsContainer = () => {
     })),
   ]
 
-  const params = buildSongsParams({
-    status: selectedStatus,
-    genre: selectedGenre,
-    q: urlSearch,
-    page: currentPage,
-  })
-
   const { data, isLoading, isError, error, refetch } = useSongs(params)
   const songs = data?.song ?? data?.songs ?? data?.data ?? []
   const total = data?.total ?? 0
@@ -70,6 +64,12 @@ const SongsContainer = () => {
 
   const columns = getSongsColumns()
 
+  // "published" and "active" are the same bucket server-side, so normalise
+  // before matching the URL's status against a tab label.
+  const normalizedStatus = normalizeSongStatus(selectedStatus)
+  const activeTab =
+    STATUS_TABS.find((tab) => normalizeSongStatus(tab) === normalizedStatus) || "All"
+
   return (
     <CommonTableContainer
       headerChildren={
@@ -77,7 +77,7 @@ const SongsContainer = () => {
           {/* Tab pills */}
           <CommonFilter
             tabs={STATUS_TABS}
-            activeTab={STATUS_TABS.find((tab) => tab.toLowerCase() === selectedStatus) || "All"}
+            activeTab={activeTab}
             onChange={(tab) => setParams({ status: tab.toLowerCase() === "all" ? undefined : tab.toLowerCase() })}
           />
 
