@@ -672,7 +672,7 @@
               "response": []
             },
             {
-              "name": "Get My Favorites",
+              "name": "✅ Get My Favorites",
               "request": {
                 "method": "GET",
                 "header": [
@@ -1318,7 +1318,7 @@
               "response": []
             },
             {
-              "name": "Liked",
+              "name": "✅ Liked",
               "request": {
                 "method": "GET",
                 "header": [
@@ -1650,7 +1650,7 @@
               "response": []
             },
             {
-              "name": "New Releases",
+              "name": "✅ New Releases",
               "request": {
                 "method": "GET",
                 "header": [
@@ -3123,7 +3123,7 @@
               "response": []
             },
             {
-              "name": "List My Playlists",
+              "name": "✅ List My Playlists",
               "request": {
                 "method": "GET",
                 "header": [
