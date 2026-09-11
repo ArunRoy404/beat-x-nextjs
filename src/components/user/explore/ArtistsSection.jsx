@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import ArtistCard from "@/components/user/explore/ArtistCard"
+import { useApprovedArtists } from "@/hooks/api/user/artists/useApprovedArtists"
 import { useUserExploreArtistsStore } from "@/zustandStore/user/userStore/userExploreArtistsStore"
 
 const gridContainerVariants = {
@@ -28,7 +29,16 @@ const gridItemVariants = {
 }
 
 const ArtistsSection = () => {
-    const artists = useUserExploreArtistsStore((state) => state.artists)
+    const { data: approvedArtistsData } = useApprovedArtists()
+    const dummyArtists = useUserExploreArtistsStore((state) => state.artists)
+
+    const liveArtists = Array.isArray(approvedArtistsData)
+        ? approvedArtistsData
+        : (approvedArtistsData?.data || [])
+
+    const artists = liveArtists.length > 0 ? liveArtists : (dummyArtists || [])
+
+    if (artists.length === 0) return null
 
     return (
         <section className="flex w-full flex-col gap-6">
@@ -45,8 +55,8 @@ const ArtistsSection = () => {
                 viewport={{ once: true, amount: 0.2 }}
                 className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5"
             >
-                {artists.map((artist) => (
-                    <motion.div key={artist.id} variants={gridItemVariants}>
+                {artists.map((artist, idx) => (
+                    <motion.div key={artist?._id || artist?.id || idx} variants={gridItemVariants}>
                         <ArtistCard artist={artist} />
                     </motion.div>
                 ))}
@@ -56,3 +66,4 @@ const ArtistsSection = () => {
 }
 
 export default ArtistsSection
+

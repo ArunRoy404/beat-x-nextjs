@@ -21,6 +21,7 @@ export const isrPaths = [
   "/admin/dashboard/profile",
   "/admin/profile",
   "/profile",
+  "/explore",
   "/",
 ];
 
