@@ -1,9 +1,8 @@
 "use client"
 
 import React, { useState, useRef, useEffect, useCallback } from "react"
-import { ShieldCheck, SquarePen, Play, Pause } from "lucide-react"
+import { ShieldCheck, Play, Pause } from "lucide-react"
 import { format } from "date-fns"
-import EditVideoDialog from "@/components/dialogs/admin/videos/EditVideoDialog"
 import { useGlobalMediaPlayerStore } from "@/zustandStore/media/useGlobalMediaPlayerStore"
 import { useVolumeStore } from "@/zustandStore/audio/useVolumeStore"
 import { resolveMediaUrl } from "@/lib/format/resolveMediaUrl"
@@ -18,10 +17,6 @@ const STATUS_COLORS = {
 }
 
 const VideoDetailHeader = ({ video }) => {
-    const [isPlayingInline, setIsPlayingInline] = useState(false)
-    const videoRef = useRef(null)
-    const { volume, isMuted, setVolume } = useVolumeStore()
-
     const statusKey = (video?.status || "draft").toLowerCase()
     const statusClass = STATUS_COLORS[statusKey] || STATUS_COLORS.draft
     const isActive = statusKey === "active" || statusKey === "published"
@@ -36,24 +31,6 @@ const VideoDetailHeader = ({ video }) => {
     const videoSrc = video?.hlsMasterUrl ? resolveMediaUrl(video.hlsMasterUrl) : (video?.sourceKey ? resolveMediaUrl(video.sourceKey) : "")
     const isThisVideoActive = activeId === (video?._id || videoSrc)
     const isPlaying = isThisVideoActive && isGlobalPlaying
-
-    const applyVolume = useCallback(() => {
-        if (videoRef.current) {
-            const targetVol = isMuted ? 0 : volume
-            videoRef.current.volume = Math.max(0, Math.min(1, targetVol))
-        }
-    }, [isMuted, volume])
-
-    useEffect(() => {
-        applyVolume()
-    }, [applyVolume, isPlayingInline])
-
-    const handleVolumeChange = (e) => {
-        const el = e.currentTarget
-        if (el) {
-            setVolume(el.volume)
-        }
-    }
 
     const handlePlayVideo = () => {
         if (!videoSrc) {
@@ -83,46 +60,28 @@ const VideoDetailHeader = ({ video }) => {
     return (
         <div className="flex flex-col w-full shrink-0 relative bg-[#1A1A19]">
             {/* 240px Player/Thumbnail Area */}
-            <div className="relative flex h-[240px] flex-col justify-center items-center self-stretch rounded-t-[16px] overflow-hidden bg-black">
-                {isPlayingInline && videoSrc ? (
-                    <video
-                        ref={videoRef}
-                        src={videoSrc}
-                        controls
-                        autoPlay
-                        onCanPlay={applyVolume}
-                        onPlay={applyVolume}
-                        onVolumeChange={handleVolumeChange}
-                        className="w-full h-full object-contain"
-                    />
-                ) : (
-                    <div
-                        className="relative flex w-full h-full flex-col justify-center items-center bg-cover bg-center bg-no-repeat shadow-[0_0_10px_0_rgba(204,151,255,0.20)] group"
-                        style={{
-                            backgroundImage: `linear-gradient(0deg, rgba(0, 0, 0, 0.40) 0%, rgba(0, 0, 0, 0.40) 100%), url('${video?.coverUrl || video?.cover || ""}')`,
-                            backgroundColor: "lightgray"
-                        }}
+            <div className="relative flex h-[240px] flex-col justify-center items-center self-stretch rounded-t-[14px] overflow-hidden bg-black">
+                <div
+                    className="relative flex w-full h-full flex-col justify-center items-center bg-cover bg-center bg-no-repeat shadow-[0_0_10px_0_rgba(204,151,255,0.20)] group"
+                    style={{
+                        backgroundImage: `linear-gradient(0deg, rgba(0, 0, 0, 0.40) 0%, rgba(0, 0, 0, 0.40) 100%), url('${video?.coverUrl || video?.cover || ""}')`,
+                        backgroundColor: "lightgray"
+                    }}
+                >
+                    {/* Play Button */}
+                    <button
+                        type="button"
+                        onClick={handlePlayVideo}
+                        className="flex w-[56px] h-[56px] justify-center items-center shrink-0 rounded-full bg-secondary hover:bg-secondary/90 text-background shadow-[0_0_10px_0_rgba(204,151,255,0.20)] transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                        title={isPlaying ? "Pause Video" : "Play Video"}
                     >
-                        {/* Play Button */}
-                        <button
-                            type="button"
-                            onClick={() => {
-                                if (videoSrc) {
-                                    setIsPlayingInline(true)
-                                }
-                                handlePlayVideo()
-                            }}
-                            className="flex w-[56px] h-[56px] justify-center items-center shrink-0 rounded-full bg-secondary hover:bg-secondary/90 text-background shadow-[0_0_10px_0_rgba(204,151,255,0.20)] transition-all hover:scale-105 active:scale-95 cursor-pointer"
-                            title={isPlaying ? "Pause Video" : "Play Video"}
-                        >
-                            {isPlaying ? (
-                                <Pause className="w-5 h-5 fill-current text-[#004B56]" />
-                            ) : (
-                                <Play className="w-5 h-5 fill-current text-[#004B56] ml-0.5" />
-                            )}
-                        </button>
-                    </div>
-                )}
+                        {isPlaying ? (
+                            <Pause className="w-5 h-5 fill-current text-[#004B56]" />
+                        ) : (
+                            <Play className="w-5 h-5 fill-current text-[#004B56] ml-0.5" />
+                        )}
+                    </button>
+                </div>
             </div>
 
             {/* Title & Actions Row (below player) */}
@@ -175,18 +134,6 @@ const VideoDetailHeader = ({ video }) => {
                         <span className="text-[14px] sm:text-[15px] font-semibold text-whitetext truncate">{video?.transcodeStatus || "ready"}</span>
                         <span className="text-[10px] font-medium text-dark-gray uppercase tracking-wider">Status</span>
                     </div>
-                </div>
-
-                {/* Absolute Edit Button */}
-                <div className="absolute top-4 right-4 z-50">
-                    <EditVideoDialog video={video}>
-                        <button
-                            className="h-7 border border-secondary/20 bg-secondary/10 hover:bg-secondary/20 text-secondary text-[11px] font-medium rounded-full px-3 flex items-center gap-1.5 cursor-pointer transition-colors active:scale-95"
-                        >
-                            <SquarePen className="w-3.5 h-3.5" />
-                            Edit
-                        </button>
-                    </EditVideoDialog>
                 </div>
             </div>
         </div>

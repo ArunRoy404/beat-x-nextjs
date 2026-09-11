@@ -3,8 +3,8 @@
 import React from "react"
 import DashboardStats from "@/components/shared/Dashboard/DashboardStats/DashboardStats"
 import VideosContainer from "@/components/admin/videos/VideosContainer"
-import UploadVideoDialog from "@/components/dialogs/admin/videos/UploadVideoDialog"
 import { Upload } from "lucide-react"
+import { toast } from "sonner"
 import { useVideos } from "@/hooks/api/admin/videos/useVideos"
 import { buildVideosParams } from "@/hooks/api/admin/videos/videosParams"
 
@@ -45,13 +45,16 @@ const AdminDashboardVideosPage = () => {
           </div>
         </div>
 
-        <UploadVideoDialog>
+        {/* UploadVideoDialog commented out per rule: admin video creation endpoint does not exist in backend */}
+        {/* <UploadVideoDialog> */}
           <button
+            type="button"
+            onClick={() => toast.info("This feature is currently unavailable.")}
             className="rounded-full bg-gradient-to-r from-secondary to-[#B1FE4D] text-button-text font-semibold hover:opacity-90 transition-opacity border-0 px-5 py-2 cursor-pointer shadow-md flex items-center gap-1.5"
           >
             <Upload className="w-4 h-4" /> Upload Video
           </button>
-        </UploadVideoDialog>
+        {/* </UploadVideoDialog> */}
       </div>
 
       {/* Videos grid/list container */}
