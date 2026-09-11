@@ -6,16 +6,16 @@
 export const PODCASTS_PAGE_SIZE = 10
 
 export function buildPodcastsParams(raw = {}) {
-  const status = raw.status
-  const genre = raw.genre
-  const q = raw.q
-  const page = Number(raw.page) || 1
+  const status = raw?.status
+  const category = raw?.category || raw?.genre
+  const q = raw?.q
+  const page = Number(raw?.page) || 1
 
   return {
     page,
     limit: PODCASTS_PAGE_SIZE,
     ...(status && status !== "all" && { status }),
-    ...(genre && genre !== "all" && { genre }),
+    ...(category && category !== "all" && { category }),
     ...(q && { q }),
   }
 }

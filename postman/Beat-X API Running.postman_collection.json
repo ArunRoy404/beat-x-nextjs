@@ -7517,6 +7517,172 @@
               "response": []
             },
             {
+              "name": "Reviews Moderation (requires podcastId)",
+              "description": "Moderation of reviews submitted for a specific podcast. Requires podcastId query parameter.",
+              "item": [
+                {
+                  "name": "List Reviews (for podcast)",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{adminAccessToken}}",
+                        "type": "text"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/admin/podcasts/reviews?podcastId={{podcastId}}&page=1&limit=20",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "admin",
+                        "podcasts",
+                        "reviews"
+                      ],
+                      "query": [
+                        {
+                          "key": "podcastId",
+                          "value": "{{podcastId}}",
+                          "disabled": false,
+                          "description": "Podcast ID (Required by backend)"
+                        },
+                        {
+                          "key": "page",
+                          "value": "1",
+                          "disabled": false,
+                          "description": "Page number"
+                        },
+                        {
+                          "key": "limit",
+                          "value": "20",
+                          "disabled": false,
+                          "description": "Items per page"
+                        }
+                      ]
+                    },
+                    "description": "List visible and hidden reviews for a specific podcast. Requires podcastId query parameter."
+                  },
+                  "response": [
+                    {
+                      "name": "200 Success",
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json; charset=utf-8"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"status\": true,\n  \"message\": \"Success\",\n  \"data\": {\n    \"data\": [\n      {\n        \"_id\": \"66f123456789abcdef00041f\",\n        \"userId\": \"66f123456789abcdef00041b\",\n        \"podcastId\": \"66f123456789abcdef00041c\",\n        \"rating\": 4.8,\n        \"text\": \"Comprehensive high-quality release curated for Beat-X listeners.\",\n        \"hidden\": false,\n        \"createdAt\": \"2026-09-11T12:00:00.000Z\"\n      },\n      {\n        \"_id\": \"66f123456789abcdef000420\",\n        \"userId\": \"66f123456789abcdef00041d\",\n        \"podcastId\": \"66f123456789abcdef00041e\",\n        \"rating\": 5,\n        \"text\": \"Excellent production values and great pacing throughout the episode.\",\n        \"hidden\": false,\n        \"createdAt\": \"2026-09-11T12:00:00.000Z\"\n      }\n    ],\n    \"total\": 2,\n    \"page\": 1,\n    \"limit\": 20\n  },\n  \"timestamp\": \"2026-09-11T16:45:20.373Z\",\n  \"path\": \"/api/v1/admin/podcasts/reviews?podcastId=66f123456789abcdef00041c&page=1&limit=20\",\n  \"metadata\": {\n    \"duration\": \"12ms\"\n  }\n}"
+                    }
+                  ]
+                },
+                {
+                  "name": "Moderate Review (hide/unhide)",
+                  "request": {
+                    "method": "PATCH",
+                    "header": [
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{adminAccessToken}}",
+                        "type": "text"
+                      },
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"hidden\": true,\n  \"reason\": \"Inappropriate language\"\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/admin/podcasts/reviews/{{podcastReviewId}}/moderate",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "admin",
+                        "podcasts",
+                        "reviews",
+                        "{{podcastReviewId}}",
+                        "moderate"
+                      ]
+                    },
+                    "description": "Moderate (hide/unhide) a review with a reason."
+                  },
+                  "response": [
+                    {
+                      "name": "200 Success",
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json; charset=utf-8"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"status\": true,\n  \"message\": \"Success\",\n  \"data\": {\n    \"_id\": \"66f123456789abcdef00041f\",\n    \"hidden\": true,\n    \"reason\": \"Inappropriate language\"\n  },\n  \"timestamp\": \"2026-09-11T16:45:20.373Z\",\n  \"path\": \"/api/v1/admin/podcasts/reviews/66f123456789abcdef00041f/moderate\",\n  \"metadata\": {\n    \"duration\": \"12ms\"\n  }\n}"
+                    }
+                  ]
+                },
+                {
+                  "name": "Delete Review",
+                  "request": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{adminAccessToken}}",
+                        "type": "text"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/admin/podcasts/reviews/{{podcastReviewId}}",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "admin",
+                        "podcasts",
+                        "reviews",
+                        "{{podcastReviewId}}"
+                      ]
+                    },
+                    "description": "Permanently delete a podcast review."
+                  },
+                  "response": [
+                    {
+                      "name": "200 Success",
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json; charset=utf-8"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"status\": true,\n  \"message\": \"Deleted successfully\",\n  \"data\": {\n    \"acknowledged\": true,\n    \"deletedCount\": 1\n  },\n  \"timestamp\": \"2026-09-11T16:45:20.373Z\",\n  \"path\": \"/api/v1/admin/podcasts/reviews/66f123456789abcdef00041f\",\n  \"metadata\": {\n    \"duration\": \"12ms\"\n  }\n}"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
               "name": "Delete Podcast",
               "request": {
                 "method": "DELETE",
@@ -7536,122 +7702,6 @@
                     "admin",
                     "podcasts",
                     "{{podcastId}}"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "List Reviews (not completed)",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "try {\n  const res = pm.response.json();\n  const d = res.data;\n  const found = d.data?.items?.[0]?._id || d.data?.data?.[0]?._id || d.data?.[0]?._id;\n  if (found) { pm.collectionVariables.set(\"podcastReviewId\", found); console.log(\"podcastReviewId saved:\", found); }\n} catch (e) { console.warn(\"Could not auto-capture podcastReviewId\", e); }"
-                    ]
-                  }
-                }
-              ],
-              "request": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "Bearer {{adminAccessToken}}"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/admin/podcasts/reviews",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "admin",
-                    "podcasts",
-                    "reviews"
-                  ],
-                  "query": [
-                    {
-                      "key": "podcastId",
-                      "value": "{{podcastId}}",
-                      "disabled": true
-                    },
-                    {
-                      "key": "page",
-                      "value": "1",
-                      "disabled": true
-                    },
-                    {
-                      "key": "limit",
-                      "value": "20",
-                      "disabled": true
-                    }
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Moderate Review (hide/unhide) (not completed)",
-              "request": {
-                "method": "PATCH",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "Bearer {{adminAccessToken}}"
-                  },
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"hidden\": true,\n  \"reason\": \"Spam / offensive content\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/admin/podcasts/reviews/{{podcastReviewId}}/moderate",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "admin",
-                    "podcasts",
-                    "reviews",
-                    "{{podcastReviewId}}",
-                    "moderate"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Delete Review (not completed)",
-              "request": {
-                "method": "DELETE",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "Bearer {{adminAccessToken}}"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/admin/podcasts/reviews/{{podcastReviewId}}",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "admin",
-                    "podcasts",
-                    "reviews",
-                    "{{podcastReviewId}}"
                   ]
                 }
               },

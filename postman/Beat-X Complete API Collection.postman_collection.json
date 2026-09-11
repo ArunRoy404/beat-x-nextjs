@@ -19552,27 +19552,17 @@
             },
             {
               "name": "Reviews Moderation (requires podcastId)",
-              "description": "Moderation of reviews submitted for a podcast. Note: The backend endpoint GET /admin/podcasts/reviews requires a specific podcastId parameter.",
+              "description": "Moderation of reviews submitted for a specific podcast. Requires podcastId query parameter.",
               "item": [
                 {
                   "name": "List Reviews (for podcast)",
-                  "event": [
-                    {
-                      "listen": "test",
-                      "script": {
-                        "type": "text/javascript",
-                        "exec": [
-                          "try {\n  const res = pm.response.json();\n  const d = res.data;\n  const found = d.data?.items?.[0]?._id || d.data?.data?.[0]?._id || d.data?.[0]?._id;\n  if (found) { pm.collectionVariables.set(\"podcastReviewId\", found); console.log(\"podcastReviewId saved:\", found); }\n} catch (e) { console.warn(\"Could not auto-capture podcastReviewId\", e); }"
-                        ]
-                      }
-                    }
-                  ],
                   "request": {
                     "method": "GET",
                     "header": [
                       {
                         "key": "Authorization",
-                        "value": "Bearer {{adminAccessToken}}"
+                        "value": "Bearer {{adminAccessToken}}",
+                        "type": "text"
                       }
                     ],
                     "url": {
@@ -19595,12 +19585,14 @@
                         {
                           "key": "page",
                           "value": "1",
-                          "disabled": false
+                          "disabled": false,
+                          "description": "Page number"
                         },
                         {
                           "key": "limit",
                           "value": "20",
-                          "disabled": false
+                          "disabled": false,
+                          "description": "Items per page"
                         }
                       ]
                     },
@@ -19609,44 +19601,6 @@
                   "response": [
                     {
                       "name": "200 Success",
-                      "originalRequest": {
-                        "method": "GET",
-                        "header": [
-                          {
-                            "key": "Authorization",
-                            "value": "Bearer {{adminAccessToken}}"
-                          }
-                        ],
-                        "url": {
-                          "raw": "{{baseUrl}}/admin/podcasts/reviews?podcastId={{podcastId}}&page=1&limit=20",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "admin",
-                            "podcasts",
-                            "reviews"
-                          ],
-                          "query": [
-                            {
-                              "key": "podcastId",
-                              "value": "{{podcastId}}",
-                              "disabled": false,
-                              "description": "Podcast ID (Required by backend)"
-                            },
-                            {
-                              "key": "page",
-                              "value": "1",
-                              "disabled": false
-                            },
-                            {
-                              "key": "limit",
-                              "value": "20",
-                              "disabled": false
-                            }
-                          ]
-                        }
-                      },
                       "status": "OK",
                       "code": 200,
                       "_postman_previewlanguage": "json",
@@ -19657,7 +19611,7 @@
                         }
                       ],
                       "cookie": [],
-                      "body": "{\n  \"status\": true,\n  \"message\": \"Success\",\n  \"data\": {\n    \"data\": [\n      {\n        \"userId\": \"66f123456789abcdef00041b\",\n        \"podcastId\": \"66f123456789abcdef00041c\",\n        \"rating\": 4.8,\n        \"text\": \"Comprehensive high-quality release curated for Beat-X listeners.\",\n        \"hidden\": false,\n        \"_id\": \"66f123456789abcdef00041f\"\n      },\n      {\n        \"userId\": \"66f123456789abcdef00041d\",\n        \"podcastId\": \"66f123456789abcdef00041e\",\n        \"rating\": 4.8,\n        \"text\": \"Comprehensive high-quality release curated for Beat-X listeners.\",\n        \"hidden\": false,\n        \"_id\": \"66f123456789abcdef000420\"\n      }\n    ],\n    \"total\": 42,\n    \"page\": 1,\n    \"limit\": 20\n  },\n  \"timestamp\": \"2026-09-11T16:45:20.373Z\",\n  \"path\": \"/api/v1/admin/podcasts/reviews\",\n  \"metadata\": {\n    \"duration\": \"12ms\"\n  }\n}"
+                      "body": "{\n  \"status\": true,\n  \"message\": \"Success\",\n  \"data\": {\n    \"data\": [\n      {\n        \"_id\": \"66f123456789abcdef00041f\",\n        \"userId\": \"66f123456789abcdef00041b\",\n        \"podcastId\": \"66f123456789abcdef00041c\",\n        \"rating\": 4.8,\n        \"text\": \"Comprehensive high-quality release curated for Beat-X listeners.\",\n        \"hidden\": false,\n        \"createdAt\": \"2026-09-11T12:00:00.000Z\"\n      },\n      {\n        \"_id\": \"66f123456789abcdef000420\",\n        \"userId\": \"66f123456789abcdef00041d\",\n        \"podcastId\": \"66f123456789abcdef00041e\",\n        \"rating\": 5,\n        \"text\": \"Excellent production values and great pacing throughout the episode.\",\n        \"hidden\": false,\n        \"createdAt\": \"2026-09-11T12:00:00.000Z\"\n      }\n    ],\n    \"total\": 2,\n    \"page\": 1,\n    \"limit\": 20\n  },\n  \"timestamp\": \"2026-09-11T16:45:20.373Z\",\n  \"path\": \"/api/v1/admin/podcasts/reviews?podcastId=66f123456789abcdef00041c&page=1&limit=20\",\n  \"metadata\": {\n    \"duration\": \"12ms\"\n  }\n}"
                     }
                   ]
                 },
@@ -19668,16 +19622,18 @@
                     "header": [
                       {
                         "key": "Authorization",
-                        "value": "Bearer {{adminAccessToken}}"
+                        "value": "Bearer {{adminAccessToken}}",
+                        "type": "text"
                       },
                       {
                         "key": "Content-Type",
-                        "value": "application/json"
+                        "value": "application/json",
+                        "type": "text"
                       }
                     ],
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"hidden\": true,\n  \"reason\": \"Spam / offensive content\"\n}",
+                      "raw": "{\n  \"hidden\": true,\n  \"reason\": \"Inappropriate language\"\n}",
                       "options": {
                         "raw": {
                           "language": "json"
@@ -19695,50 +19651,13 @@
                         "reviews",
                         "{{podcastReviewId}}",
                         "moderate"
-                      ],
-                      "query": []
+                      ]
                     },
-                    "description": "Hide or unhide a review"
+                    "description": "Moderate (hide/unhide) a review with a reason."
                   },
                   "response": [
                     {
                       "name": "200 Success",
-                      "originalRequest": {
-                        "method": "PATCH",
-                        "header": [
-                          {
-                            "key": "Authorization",
-                            "value": "Bearer {{adminAccessToken}}"
-                          },
-                          {
-                            "key": "Content-Type",
-                            "value": "application/json"
-                          }
-                        ],
-                        "url": {
-                          "raw": "{{baseUrl}}/admin/podcasts/reviews/{{podcastReviewId}}/moderate",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "admin",
-                            "podcasts",
-                            "reviews",
-                            "{{podcastReviewId}}",
-                            "moderate"
-                          ],
-                          "query": []
-                        },
-                        "body": {
-                          "mode": "raw",
-                          "raw": "{\n  \"hidden\": true,\n  \"reason\": \"Spam / offensive content\"\n}",
-                          "options": {
-                            "raw": {
-                              "language": "json"
-                            }
-                          }
-                        }
-                      },
                       "status": "OK",
                       "code": 200,
                       "_postman_previewlanguage": "json",
@@ -19749,7 +19668,7 @@
                         }
                       ],
                       "cookie": [],
-                      "body": "{\n  \"status\": true,\n  \"message\": \"Success\",\n  \"data\": {\n    \"userId\": \"66f123456789abcdef000421\",\n    \"podcastId\": \"66f123456789abcdef000422\",\n    \"rating\": 4.8,\n    \"text\": \"Comprehensive high-quality release curated for Beat-X listeners.\",\n    \"hidden\": false\n  },\n  \"timestamp\": \"2026-09-11T16:45:20.373Z\",\n  \"path\": \"/api/v1/admin/podcasts/reviews/66f123456789abcdef123456/moderate\",\n  \"metadata\": {\n    \"duration\": \"12ms\"\n  }\n}"
+                      "body": "{\n  \"status\": true,\n  \"message\": \"Success\",\n  \"data\": {\n    \"_id\": \"66f123456789abcdef00041f\",\n    \"hidden\": true,\n    \"reason\": \"Inappropriate language\"\n  },\n  \"timestamp\": \"2026-09-11T16:45:20.373Z\",\n  \"path\": \"/api/v1/admin/podcasts/reviews/66f123456789abcdef00041f/moderate\",\n  \"metadata\": {\n    \"duration\": \"12ms\"\n  }\n}"
                     }
                   ]
                 },
@@ -19760,7 +19679,8 @@
                     "header": [
                       {
                         "key": "Authorization",
-                        "value": "Bearer {{adminAccessToken}}"
+                        "value": "Bearer {{adminAccessToken}}",
+                        "type": "text"
                       }
                     ],
                     "url": {
@@ -19773,36 +19693,13 @@
                         "podcasts",
                         "reviews",
                         "{{podcastReviewId}}"
-                      ],
-                      "query": []
+                      ]
                     },
-                    "description": "Delete any review"
+                    "description": "Permanently delete a podcast review."
                   },
                   "response": [
                     {
                       "name": "200 Success",
-                      "originalRequest": {
-                        "method": "DELETE",
-                        "header": [
-                          {
-                            "key": "Authorization",
-                            "value": "Bearer {{adminAccessToken}}"
-                          }
-                        ],
-                        "url": {
-                          "raw": "{{baseUrl}}/admin/podcasts/reviews/{{podcastReviewId}}",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "admin",
-                            "podcasts",
-                            "reviews",
-                            "{{podcastReviewId}}"
-                          ],
-                          "query": []
-                        }
-                      },
                       "status": "OK",
                       "code": 200,
                       "_postman_previewlanguage": "json",
@@ -19813,7 +19710,7 @@
                         }
                       ],
                       "cookie": [],
-                      "body": "{\n  \"status\": true,\n  \"message\": \"Success\",\n  \"data\": {\n    \"success\": true,\n    \"message\": \"Podcast deleted successfully\",\n    \"id\": \"66fd1c2e2f1b9a0012a34567\"\n  },\n  \"timestamp\": \"2026-09-11T16:45:20.373Z\",\n  \"path\": \"/api/v1/admin/podcasts/reviews/66f123456789abcdef123456\",\n  \"metadata\": {\n    \"duration\": \"12ms\"\n  }\n}"
+                      "body": "{\n  \"status\": true,\n  \"message\": \"Deleted successfully\",\n  \"data\": {\n    \"acknowledged\": true,\n    \"deletedCount\": 1\n  },\n  \"timestamp\": \"2026-09-11T16:45:20.373Z\",\n  \"path\": \"/api/v1/admin/podcasts/reviews/66f123456789abcdef00041f\",\n  \"metadata\": {\n    \"duration\": \"12ms\"\n  }\n}"
                     }
                   ]
                 }

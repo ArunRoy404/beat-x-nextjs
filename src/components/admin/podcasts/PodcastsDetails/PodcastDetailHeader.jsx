@@ -1,7 +1,5 @@
 import React from "react"
 import Image from "next/image"
-import { SquarePen } from "lucide-react"
-import EditPodcastDialog from "@/components/dialogs/admin/podcasts/EditPodcastDialog"
 import { formatDurationMs } from "@/lib/format/formatDuration"
 
 const STATUS_COLORS = {
@@ -71,17 +69,6 @@ const PodcastDetailHeader = ({ podcast }) => {
                 </div>
             </div>
 
-            {/* Absolute Edit Button placed to the left of Close button (Close is at top-4 right-6) */}
-            <div className="absolute top-4 right-16 z-50">
-                <EditPodcastDialog podcast={podcast}>
-                    <button
-                        className="h-7 border border-secondary/20 bg-secondary/10 hover:bg-secondary/20 text-secondary text-[11px] font-medium rounded-full px-3 flex items-center gap-1.5 cursor-pointer transition-colors active:scale-95"
-                    >
-                        <SquarePen className="w-3.5 h-3.5" />
-                        Edit
-                    </button>
-                </EditPodcastDialog>
-            </div>
         </div>
     )
 }

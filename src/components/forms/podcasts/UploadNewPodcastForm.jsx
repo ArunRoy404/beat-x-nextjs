@@ -41,7 +41,7 @@ const UploadNewPodcastForm = ({ onSuccess, onCancel }) => {
     })
 
     const onSubmit = (data) => {
-        toast.success("Podcast submitted successfully!")
+        toast.info("Podcast creation is currently unavailable.")
         reset()
         onSuccess?.()
     }
