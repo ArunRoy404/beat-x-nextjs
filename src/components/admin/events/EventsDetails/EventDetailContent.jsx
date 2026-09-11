@@ -35,14 +35,14 @@ const EventDetailContent = ({ event }) => {
                 <CommonInfoBox label="City" value={event?.city} />
                 <CommonInfoBox label="Event Date" value={formattedDate} />
                 <CommonInfoBox label="Event Time" value={event?.eventTime} />
-                <CommonInfoBox label="Ticket Price" value={event?.ticketPrice ? `৳${event.ticketPrice}` : "-"} />
-                <CommonInfoBox label="Total Tickets" value={event?.totalTickets} />
+                <CommonInfoBox label="Ticket Price" value={event?.ticketPrice != null ? `৳${Number(event.ticketPrice).toLocaleString()}` : "-"} />
+                <CommonInfoBox label="Total Tickets" value={event?.totalTickets != null ? Number(event.totalTickets).toLocaleString() : "-"} />
 
                 {/* Description Box (Full Width) */}
                 <div className="col-span-2 border border-white/10 bg-white/5 rounded-[16px] p-3 px-4 flex flex-col gap-1.5 w-full">
                     <span className="text-[12px] text-dark-gray font-normal not-italic uppercase tracking-wider">About this Event</span>
                     <span className="text-[13px] text-whitetext/90 leading-relaxed font-normal">
-                        {event?.description || `${event?.title} at ${event?.venue}, ${event?.city}.`}
+                        {event?.description || "-"}
                     </span>
                 </div>
             </div>

@@ -38,12 +38,12 @@ const EventDetailHeader = ({ event }) => {
                     {/* Short Stats */}
                     <div className="flex items-center gap-6 mt-3">
                         <div className="flex flex-col gap-[8px]">
-                            <span className="text-[16px] font-medium not-italic text-whitetext leading-tight">{event?.ticketsSold ?? "0"}</span>
+                            <span className="text-[16px] font-medium not-italic text-whitetext leading-tight">{Number(event?.ticketsSold ?? 0).toLocaleString()}</span>
                             <span className="text-[12px] font-medium not-italic text-dark-gray uppercase tracking-wider">Tickets Sold</span>
                         </div>
                         <div className="w-[1px] h-6 bg-white/10" />
                         <div className="flex flex-col gap-[8px]">
-                            <span className="text-[16px] font-medium not-italic text-whitetext leading-tight">৳{event?.revenue ?? ((event?.ticketsSold ?? 0) * (event?.ticketPrice ?? 0))}</span>
+                            <span className="text-[16px] font-medium not-italic text-whitetext leading-tight">৳{Number(event?.revenue ?? ((Number(event?.ticketsSold || 0)) * (Number(event?.ticketPrice || 0)))).toLocaleString()}</span>
                             <span className="text-[12px] font-medium not-italic text-dark-gray uppercase tracking-wider">Revenue</span>
                         </div>
                     </div>

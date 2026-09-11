@@ -74,7 +74,32 @@ export async function updateEventRequest(param1, param2) {
     throw new Error("Event ID is required for update")
   }
 
-  const res = await axiosPrivate.patch(`/admin/events/${eventId}`, data)
+  // If data is FormData, send directly to creator update endpoint (multipart, admin-only)
+  if (data instanceof FormData) {
+    const res = await axiosPrivate.patch(`/creator/events/${eventId}`, data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+    return res?.data?.data ?? res?.data
+  }
+
+  // If plain object has only ownerId, send to admin owner reassignment endpoint
+  const keys = Object.keys(data || {})
+  if (keys.length === 1 && keys[0] === "ownerId") {
+    const res = await axiosPrivate.patch(`/admin/events/${eventId}`, data)
+    return res?.data?.data ?? res?.data
+  }
+
+  // For general event fields, package into FormData for the creator update endpoint
+  const formData = new FormData()
+  for (const [key, value] of Object.entries(data || {})) {
+    if (value !== undefined && value !== null) {
+      formData.append(key, value)
+    }
+  }
+
+  const res = await axiosPrivate.patch(`/creator/events/${eventId}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  })
   return res?.data?.data ?? res?.data
 }
 

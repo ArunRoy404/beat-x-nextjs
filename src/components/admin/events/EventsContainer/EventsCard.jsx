@@ -11,7 +11,8 @@ import EventsTableActions from "./EventsTableActions"
 const EventsCard = ({ event }) => {
     if (!event) return null
 
-    const DetailsWrapper = event.status === "Under Review" ? EventUnderReviewDialog : EventDetailsDialog
+    const isUnderReview = String(event?.status || "").toLowerCase().replace(/ /g, "_") === "under_review"
+    const DetailsWrapper = isUnderReview ? EventUnderReviewDialog : EventDetailsDialog
 
     return (
         <DetailsWrapper event={event}>
@@ -28,7 +29,11 @@ const EventsCard = ({ event }) => {
                             <h3 className="text-whitetext text-[18px] sm:text-[24px] font-normal truncate">
                                 {event?.title}
                             </h3>
-                            <CommonTableTag className="normal-case">{event?.genre}</CommonTableTag>
+                            {(event?.genreTag || event?.genre) && (
+                                <CommonTableTag className="normal-case">
+                                    {event?.genreTag || event?.genre}
+                                </CommonTableTag>
+                            )}
                         </div>
 
                         <div className="flex items-center gap-1.5 text-light-gray text-[14px] sm:text-[16px]">
@@ -45,7 +50,7 @@ const EventsCard = ({ event }) => {
                     <div className="flex items-center gap-4 sm:gap-6">
                         <div className="flex flex-col items-center gap-0.5">
                             <span className="text-whitetext text-[18px] sm:text-[24px] font-normal leading-none">
-                                ৳{event?.ticketPrice}
+                                ৳{Number(event?.ticketPrice || 0).toLocaleString()}
                             </span>
                             <span className="text-light-gray text-[12px] sm:text-[16px] font-normal leading-none">
                                 Per ticket
@@ -53,7 +58,7 @@ const EventsCard = ({ event }) => {
                         </div>
                         <div className="flex flex-col items-center gap-0.5">
                             <span className="text-whitetext text-[18px] sm:text-[24px] font-normal leading-none">
-                                ৳{event?.revenue ?? ((event?.ticketsSold ?? 0) * (event?.ticketPrice ?? 0))}
+                                ৳{Number(event?.revenue ?? ((Number(event?.ticketsSold || 0)) * (Number(event?.ticketPrice || 0)))).toLocaleString()}
                             </span>
                             <span className="text-light-gray text-[12px] sm:text-[16px] font-normal leading-none">
                                 Revenue
