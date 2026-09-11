@@ -1,14 +1,12 @@
 "use client"
 
 import { Heart, Play, Pause } from "lucide-react"
-import { useUserLibraryStore } from "@/zustandStore/user/userStore/userLibraryStore"
 import { useLikedSongs } from "@/hooks/api/user/songs/useLikedSongs"
 import { usePlaySong } from "@/hooks/api/user/songs/usePlaySong"
 
 const LikedSongsHero = () => {
     const { data: likedData } = useLikedSongs()
     const { playSong, currentSongId, isPlaying, isPending } = usePlaySong()
-    const storeHero = useUserLibraryStore((state) => state.likedSongsHero)
 
     const likedList =
         likedData?.songs ??
@@ -32,10 +30,11 @@ const LikedSongsHero = () => {
         }
     }
 
-    const badgeText = totalSongs > 0 ? `${totalSongs} TRACKS SAVED` : (storeHero?.badge || "COLLECTION")
+    const badgeText = `${totalSongs} TRACKS SAVED`
     const descriptionText = totalSongs > 0
-        ? `${totalSongs} liked ${totalSongs === 1 ? "track" : "tracks"} saved to your private collection.`
-        : (storeHero?.description || "All your favorite tracks in one place.")
+        ? `${totalSongs} liked ${totalSongs === 1 ? "track" : "tracks"} saved to your personal collection.`
+        : "Your liked collection is empty. Explore tracks across Beat-X and tap the heart icon to save them here."
+
 
     return (
         <div className="relative flex h-85 flex-1 flex-col justify-between overflow-hidden rounded-[16px] border border-(--glass-panel-border) bg-(image:--liked-hero-gradient) p-10">
@@ -43,7 +42,7 @@ const LikedSongsHero = () => {
             <span className="w-fit rounded-full border border-secondary/20 bg-secondary/10 px-4 py-1 text-xs text-secondary font-medium tracking-wide">
                 {badgeText}
             </span>
-            <h1 className="text-6xl font-semibold text-whitetext lg:text-[72px]">{storeHero?.title || "Liked Songs"}</h1>
+            <h1 className="text-6xl font-semibold text-whitetext lg:text-[72px]">Liked Songs</h1>
             <p className="max-w-lg text-base text-light-gray">{descriptionText}</p>
             <div className="flex items-center gap-4">
                 <button
