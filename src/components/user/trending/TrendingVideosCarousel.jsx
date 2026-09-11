@@ -2,7 +2,6 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useUserTrendingStore } from "@/zustandStore/user/userStore/userTrendingStore"
 import { Carousel, CarouselContent, CarouselItem, useCarousel } from "@/components/ui/carousel"
 import TrendingVideoCard from "@/components/user/watch/TrendingVideoCard"
 import { useTrendingVideos } from "@/hooks/api/user/videos/useTrendingVideos"
@@ -34,14 +33,13 @@ const TrendingVideosCarouselNav = () => {
 
 const TrendingVideosCarousel = () => {
     const { data: videosData } = useTrendingVideos()
-    const dummyVideos = useUserTrendingStore((state) => state.trendingVideos)
 
     const liveVideos =
         videosData?.videos ??
         videosData?.data ??
         (Array.isArray(videosData) ? videosData : [])
 
-    const videos = liveVideos.length > 0 ? liveVideos : dummyVideos
+    const videos = Array.isArray(liveVideos) ? liveVideos : []
 
     return (
         <Carousel opts={{ align: "start" }} className="w-full min-w-0">
@@ -49,16 +47,24 @@ const TrendingVideosCarousel = () => {
                 <h2 className="text-2xl text-whitetext sm:text-[32px]">Trending Videos</h2>
                 <span className="cursor-pointer text-sm text-secondary sm:text-base">Explore All</span>
             </div>
-            <CarouselContent className="mt-4 -ml-3 sm:-ml-4">
-                {videos.map((video, idx) => (
-                    <CarouselItem key={video?._id || video?.id || idx} className={cn("basis-[80%] pl-3 sm:basis-1/3 sm:pl-4 lg:basis-1/4")}>
-                        <TrendingVideoCard video={video} showPlayButton />
-                    </CarouselItem>
-                ))}
-            </CarouselContent>
-            <div className="flex w-full justify-end pt-4">
-                <TrendingVideosCarouselNav />
-            </div>
+            {videos.length > 0 ? (
+                <>
+                    <CarouselContent className="mt-4 -ml-3 sm:-ml-4">
+                        {videos.map((video, idx) => (
+                            <CarouselItem key={video?._id || video?.id || idx} className={cn("basis-[80%] pl-3 sm:basis-1/3 sm:pl-4 lg:basis-1/4")}>
+                                <TrendingVideoCard video={video} showPlayButton />
+                            </CarouselItem>
+                        ))}
+                    </CarouselContent>
+                    <div className="flex w-full justify-end pt-4">
+                        <TrendingVideosCarouselNav />
+                    </div>
+                </>
+            ) : (
+                <div className="mt-4 flex w-full flex-col items-center justify-center rounded-[16px] border border-dashed border-white/10 py-8 text-center">
+                    <p className="text-sm text-light-gray">No trending videos found</p>
+                </div>
+            )}
         </Carousel>
     )
 }

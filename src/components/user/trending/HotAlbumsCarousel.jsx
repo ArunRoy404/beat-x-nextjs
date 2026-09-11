@@ -2,7 +2,6 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useUserTrendingStore } from "@/zustandStore/user/userStore/userTrendingStore"
 import { Carousel, CarouselContent, CarouselItem, useCarousel } from "@/components/ui/carousel"
 import RankedChartCard from "./RankedChartCard"
 
@@ -35,14 +34,13 @@ const HotAlbumsCarouselNav = () => {
 
 const HotAlbumsCarousel = () => {
     const { data: albumsData } = useFeaturedAlbums()
-    const dummyAlbums = useUserTrendingStore((state) => state.hotAlbums)
 
     const liveAlbums =
         albumsData?.albums ??
         albumsData?.data ??
         (Array.isArray(albumsData) ? albumsData : [])
 
-    const albums = liveAlbums.length > 0
+    const albums = Array.isArray(liveAlbums)
         ? liveAlbums.map((album, index) => ({
             id: album?._id || album?.id || index,
             rank: `#${index + 1}`,
@@ -51,7 +49,7 @@ const HotAlbumsCarousel = () => {
             art: album?.coverUrl || album?.art,
             album,
         }))
-        : dummyAlbums
+        : []
 
     return (
         <Carousel opts={{ align: "start" }} className="w-full min-w-0 flex-1">
@@ -59,16 +57,22 @@ const HotAlbumsCarousel = () => {
                 <h2 className="text-2xl text-whitetext sm:text-[32px]">Hot Albums</h2>
                 <div className="flex items-center gap-3 sm:gap-6">
                     <span className="hidden cursor-pointer text-sm text-secondary sm:block sm:text-base">View all live streams</span>
-                    <HotAlbumsCarouselNav />
+                    {albums.length > 0 && <HotAlbumsCarouselNav />}
                 </div>
             </div>
-            <CarouselContent className="mt-4 -ml-3 sm:-ml-4">
-                {albums.map((album) => (
-                    <CarouselItem key={album.id} className="basis-[70%] pl-3 sm:basis-1/3 sm:pl-4">
-                        <RankedChartCard item={album} />
-                    </CarouselItem>
-                ))}
-            </CarouselContent>
+            {albums.length > 0 ? (
+                <CarouselContent className="mt-4 -ml-3 sm:-ml-4">
+                    {albums.map((album) => (
+                        <CarouselItem key={album.id} className="basis-[70%] pl-3 sm:basis-1/3 sm:pl-4">
+                            <RankedChartCard item={album} />
+                        </CarouselItem>
+                    ))}
+                </CarouselContent>
+            ) : (
+                <div className="mt-4 flex w-full flex-col items-center justify-center rounded-[16px] border border-dashed border-white/10 py-8 text-center">
+                    <p className="text-sm text-light-gray">No hot albums found</p>
+                </div>
+            )}
         </Carousel>
     )
 }

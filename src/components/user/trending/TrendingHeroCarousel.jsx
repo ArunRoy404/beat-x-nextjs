@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react"
 import { Play, Pause, Plus, TrendingUp } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
-import { useUserTrendingStore } from "@/zustandStore/user/userStore/userTrendingStore"
 import { useTrendingSongs } from "@/hooks/api/user/songs/useTrendingSongs"
 import { usePlaySong } from "@/hooks/api/user/songs/usePlaySong"
 import { Carousel, CarouselContent, CarouselItem, useCarousel } from "@/components/ui/carousel"
@@ -138,24 +137,23 @@ const HeroCarouselAutoplay = () => {
 const TrendingHeroCarousel = () => {
     const { data: trendingData } = useTrendingSongs()
     const { playSong, currentSongId, isPlaying } = usePlaySong()
-    const dummySlides = useUserTrendingStore((state) => state.trendingHeroSlides)
 
     const trendingList = Array.isArray(trendingData)
         ? trendingData
         : (trendingData?.data || [])
 
-    const slides = trendingList.length > 0
-        ? trendingList.slice(0, 5).map((song, index) => ({
-            id: song?._id || song?.id || index,
-            rank: `#${index + 1} Worldwide`,
-            title: song?.title || "Trending Single",
-            description: song?.artist
-                ? `By ${song.artist} • ${song?.album || "Top viral hit"}. Stream live now on Beat-X.`
-                : (song?.album ? `Album: ${song.album}` : "Trending viral hit on Beat-X this week."),
-            background: song?.coverUrl || "/watch/images/hero-deadline-studio.jpg",
-            song,
-        }))
-        : dummySlides
+    const slides = trendingList.slice(0, 5).map((song, index) => ({
+        id: song?._id || song?.id || index,
+        rank: `#${index + 1} Worldwide`,
+        title: song?.title || "Trending Single",
+        description: song?.artist
+            ? `By ${song.artist} • ${song?.album || "Top viral hit"}. Stream live now on Beat-X.`
+            : (song?.album ? `Album: ${song.album}` : "Trending viral hit on Beat-X this week."),
+        background: song?.coverUrl || "/watch/images/hero-deadline-studio.jpg",
+        song,
+    }))
+
+    if (slides.length === 0) return null
 
     return (
         <Carousel opts={{ align: "start", loop: true }} className="group w-full min-w-0">
