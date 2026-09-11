@@ -649,7 +649,7 @@
               "response": []
             },
             {
-              "name": "✅ Get Approved Artists",
+              "name": "⚠️ Get Approved Artists (missing isFollowing in response)",
               "request": {
                 "method": "GET",
                 "header": [
@@ -897,7 +897,7 @@
           "name": "Genres & Categories (Public browsing)",
           "item": [
             {
-              "name": "List Genres",
+              "name": "✅ List Genres",
               "event": [
                 {
                   "listen": "test",
@@ -1143,7 +1143,7 @@
           "name": "Songs",
           "item": [
             {
-              "name": "Home",
+              "name": "✅ Home",
               "request": {
                 "method": "GET",
                 "header": [
@@ -1270,7 +1270,7 @@
               "response": []
             },
             {
-              "name": "Featured",
+              "name": "✅ Featured",
               "request": {
                 "method": "GET",
                 "header": [
@@ -1438,7 +1438,7 @@
               "response": []
             },
             {
-              "name": "Get Song by Id",
+              "name": "✅ Get Song by Id",
               "request": {
                 "method": "GET",
                 "header": [
@@ -1462,7 +1462,7 @@
               "response": []
             },
             {
-              "name": "Like / Unlike Toggle",
+              "name": "✅ Like / Unlike Toggle",
               "request": {
                 "method": "POST",
                 "header": [
@@ -1487,7 +1487,7 @@
               "response": []
             },
             {
-              "name": "Get Stream URL",
+              "name": "✅ Get Stream URL",
               "request": {
                 "method": "GET",
                 "header": [
@@ -1512,7 +1512,7 @@
               "response": []
             },
             {
-              "name": "Save Playback Progress",
+              "name": "✅ Save Playback Progress",
               "request": {
                 "method": "POST",
                 "header": [
