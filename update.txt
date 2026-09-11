@@ -2,40 +2,64 @@ BeatX
 
 Hello there,
 
-I wanted to share a quick update on our progress, covering both API integration updates and new page UI updates across the platform:
+I wanted to share a comprehensive update on our progress across the Admin modules, covering API integration, endpoint harmonization, data modeling, and platform improvements completed today:
 
-API Integration Updates
------------------------
+API Integration & Module Harmonization Updates
+----------------------------------------------
+Dashboard Overview & Analytics
+- Connected live platform metrics, revenue tracking, dynamic peak listening hours, and multi-range buckets (7d, 30d, 3m, 6m, 1y)
+- Standardized currency formatting strictly in Bangladeshi Taka (৳) and enforced optional chaining across all charts and stat widgets
+
+Music & Songs
+- Harmonized status vocabulary and SSR parameter sanitization across songs listings
+- Audited endpoints against backend contracts for live playback counts, metadata previews, and moderation
+
+Videos
+- Connected live video catalog with status tabs, search, and pagination
+- Wired video detail preview, approve/reject workflows for artist submissions, and deletion endpoints
+- Cleaned up obsolete local stores in favor of direct TanStack Query caching
+
+Podcasts & Reviews Moderation
+- Connected real-time podcast listings, episode previews, and artist submission approval/rejection flows
+- Integrated dedicated reviews moderation endpoints (/admin/podcasts/reviews) with hide/unhide review controls
+
+Audiobooks
+- Connected admin audiobook services, chapter and book previews, and content moderation actions
+
+Artists Management & Verification
+- Integrated full artist application review workflow: approve verification, reject with standardized backend reason enums, and request additional documents
+- Harmonized artist dashboard statistics with the platform-wide compact card aesthetic and purged unused dummy data stores
+
+Users Oversight
+- Connected live user directory with SSR prefetching, pagination, and multi-field search
+- Hardened table and mobile card views with strict optional chaining and safe fallback handling
+- Preserved user management UI markup in read-only mode with helpful user notices while awaiting backend CRUD releases
+
 Shop & Products (Merchandise)
-- Connected real-time shop dashboard statistics, paginated products listing with search and status filters
-- Connected product detail preview, product analytics metrics, update product data, and product deletion endpoints
+- Connected real-time shop dashboard statistics, inventory counters, and paginated product listings with category and status filters
+- Wired product analytics metrics, sales trend charts from backend DTO points, and product deletion endpoints with graceful empty-state handling
 
 Tours & Events
-- Connected real-time events dashboard statistics, paginated events list with search and status filters
-- Connected single event detail preview, event analytics, event creation, update event, and event deletion endpoints
+- Connected real-time events dashboard statistics, paginated events list with status filtering, and search
+- Harmonized multipart event creation/update endpoints (/creator/events/:id) with admin owner reassignment (/admin/events/:id)
+- Connected live event analytics (sales trends, platform breakdowns, country breakdowns) and purged obsolete dummy data stores
 
-Admin Profile & Login Audit History
-- Connected live admin profile data (/auth/me) and authentication log history (/auth/login-history)
-
-
-New Page UI Updates
--------------------
-Subscriptions Management
-- Updated Subscriptions page layout with plan overview cards, subscriber list table with plan filters, search, and responsive mobile card layouts
-
-Roles & RBAC Management
-- Updated Roles & Permissions management screen featuring system role cards, granular permission matrices, and role editing modals
-
-Admin Profile Page & Audit Logs UI
-- Updated Admin Profile page with account overview cards, system preferences, saved collections, and redesigned the Login Audit History table with non-scrolling stationary headers, fixed-height log scrolling, and responsive card views for smaller devices
+Global Media Player Improvements
+- Integrated Web MediaSession API for OS lock screen metadata, artwork display, and native playback controls
+- Resolved audio and video teardown on close to eliminate ghost playback across navigation
 
 
 Live Dashboard Module Links:
+https://beat-x-nextjs.vercel.app/admin/dashboard/overview
+https://beat-x-nextjs.vercel.app/admin/dashboard/analytics
+https://beat-x-nextjs.vercel.app/admin/dashboard/music
+https://beat-x-nextjs.vercel.app/admin/dashboard/videos
+https://beat-x-nextjs.vercel.app/admin/dashboard/podcasts
+https://beat-x-nextjs.vercel.app/admin/dashboard/audiobooks
+https://beat-x-nextjs.vercel.app/admin/dashboard/artists
+https://beat-x-nextjs.vercel.app/admin/dashboard/users
 https://beat-x-nextjs.vercel.app/admin/dashboard/shop
 https://beat-x-nextjs.vercel.app/admin/dashboard/tours
-https://beat-x-nextjs.vercel.app/admin/dashboard/subscriptions
-https://beat-x-nextjs.vercel.app/admin/dashboard/roles-rbac
-https://beat-x-nextjs.vercel.app/admin/dashboard/profile
 
 Admin credentials:
 email: techreion@gmail.com
