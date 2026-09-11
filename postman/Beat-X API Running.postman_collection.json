@@ -649,7 +649,7 @@
               "response": []
             },
             {
-              "name": "⚠️ Get Approved Artists (missing isFollowing in response)",
+              "name": "✅ ⚠️ Get Approved Artists (missing isFollowing in response)",
               "request": {
                 "method": "GET",
                 "header": [
@@ -1557,7 +1557,7 @@
           "name": "Albums",
           "item": [
             {
-              "name": "Browse",
+              "name": "✅ Browse",
               "event": [
                 {
                   "listen": "test",
