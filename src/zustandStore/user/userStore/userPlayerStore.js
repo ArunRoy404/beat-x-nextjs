@@ -23,5 +23,14 @@ export const useUserPlayerStore = create((set) => ({
   setIsPlaying: (isPlaying) => set({ isPlaying }),
   setLiked: (liked) => set({ liked }),
   toggleLiked: () => set((state) => ({ liked: !state.liked })),
+  closeTrack: () =>
+    set({
+      songId: null,
+      title: "",
+      artist: "",
+      artwork: "",
+      src: "",
+      isPlaying: false,
+    }),
 }))
 

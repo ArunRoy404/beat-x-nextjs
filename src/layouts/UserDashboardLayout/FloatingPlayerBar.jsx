@@ -1,9 +1,9 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useCallback } from "react"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { Heart, ListMusic, Maximize2, Mic2, Music, Repeat, Shuffle, SkipBack, SkipForward, Volume2, VolumeX } from "lucide-react"
+import { Heart, ListMusic, Maximize2, Mic2, Music, Repeat, Shuffle, SkipBack, SkipForward, Volume2, VolumeX, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import GradientPlayButton from "@/components/shared/GradientPlayButton"
 import { useUserPlayerStore } from "@/zustandStore/user/userStore/userPlayerStore"
@@ -22,7 +22,7 @@ const formatTime = (seconds) => {
 }
 
 const FloatingPlayerBar = () => {
-    const { title, artist, artwork, src, liked, toggleLiked, songId, isPlaying: storeIsPlaying, setIsPlaying: setStoreIsPlaying } = useUserPlayerStore()
+    const { title, artist, artwork, src, liked, toggleLiked, songId, isPlaying: storeIsPlaying, setIsPlaying: setStoreIsPlaying, closeTrack } = useUserPlayerStore()
     const { volume, isMuted, setVolume, toggleMute } = useVolumeStore()
     const { toggleLike } = useToggleLikeSong()
     const audioRef = useRef(null)
@@ -31,6 +31,140 @@ const FloatingPlayerBar = () => {
     const [currentTime, setCurrentTime] = useState(0)
     const [duration, setDuration] = useState(0)
     const [repeat, setRepeat] = useState(false)
+
+    // Complete player teardown
+    const handleClose = useCallback(() => {
+        if (audioRef.current) {
+            try {
+                audioRef.current.pause()
+                audioRef.current.currentTime = 0
+                audioRef.current.removeAttribute("src")
+                audioRef.current.load()
+            } catch (e) {}
+        }
+        if (typeof navigator !== "undefined" && "mediaSession" in navigator) {
+            try {
+                navigator.mediaSession.metadata = null
+                navigator.mediaSession.playbackState = "none"
+                const actions = ["play", "pause", "seekbackward", "seekforward", "seekto", "stop"]
+                actions.forEach((act) => {
+                    try {
+                        navigator.mediaSession.setActionHandler(act, null)
+                    } catch (e) {}
+                })
+            } catch (e) {}
+        }
+        if (typeof document !== "undefined") {
+            document.title = "BeatX"
+        }
+        setIsPlaying(false)
+        setStoreIsPlaying?.(false)
+        closeTrack?.()
+    }, [closeTrack, setStoreIsPlaying])
+
+    // Synchronize OS Media Session (Windows SMTC / macOS Now Playing)
+    useEffect(() => {
+        if (typeof window === "undefined" || typeof navigator === "undefined" || !("mediaSession" in navigator)) return
+        if (!src) {
+            try {
+                navigator.mediaSession.metadata = null
+                navigator.mediaSession.playbackState = "none"
+            } catch (e) {}
+            if (typeof document !== "undefined") {
+                document.title = "BeatX"
+            }
+            return
+        }
+
+        let absoluteArtwork = ""
+        if (artwork) {
+            if (artwork.startsWith("http://") || artwork.startsWith("https://") || artwork.startsWith("blob:") || artwork.startsWith("data:")) {
+                absoluteArtwork = artwork
+            } else {
+                absoluteArtwork = `${window.location.origin}${artwork.startsWith("/") ? "" : "/"}${artwork}`
+            }
+        }
+
+        const displayTitle = title || "Song Track"
+        const displayArtist = artist || "BeatX"
+
+        try {
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: displayTitle,
+                artist: displayArtist,
+                album: "BeatX",
+                artwork: absoluteArtwork
+                    ? [
+                          { src: absoluteArtwork, sizes: "96x96", type: "image/png" },
+                          { src: absoluteArtwork, sizes: "128x128", type: "image/png" },
+                          { src: absoluteArtwork, sizes: "192x192", type: "image/png" },
+                          { src: absoluteArtwork, sizes: "256x256", type: "image/png" },
+                          { src: absoluteArtwork, sizes: "384x384", type: "image/png" },
+                          { src: absoluteArtwork, sizes: "512x512", type: "image/png" },
+                      ]
+                    : [],
+            })
+        } catch (e) {}
+
+        if (typeof document !== "undefined") {
+            document.title = isPlaying ? `▶ ${displayTitle} • ${displayArtist} | BeatX` : `${displayTitle} • ${displayArtist} | BeatX`
+        }
+    }, [src, title, artist, artwork, isPlaying])
+
+    // Sync playbackState
+    useEffect(() => {
+        if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return
+        if (!src) {
+            try {
+                navigator.mediaSession.playbackState = "none"
+            } catch (e) {}
+            return
+        }
+        try {
+            navigator.mediaSession.playbackState = isPlaying ? "playing" : "paused"
+        } catch (e) {}
+    }, [isPlaying, src])
+
+    // Register OS Media Session action handlers
+    useEffect(() => {
+        if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return
+        if (!src) return
+
+        const handlers = [
+            ["play", () => {
+                if (audioRef.current) {
+                    audioRef.current.play().then(() => {
+                        setIsPlaying(true)
+                        setStoreIsPlaying?.(true)
+                    }).catch(() => {})
+                }
+            }],
+            ["pause", () => {
+                if (audioRef.current) {
+                    audioRef.current.pause()
+                    setIsPlaying(false)
+                    setStoreIsPlaying?.(false)
+                }
+            }],
+            ["seekbackward", () => seekBy(-SEEK_SECONDS)],
+            ["seekforward", () => seekBy(SEEK_SECONDS)],
+            ["stop", () => handleClose()],
+        ]
+
+        handlers.forEach(([action, handler]) => {
+            try {
+                navigator.mediaSession.setActionHandler(action, handler)
+            } catch (e) {}
+        })
+
+        return () => {
+            handlers.forEach(([action]) => {
+                try {
+                    navigator.mediaSession.setActionHandler(action, null)
+                } catch (e) {}
+            })
+        }
+    }, [src, handleClose, setStoreIsPlaying])
 
     useEffect(() => {
         // The audio element can finish loading metadata before this component's
@@ -254,6 +388,15 @@ const FloatingPlayerBar = () => {
                 </div>
                 <button type="button" className="text-light-gray" aria-label="Fullscreen">
                     <Maximize2 className="size-4" />
+                </button>
+                <button
+                    type="button"
+                    onClick={handleClose}
+                    className="cursor-pointer rounded-full p-1 text-light-gray transition-colors hover:text-red-error"
+                    aria-label="Close"
+                    title="Close player"
+                >
+                    <X className="size-4" />
                 </button>
             </div>
         </motion.div>

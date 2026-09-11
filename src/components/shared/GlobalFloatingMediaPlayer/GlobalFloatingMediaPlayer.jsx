@@ -47,6 +47,7 @@ const GlobalFloatingMediaPlayer = () => {
     duration,
     togglePlay,
     pauseMedia,
+    resumeMedia,
     setCurrentTime,
     setDuration,
     closePlayer,
@@ -129,14 +130,196 @@ const GlobalFloatingMediaPlayer = () => {
     }
   }, [isPlaying, src, pauseMedia, applyVolume]);
 
-  const seekBy = (delta) => {
+  const seekBy = useCallback((delta) => {
     const media = mediaRef.current;
     if (!media) return;
     const max = Number.isFinite(media.duration) ? media.duration : Infinity;
     const newTime = Math.min(Math.max(media.currentTime + delta, 0), max);
     media.currentTime = newTime;
     setCurrentTime(newTime);
-  };
+  }, [setCurrentTime]);
+
+  // Comprehensive player teardown: drops OS Media Session (SMTC) & fully unloads audio/video resource
+  const handleClose = useCallback(() => {
+    // 1. Immediately pause and unbind the active media element to stop all audio/video buffers
+    if (mediaRef.current) {
+      try {
+        mediaRef.current.pause();
+        mediaRef.current.currentTime = 0;
+        mediaRef.current.removeAttribute("src");
+        mediaRef.current.load();
+      } catch (e) {}
+    }
+
+    // 2. Completely dismantle OS Media Session (Windows SMTC / Chrome Global Media Controls)
+    if (typeof navigator !== "undefined" && "mediaSession" in navigator) {
+      try {
+        navigator.mediaSession.metadata = null;
+        navigator.mediaSession.playbackState = "none";
+        const actions = ["play", "pause", "seekbackward", "seekforward", "seekto", "stop", "previoustrack", "nexttrack"];
+        actions.forEach((act) => {
+          try {
+            navigator.mediaSession.setActionHandler(act, null);
+          } catch (e) {}
+        });
+      } catch (e) {}
+    }
+
+    // 3. Restore document title
+    if (typeof document !== "undefined") {
+      document.title = "BeatX";
+    }
+
+    // 4. Update Zustand store
+    closePlayer();
+  }, [closePlayer]);
+
+  // Synchronize OS Media Session Metadata (Windows SMTC / macOS / Mobile media controls)
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
+
+    if (!isOpen || !src) {
+      try {
+        navigator.mediaSession.metadata = null;
+        navigator.mediaSession.playbackState = "none";
+      } catch (e) {}
+      if (typeof document !== "undefined") {
+        document.title = "BeatX";
+      }
+      return;
+    }
+
+    // Build absolute URL for artwork so Chromium/Windows SMTC can fetch it reliably
+    let absoluteCover = "";
+    if (coverUrl) {
+      if (coverUrl.startsWith("http://") || coverUrl.startsWith("https://") || coverUrl.startsWith("blob:") || coverUrl.startsWith("data:")) {
+        absoluteCover = coverUrl;
+      } else {
+        absoluteCover = `${window.location.origin}${coverUrl.startsWith("/") ? "" : "/"}${coverUrl}`;
+      }
+    }
+
+    const displayTitle = title || (mediaType === "video" ? "Video Stream" : "Audio Track");
+    const displayArtist = artist || "BeatX";
+
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: displayTitle,
+        artist: displayArtist,
+        album: "BeatX",
+        artwork: absoluteCover
+          ? [
+              { src: absoluteCover, sizes: "96x96", type: "image/png" },
+              { src: absoluteCover, sizes: "128x128", type: "image/png" },
+              { src: absoluteCover, sizes: "192x192", type: "image/png" },
+              { src: absoluteCover, sizes: "256x256", type: "image/png" },
+              { src: absoluteCover, sizes: "384x384", type: "image/png" },
+              { src: absoluteCover, sizes: "512x512", type: "image/png" },
+            ]
+          : [],
+      });
+    } catch (e) {
+      console.warn("Error setting MediaSession metadata:", e);
+    }
+
+    // Update document title for the browser tab
+    if (typeof document !== "undefined") {
+      document.title = isPlaying ? `▶ ${displayTitle} • ${displayArtist} | BeatX` : `${displayTitle} • ${displayArtist} | BeatX`;
+    }
+  }, [isOpen, src, title, artist, coverUrl, mediaType, isPlaying]);
+
+  // Sync playbackState with OS media controls
+  useEffect(() => {
+    if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
+    if (!isOpen || !src) {
+      try {
+        navigator.mediaSession.playbackState = "none";
+      } catch (e) {}
+      return;
+    }
+    try {
+      navigator.mediaSession.playbackState = isPlaying ? "playing" : "paused";
+    } catch (e) {}
+  }, [isPlaying, isOpen, src]);
+
+  // Sync position state (progress bar in Windows SMTC)
+  useEffect(() => {
+    if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
+    if (!("setPositionState" in navigator.mediaSession)) return;
+    if (!isOpen || !src || !Number.isFinite(duration) || duration <= 0) return;
+
+    try {
+      navigator.mediaSession.setPositionState({
+        duration: Math.max(duration, 0),
+        playbackRate: 1,
+        position: Math.min(Math.max(currentTime, 0), duration),
+      });
+    } catch (e) {}
+  }, [currentTime, duration, isOpen, src]);
+
+  // Register OS hardware / SMTC action handlers (play, pause, seek, stop)
+  useEffect(() => {
+    if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
+    if (!isOpen || !src) return;
+
+    const handlers = [
+      [
+        "play",
+        () => {
+          resumeMedia();
+          if (mediaRef.current) mediaRef.current.play().catch(() => {});
+        },
+      ],
+      [
+        "pause",
+        () => {
+          pauseMedia();
+          if (mediaRef.current) mediaRef.current.pause();
+        },
+      ],
+      [
+        "seekbackward",
+        (details) => {
+          seekBy(-(details?.seekOffset || SEEK_SECONDS));
+        },
+      ],
+      [
+        "seekforward",
+        (details) => {
+          seekBy(details?.seekOffset || SEEK_SECONDS);
+        },
+      ],
+      [
+        "seekto",
+        (details) => {
+          if (details?.seekTime !== undefined && mediaRef.current) {
+            mediaRef.current.currentTime = details.seekTime;
+            setCurrentTime(details.seekTime);
+          }
+        },
+      ],
+      [
+        "stop",
+        () => {
+          handleClose();
+        },
+      ],
+    ];
+
+    handlers.forEach(([action, handler]) => {
+      try {
+        navigator.mediaSession.setActionHandler(action, handler);
+      } catch (e) {}
+    });
+
+    return () => {
+      handlers.forEach(([action]) => {
+        try {
+          navigator.mediaSession.setActionHandler(action, null);
+        } catch (e) {}
+      });
+    };
+  }, [isOpen, src, resumeMedia, pauseMedia, handleClose, setCurrentTime, seekBy]);
 
   const handleSeekChange = (e) => {
     const time = Number(e.target.value);
@@ -187,7 +370,7 @@ const GlobalFloatingMediaPlayer = () => {
               stiffness: 280,
               damping: 22,
             }}
-            className="fixed bottom-6 right-6 z-[999999] w-[340px] sm:w-[410px] md:w-[450px] rounded-xl border border-border bg-(--player-bar-bg) shadow-2xl backdrop-blur-xl overflow-hidden select-none"
+            className="fixed bottom-6 right-6 z-[999999] w-[340px] sm:w-[410px] md:w-[450px] rounded-md border border-border/70 bg-(--player-bar-bg) shadow-2xl backdrop-blur-xl overflow-hidden select-none"
           >
             {/* 16:9 Video Canvas */}
             <div className="relative aspect-video w-full bg-black group overflow-hidden">
@@ -214,7 +397,7 @@ const GlobalFloatingMediaPlayer = () => {
               {/* Top Hover Header Overlay */}
               <div className="absolute top-0 inset-x-0 p-3 flex items-center justify-between bg-gradient-to-b from-black/85 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-auto">
                 <div className="flex items-center gap-2 min-w-0 pr-2">
-                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-black/60 border border-white/10 text-[10px] font-semibold uppercase tracking-wider text-secondary backdrop-blur-sm shrink-0">
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-black/60 border border-white/10 text-[10px] font-semibold uppercase tracking-wider text-secondary backdrop-blur-sm shrink-0">
                     <Video className="size-3" />
                     Video
                   </span>
@@ -226,15 +409,15 @@ const GlobalFloatingMediaPlayer = () => {
                   <button
                     type="button"
                     onClick={toggleFullscreenVideo}
-                    className="p-1.5 rounded-md bg-black/50 text-white/80 hover:text-white hover:bg-black/80 backdrop-blur-sm transition-colors cursor-pointer"
+                    className="p-1.5 rounded-sm bg-black/50 text-white/80 hover:text-white hover:bg-black/80 backdrop-blur-sm transition-colors cursor-pointer"
                     title="Fullscreen"
                   >
                     <Maximize2 className="size-3.5" />
                   </button>
                   <button
                     type="button"
-                    onClick={closePlayer}
-                    className="p-1.5 rounded-md bg-black/50 text-white/80 hover:text-red-error hover:bg-black/80 backdrop-blur-sm transition-colors cursor-pointer"
+                    onClick={handleClose}
+                    className="p-1.5 rounded-sm bg-black/50 text-white/80 hover:text-red-error hover:bg-black/80 backdrop-blur-sm transition-colors cursor-pointer"
                     title="Close"
                   >
                     <X className="size-3.5" />
@@ -350,7 +533,7 @@ const GlobalFloatingMediaPlayer = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={closePlayer}
+                  onClick={handleClose}
                   className="text-light-gray hover:text-red-error transition-colors p-1 cursor-pointer"
                   title="Close"
                 >
@@ -568,7 +751,7 @@ const GlobalFloatingMediaPlayer = () => {
 
               <button
                 type="button"
-                onClick={closePlayer}
+                onClick={handleClose}
                 className="cursor-pointer rounded-full p-1.5 text-light-gray transition-colors hover:text-red-error sm:p-1"
                 aria-label="Close"
                 title="Close player"
