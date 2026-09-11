@@ -30,9 +30,6 @@ Admin Profile Page & Audit Logs UI
 - Updated Admin Profile page with account overview cards, system preferences, saved collections, and redesigned the Login Audit History table with non-scrolling stationary headers, fixed-height log scrolling, and responsive card views for smaller devices
 
 
-Video Explanation Link:
-https://app.usebubbles.com/a7H28teXZA85DnUDbTMXq4/update-beat-x-sep-05-2026
-
 Live Dashboard Module Links:
 https://beat-x-nextjs.vercel.app/admin/dashboard/shop
 https://beat-x-nextjs.vercel.app/admin/dashboard/tours
