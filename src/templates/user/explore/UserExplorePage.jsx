@@ -10,7 +10,6 @@ import ArtistsSection from "@/components/user/explore/ArtistsSection"
 // import RecentSearchesPanel from "@/components/user/explore/RecentSearchesPanel"
 // import LiveSessionsPanel from "@/components/user/explore/LiveSessionsPanel"
 import { useUserGenres } from "@/hooks/api/user/genre/useUserGenres"
-import { useUserExploreStore } from "@/zustandStore/user/userStore/userExploreStore"
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -61,7 +60,6 @@ const gridItemVariants = {
 
 const UserExplorePage = () => {
     const { data: genresData } = useUserGenres()
-    const storeGenres = useUserExploreStore((state) => state.genres)
     const [activeFilter, setActiveFilter] = useState("All")
 
     const liveGenres =
@@ -70,7 +68,7 @@ const UserExplorePage = () => {
         genresData?.data ??
         (Array.isArray(genresData) ? genresData : [])
 
-    const allGenres = liveGenres.length > 0 ? liveGenres : (storeGenres || [])
+    const allGenres = Array.isArray(liveGenres) ? liveGenres : []
 
     const displayedGenres = activeFilter === "All"
         ? allGenres
@@ -109,16 +107,22 @@ const UserExplorePage = () => {
                             View All Clusters
                         </button>
                     </div>
-                    <motion.div 
-                        variants={gridContainerVariants}
-                        className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
-                    >
-                        {displayedGenres.map((genre, index) => (
-                            <motion.div key={genre?._id || genre?.id || index} variants={gridItemVariants}>
-                                <GenreCard genre={genre} index={index} />
-                            </motion.div>
-                        ))}
-                    </motion.div>
+                    {displayedGenres.length > 0 ? (
+                        <motion.div 
+                            variants={gridContainerVariants}
+                            className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+                        >
+                            {displayedGenres.map((genre, index) => (
+                                <motion.div key={genre?._id || genre?.id || index} variants={gridItemVariants}>
+                                    <GenreCard genre={genre} index={index} />
+                                </motion.div>
+                            ))}
+                        </motion.div>
+                    ) : (
+                        <div className="flex w-full flex-col items-center justify-center rounded-[16px] border border-dashed border-white/10 py-12 text-center">
+                            <p className="text-base text-light-gray">No genres found</p>
+                        </div>
+                    )}
                 </motion.section>
 
                 {/* Preserving UI design blocks per Rule 35 & user instructions:

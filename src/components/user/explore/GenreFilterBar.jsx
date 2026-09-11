@@ -3,13 +3,8 @@
 import { useState } from "react"
 import { ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useUserExploreStore } from "@/zustandStore/user/userStore/userExploreStore"
-
 const GenreFilterBar = ({ genres = [], activeFilter = "All", onSelectFilter }) => {
-    const genreFilters = useUserExploreStore((state) => state.genreFilters)
-    const filterList = genres?.length > 0
-        ? ["All", ...genres.map((g) => g?.name || g?.title).filter(Boolean)]
-        : genreFilters
+    const filterList = ["All", ...(genres?.map((g) => g?.name || g?.title).filter(Boolean) || [])]
 
     return (
         <div className="flex w-full items-center gap-2 overflow-x-auto no-scrollbar">

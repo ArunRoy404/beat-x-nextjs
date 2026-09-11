@@ -3,14 +3,12 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import { Play, Pause, ChevronLeft, ChevronRight } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
-import { useUserExploreStore } from "@/zustandStore/user/userStore/userExploreStore"
 import { useFeaturedSongs } from "@/hooks/api/user/songs/useFeaturedSongs"
 import { usePlaySong } from "@/hooks/api/user/songs/usePlaySong"
 
 const GenreHeroBanner = () => {
     const { data: featuredData } = useFeaturedSongs()
     const { playSong, currentSongId, isPlaying, isPending } = usePlaySong()
-    const exploreHero = useUserExploreStore((state) => state.exploreHero)
     
     const [currentIndex, setCurrentIndex] = useState(0)
     const isHovered = useRef(false)
@@ -19,8 +17,7 @@ const GenreHeroBanner = () => {
         ? featuredData
         : (featuredData?.data || [])
 
-    const fallbackSlides = Array.isArray(exploreHero) ? exploreHero : (exploreHero ? [exploreHero] : [])
-    const slides = featuredList.length > 0 ? featuredList : fallbackSlides
+    const slides = featuredList
     const rawSlide = slides[currentIndex] || {}
     const currentSlide = rawSlide?.song || rawSlide || {}
     const isCurrentPlaying = currentSongId === (currentSlide?._id || currentSlide?.id) && isPlaying

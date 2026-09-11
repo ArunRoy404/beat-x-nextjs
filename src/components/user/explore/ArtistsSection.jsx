@@ -3,7 +3,6 @@
 import { motion } from "framer-motion"
 import ArtistCard from "@/components/user/explore/ArtistCard"
 import { useApprovedArtists } from "@/hooks/api/user/artists/useApprovedArtists"
-import { useUserExploreArtistsStore } from "@/zustandStore/user/userStore/userExploreArtistsStore"
 
 const gridContainerVariants = {
     hidden: { opacity: 0 },
@@ -30,13 +29,12 @@ const gridItemVariants = {
 
 const ArtistsSection = () => {
     const { data: approvedArtistsData } = useApprovedArtists()
-    const dummyArtists = useUserExploreArtistsStore((state) => state.artists)
 
     const liveArtists = Array.isArray(approvedArtistsData)
         ? approvedArtistsData
         : (approvedArtistsData?.data || [])
 
-    const artists = liveArtists.length > 0 ? liveArtists : (dummyArtists || [])
+    const artists = liveArtists
 
     if (artists.length === 0) return null
 
