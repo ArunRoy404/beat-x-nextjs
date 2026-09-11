@@ -2,7 +2,9 @@ import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 import { getQueryClient } from "@/lib/reactQuery/getQueryClient";
 import { queryKeys } from "@/lib/reactQuery/queryKeys";
 import { getSongsRequest } from "@/services/admin/songsServices";
+import { getGenresRequest } from "@/services/admin/genreServices";
 import { buildSongsParams } from "@/hooks/api/admin/songs/songsParams";
+import { TAXONOMY_OPTIONS_PARAMS } from "@/lib/constants/taxonomyOptions";
 import AdminDashboardMusicPage from "@/templates/admin/dashboard/AdminDashboardMusicPage";
 
 // No `export const revalidate` here on purpose: getSongsRequest reads the
@@ -17,10 +19,19 @@ const page = async ({ searchParams }) => {
 
   const queryClient = getQueryClient();
 
-  await queryClient.prefetchQuery({
-    queryKey: queryKeys.music.list(params),
-    queryFn: () => getSongsRequest(params),
-  });
+  // The genre filter sits in the table header, so it renders on first paint
+  // and has to be prefetched alongside the list — otherwise the select pops
+  // in empty and fills once the client query lands.
+  await Promise.all([
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.music.list(params),
+      queryFn: () => getSongsRequest(params),
+    }),
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.genre.list(TAXONOMY_OPTIONS_PARAMS),
+      queryFn: () => getGenresRequest(TAXONOMY_OPTIONS_PARAMS),
+    }),
+  ]);
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

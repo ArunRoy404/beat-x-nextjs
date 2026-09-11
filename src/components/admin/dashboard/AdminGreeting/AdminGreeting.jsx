@@ -30,18 +30,18 @@ const AdminGreeting = ({ greetingData }) => {
                 {greetingData?.statusLabel && (
                     <div className="flex items-center gap-1.5 text-yellow-warning text-[16px] not-italic font-medium">
                         <LucideIcons.Zap className="w-4 h-4 fill-current" />
-                        <span>{greetingData.statusLabel}</span>
+                        <span>{greetingData?.statusLabel}</span>
                     </div>
                 )}
                 {greetingData?.greeting && (
                     <h2 className="text-whitetext text-[24px] not-italic font-medium mt-1">
-                        {greetingData.greeting}
+                        {greetingData?.greeting}
                     </h2>
                 )}
                 <div className="flex flex-wrap items-center gap-1.5 text-[14px] not-italic font-normal mt-2">
                     {greetingData?.activeUsersText && (
                         <>
-                            <span className="text-secondary">{greetingData.activeUsersText}</span>
+                            <span className="text-secondary">{greetingData?.activeUsersText}</span>
                             <span className="text-light-gray">{greetingData?.activeUsersLabel || "active"}</span>
                         </>
                     )}
@@ -50,23 +50,32 @@ const AdminGreeting = ({ greetingData }) => {
                     )}
                     {greetingData?.pendingReportsText && (
                         <>
-                            <span className="text-yellow-warning">{greetingData.pendingReportsText}</span>
+                            <span className="text-yellow-warning">{greetingData?.pendingReportsText}</span>
                             <span className="text-light-gray">{greetingData?.pendingReportsLabel || "pending"}</span>
                         </>
                     )}
-                    {greetingData?.pendingReportsText && greetingData?.operationalText && (
+                    {greetingData?.pendingReportsText && greetingData?.pendingReviewsText && (
+                        <span className="text-dark-gray">•</span>
+                    )}
+                    {greetingData?.pendingReviewsText && (
+                        <>
+                            <span className="text-yellow-warning">{greetingData?.pendingReviewsText}</span>
+                            <span className="text-light-gray">{greetingData?.pendingReviewsLabel || "reviews"}</span>
+                        </>
+                    )}
+                    {(greetingData?.pendingReportsText || greetingData?.pendingReviewsText || greetingData?.activeUsersText) && greetingData?.operationalText && (
                         <span className="text-dark-gray">•</span>
                     )}
                     {greetingData?.operationalText && (
-                        <span className="text-green-success">{greetingData.operationalText}</span>
+                        <span className="text-green-success">{greetingData?.operationalText}</span>
                     )}
                 </div>
             </div>
 
             {/* Content - Right Section (Status Metrics Pills) */}
-            {Array.isArray(greetingData?.metrics) && greetingData.metrics.length > 0 && (
+            {Array.isArray(greetingData?.metrics) && greetingData?.metrics?.length > 0 && (
                 <div className="relative z-10 flex items-center gap-3 flex-wrap">
-                    {greetingData.metrics.map((metric, index) => {
+                    {greetingData?.metrics?.map((metric, index) => {
                         const style = metricStyles[metric?.type] || metricStyles.primary
                         return (
                             <div

@@ -32,6 +32,7 @@ const UploadNewSongForm = ({ onSuccess, onCancel }) => {
             title: "",
             artist: "",
             genre: "",
+            album: "none",
             explicit: false,
             visibility: "publish",
             scheduledAt: undefined,

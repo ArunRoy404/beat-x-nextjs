@@ -8,6 +8,7 @@ import CommonTableStat from "@/components/shared/CommonTable/CommonTableStat"
 import CommonTableStatus from "@/components/shared/CommonTable/CommonTableStatus"
 import SongsTableActions from "@/components/admin/music/SongsContainer/SongsTableActions"
 import { formatDurationMs } from "@/lib/format/formatDuration"
+import { normalizeSongStatus } from "@/lib/constants/songStatus"
 
 export const getSongsColumns = () => [
   {
@@ -27,20 +28,20 @@ export const getSongsColumns = () => [
   {
     accessorKey: "artist",
     header: () => <CommonTableHeader>Artist</CommonTableHeader>,
-    cell: ({ getValue }) => (
-      <CommonTableCell>
-        {getValue() || "-"}
-      </CommonTableCell>
-    )
+    cell: ({ getValue }) => {
+      const val = getValue()
+      const text = typeof val === "object" && val !== null ? val?.name || val?.title || "-" : val || "-"
+      return <CommonTableCell>{text}</CommonTableCell>
+    }
   },
   {
     accessorKey: "album",
     header: () => <CommonTableHeader>Album</CommonTableHeader>,
-    cell: ({ getValue }) => (
-      <CommonTableCell>
-        {getValue()?.name || getValue() || "-"}
-      </CommonTableCell>
-    )
+    cell: ({ getValue }) => {
+      const val = getValue()
+      const text = typeof val === "object" && val !== null ? val?.title || val?.name || "-" : val || "-"
+      return <CommonTableCell>{text}</CommonTableCell>
+    }
   },
   {
     accessorKey: "genre",
@@ -66,18 +67,21 @@ export const getSongsColumns = () => [
     header: () => <CommonTableHeader>Released</CommonTableHeader>,
     cell: ({ getValue }) => {
       const value = getValue()
-      return (
-        <CommonTableCell>
-          {value ? format(new Date(value), "MMM d, yyyy") : "-"}
-        </CommonTableCell>
-      )
+      let dateText = "-"
+      if (value) {
+        const d = new Date(value)
+        if (!isNaN(d.getTime())) {
+          dateText = format(d, "MMM d, yyyy")
+        }
+      }
+      return <CommonTableCell>{dateText}</CommonTableCell>
     }
   },
   {
     accessorKey: "status",
     header: () => <CommonTableHeader>Status</CommonTableHeader>,
     cell: ({ getValue }) => (
-      <CommonTableStatus status={getValue()} />
+      <CommonTableStatus status={normalizeSongStatus(getValue())} />
     )
   },
   {

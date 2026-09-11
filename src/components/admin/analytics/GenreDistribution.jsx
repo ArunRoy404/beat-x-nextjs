@@ -25,7 +25,7 @@ const GenreDistribution = ({ data }) => {
                 dataKey="value"
               >
                 {(data || []).map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
+                  <Cell key={`cell-${index}`} fill={entry?.color} stroke="none" />
                 ))}
               </Pie>
               <Tooltip
@@ -33,8 +33,8 @@ const GenreDistribution = ({ data }) => {
                   if (active && payload && payload.length) {
                     return (
                       <div className="bg-[#0E0E0E] border border-border p-2 rounded-[8px] text-xs">
-                        <p className="font-semibold text-whitetext" style={{ color: payload[0].payload.color }}>
-                          {payload[0].name}: {payload[0].value}%
+                        <p className="font-semibold text-whitetext" style={{ color: payload?.[0]?.payload?.color }}>
+                          {payload?.[0]?.name}: {payload?.[0]?.value}%
                         </p>
                       </div>
                     )
@@ -51,11 +51,11 @@ const GenreDistribution = ({ data }) => {
           {(data || []).map((genre, idx) => (
             <div key={idx} className="flex items-center justify-between text-xs py-1 border-b border-white/[0.02] last:border-0">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: genre.color }} />
-                <span className="text-light-gray uppercase font-medium">{genre.name}</span>
+                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: genre?.color }} />
+                <span className="text-light-gray uppercase font-medium">{genre?.name}</span>
               </div>
-              <span className="font-semibold" style={{ color: genre.color }}>
-                {genre.value}%
+              <span className="font-semibold" style={{ color: genre?.color }}>
+                {genre?.value}%
               </span>
             </div>
           ))}

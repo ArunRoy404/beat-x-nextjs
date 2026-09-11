@@ -1,8 +1,17 @@
+"use client"
+
 import React from "react"
-import { Upload } from "lucide-react"
+import { Upload, PlusCircle } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
+// Preserved for future backend integration when create podcast endpoint is available
 import UploadNewPodcastDialog from "@/components/dialogs/admin/podcasts/UploadNewPodcastDialog"
 
 const UploadNewPodcast = () => {
+  const handleUploadClick = () => {
+    toast.info("This feature is currently unavailable.")
+  }
+
   return (
     <div
       className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 rounded-[16px] border-dashed border-2 border-secondary/15 bg-secondary/[0.03] gap-4 w-full"
@@ -22,8 +31,17 @@ const UploadNewPodcast = () => {
         </div>
       </div>
 
-      {/* Upload Dialog */}
+      {/* Button showing unavailable toast */}
+      <Button variant="gradient" onClick={handleUploadClick}>
+        <PlusCircle className="mr-2 h-4 w-4" /> Upload Podcasts
+      </Button>
+
+      {/* 
+      ========================================================================
+      COMMENTED DIALOG CONNECTION FOR FUTURE INTEGRATION WHEN BACKEND SUPPORTS ADMIN PODCAST CREATION:
+      ========================================================================
       <UploadNewPodcastDialog />
+      */}
     </div>
   )
 }

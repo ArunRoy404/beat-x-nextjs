@@ -1,50 +1,75 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Play, Plus, TrendingUp } from "lucide-react"
+import { Play, Pause, Plus, TrendingUp } from "lucide-react"
+import Link from "next/link"
 import { cn } from "@/lib/utils"
-import { useUserTrendingStore } from "@/zustandStore/user/userStore/userTrendingStore"
+import { useTrendingSongs } from "@/hooks/api/user/songs/useTrendingSongs"
+import { usePlaySong } from "@/hooks/api/user/songs/usePlaySong"
 import { Carousel, CarouselContent, CarouselItem, useCarousel } from "@/components/ui/carousel"
 
 const AUTOPLAY_DELAY = 6000
 
-const HeroSlide = ({ slide }) => (
-    <div
-        className="relative flex h-75 w-full flex-col justify-end overflow-hidden rounded-[16px] p-5 sm:h-90 sm:rounded-[24px] sm:p-8 lg:h-105 lg:p-12"
-        style={{ backgroundImage: `url(${slide.background})`, backgroundSize: "cover", backgroundPosition: "center" }}
-    >
-        <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-        <div className="relative flex flex-col items-start gap-3 sm:gap-4">
-            <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-                <span className="flex items-center gap-2 rounded-full border border-secondary/30 bg-secondary/20 px-3.25 py-1.25 text-xs text-secondary">
-                    <TrendingUp className="size-4" />
-                    TRENDING NOW
-                </span>
-                <span className="text-xs text-light-gray">{slide.rank}</span>
-            </div>
-            <h1 className="max-w-3xl text-2xl leading-tight font-semibold text-whitetext sm:text-[44px] lg:text-[56px] xl:text-[72px]">
-                {slide.title}
-            </h1>
-            <p className="max-w-2xl text-sm text-light-gray sm:text-base lg:text-lg">{slide.description}</p>
-            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-                <button
-                    type="button"
-                    className="flex cursor-pointer items-center justify-center gap-2 rounded-full bg-secondary px-5 py-2.5 text-sm font-semibold text-button-text transition-transform active:scale-95 sm:px-8 sm:py-4 sm:text-base"
-                >
-                    <Play className="size-4 sm:size-5" fill="currentColor" />
-                    Listen Now
-                </button>
-                <button
-                    type="button"
-                    className="flex cursor-pointer items-center justify-center gap-2 rounded-full border border-(--glass-panel-border) bg-(--glass-panel-bg) px-5 py-2.5 text-sm font-semibold text-whitetext backdrop-blur-[12px] sm:px-8.25 sm:py-4.25 sm:text-base"
-                >
-                    <Plus className="size-5 sm:size-6" />
-                    View Artist
-                </button>
+const HeroSlide = ({ slide, onPlay, isPlayingThis }) => {
+    const artistHref = slide?.song?.artistId
+        ? `/explore/artist/${slide.song.artistId}`
+        : slide?.song?.artist
+        ? `/explore/artist/${encodeURIComponent(slide.song.artist)}`
+        : null
+
+    return (
+        <div
+            className="relative flex h-75 w-full flex-col justify-end overflow-hidden rounded-[16px] p-5 sm:h-90 sm:rounded-[24px] sm:p-8 lg:h-105 lg:p-12"
+            style={{ backgroundImage: `url(${slide?.background})`, backgroundSize: "cover", backgroundPosition: "center" }}
+        >
+            <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+            <div className="relative flex flex-col items-start gap-3 sm:gap-4">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+                    <span className="flex items-center gap-2 rounded-full border border-secondary/30 bg-secondary/20 px-3.25 py-1.25 text-xs text-secondary">
+                        <TrendingUp className="size-4" />
+                        TRENDING NOW
+                    </span>
+                    <span className="text-xs text-light-gray">{slide?.rank}</span>
+                </div>
+                <h1 className="max-w-3xl text-2xl leading-tight font-semibold text-whitetext sm:text-[44px] lg:text-[56px] xl:text-[72px]">
+                    {slide?.title}
+                </h1>
+                <p className="max-w-2xl text-sm text-light-gray sm:text-base lg:text-lg">{slide?.description}</p>
+                <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+                    <button
+                        type="button"
+                        onClick={() => onPlay(slide?.song)}
+                        className="flex cursor-pointer items-center justify-center gap-2 rounded-full bg-secondary px-5 py-2.5 text-sm font-semibold text-button-text transition-transform active:scale-95 sm:px-8 sm:py-4 sm:text-base"
+                    >
+                        {isPlayingThis ? (
+                            <Pause className="size-4 sm:size-5" fill="currentColor" />
+                        ) : (
+                            <Play className="size-4 sm:size-5" fill="currentColor" />
+                        )}
+                        {isPlayingThis ? "Pause" : "Listen Now"}
+                    </button>
+                    {artistHref ? (
+                        <Link
+                            href={artistHref}
+                            className="flex cursor-pointer items-center justify-center gap-2 rounded-full border border-(--glass-panel-border) bg-(--glass-panel-bg) px-5 py-2.5 text-sm font-semibold text-whitetext backdrop-blur-[12px] sm:px-8.25 sm:py-4.25 sm:text-base transition-colors hover:bg-white/10"
+                        >
+                            <Plus className="size-5 sm:size-6" />
+                            View Artist
+                        </Link>
+                    ) : (
+                        <button
+                            type="button"
+                            className="flex cursor-pointer items-center justify-center gap-2 rounded-full border border-(--glass-panel-border) bg-(--glass-panel-bg) px-5 py-2.5 text-sm font-semibold text-whitetext backdrop-blur-[12px] sm:px-8.25 sm:py-4.25 sm:text-base"
+                        >
+                            <Plus className="size-5 sm:size-6" />
+                            View Artist
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
-    </div>
-)
+    )
+}
 
 const HeroCarouselDots = ({ slideCount }) => {
     const { api } = useCarousel()
@@ -110,17 +135,42 @@ const HeroCarouselAutoplay = () => {
 }
 
 const TrendingHeroCarousel = () => {
-    const slides = useUserTrendingStore((state) => state.trendingHeroSlides)
+    const { data: trendingData } = useTrendingSongs()
+    const { playSong, currentSongId, isPlaying } = usePlaySong()
+
+    const trendingList = Array.isArray(trendingData)
+        ? trendingData
+        : (trendingData?.data || [])
+
+    const slides = trendingList.slice(0, 5).map((song, index) => ({
+        id: song?._id || song?.id || index,
+        rank: `#${index + 1} Worldwide`,
+        title: song?.title || "Trending Single",
+        description: song?.artist
+            ? `By ${song.artist} • ${song?.album || "Top viral hit"}. Stream live now on Beat-X.`
+            : (song?.album ? `Album: ${song.album}` : "Trending viral hit on Beat-X this week."),
+        background: song?.coverUrl || "/watch/images/hero-deadline-studio.jpg",
+        song,
+    }))
+
+    if (slides.length === 0) return null
 
     return (
         <Carousel opts={{ align: "start", loop: true }} className="group w-full min-w-0">
             <HeroCarouselAutoplay />
             <CarouselContent className="-ml-0">
-                {slides.map((slide) => (
-                    <CarouselItem key={slide.id} className="pl-0">
-                        <HeroSlide slide={slide} />
-                    </CarouselItem>
-                ))}
+                {slides.map((slide) => {
+                    const isPlayingThis = currentSongId === (slide?.song?._id || slide?.song?.id) && isPlaying
+                    return (
+                        <CarouselItem key={slide.id} className="pl-0">
+                            <HeroSlide
+                                slide={slide}
+                                onPlay={(s) => s ? playSong(s) : null}
+                                isPlayingThis={isPlayingThis}
+                            />
+                        </CarouselItem>
+                    )
+                })}
             </CarouselContent>
             <HeroCarouselDots slideCount={slides.length} />
         </Carousel>
@@ -128,3 +178,4 @@ const TrendingHeroCarousel = () => {
 }
 
 export default TrendingHeroCarousel
+

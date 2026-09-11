@@ -15,8 +15,6 @@ import { toast } from "sonner"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSelect"
 import CommonSelectCards from "@/components/shared/CommonInputs/CommonInput/CommonSelectCards"
-import { Switch } from "@/components/ui/switch"
-import { useCreateVideo } from "@/hooks/api/admin/videos/useCreateVideo"
 import { useGenres } from "@/hooks/api/admin/genre/useGenres"
 
 const VISIBILITY_OPTIONS = [
@@ -24,9 +22,8 @@ const VISIBILITY_OPTIONS = [
   { value: "draft", label: "Save as Draft", icon: FileText },
 ]
 
-const UploadVideoDialog = ({ children }) => {
   const [open, setOpen] = useState(false)
-  const { mutate: createVideo, isPending } = useCreateVideo()
+  const isPending = false
 
   const videoInputRef = useRef(null)
   const imageInputRef = useRef(null)
@@ -76,21 +73,8 @@ const UploadVideoDialog = ({ children }) => {
       return
     }
 
-    const formData = new FormData()
-    formData.append("title", videoTitle.trim())
-    formData.append("video", videoFile)
-    formData.append("cover", coverImage)
-    if (genre) formData.append("genre", genre)
-    if (description) formData.append("description", description.trim())
-    formData.append("status", status)
-    formData.append("isFeatured", String(isFeatured))
-
-    createVideo(formData, {
-      onSuccess: () => {
-        handleReset()
-        setOpen(false)
-      },
-    })
+    toast.info("Video creation is currently unavailable.")
+    setOpen(false)
   }
 
   const handleVideoSelect = (e) => {

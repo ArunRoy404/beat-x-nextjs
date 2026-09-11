@@ -15,9 +15,12 @@ import { useReactivateArtist } from "@/hooks/api/admin/artists/useReactivateArti
 
 const rejectionReasons = [
   { value: "document_unclear", label: "Identity document unclear or unreadable" },
-  { value: "invalid_details", label: "Incomplete or fake profile information" },
-  { value: "copyright_issue", label: "Potential Copyright Infringement" },
-  { value: "tos_violation", label: "Terms of Service violation" }
+  { value: "name_mismatch", label: "Name on document does not match profile" },
+  { value: "document_expired", label: "Document is expired" },
+  { value: "selfie_mismatch", label: "Selfie does not match document photo" },
+  { value: "incomplete_profile", label: "Incomplete profile information" },
+  { value: "suspicious_activity", label: "Suspicious activity detected" },
+  { value: "other", label: "Other reason" },
 ]
 
 const ArtistDetailFooter = ({ artist, onClose }) => {
@@ -84,7 +87,7 @@ const ArtistDetailFooter = ({ artist, onClose }) => {
     if (infoChecklist.resolutionSelfie) items.push("higher_res_selfie")
     if (infoChecklist.socialLinks) items.push("missing_social_links")
     if (infoChecklist.incompleteBio) items.push("incomplete_bio")
-    if (infoChecklist.platformLinks) items.push("platform_links_needed")
+    if (infoChecklist.platformLinks) items.push("music_platform_links")
 
     if (items.length === 0 && !customMessage) {
       toast.error("Please select at least one checklist item or write a custom message.")

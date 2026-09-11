@@ -126,7 +126,7 @@ const ProductCard = ({ product }) => {
         <div className="flex items-center justify-between gap-2 w-full mt-1">
           {/* Price */}
           <span className="text-[#3ADFFA] text-[16px] font-semibold font-sans">
-            ৳{price.toFixed(2)}
+            ৳{Number(price || 0).toFixed(2)}
           </span>
 
           {/* Stock and Sold */}

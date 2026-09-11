@@ -3,7 +3,8 @@
 import { motion } from "framer-motion"
 import TrendingHeroCarousel from "@/components/user/trending/TrendingHeroCarousel"
 import HotAlbumsCarousel from "@/components/user/trending/HotAlbumsCarousel"
-import RecentSearchesPanel from "@/components/user/trending/RecentSearchesPanel"
+// Preserved per Rule 35 & user instruction: component kept in codebase for future search history API
+// import RecentSearchesPanel from "@/components/user/trending/RecentSearchesPanel"
 import TrendingVideosCarousel from "@/components/user/trending/TrendingVideosCarousel"
 import GlobalTop50Section from "@/components/user/trending/GlobalTop50Section"
 
@@ -44,8 +45,13 @@ const UserTrendingPage = () => {
 
             <motion.div variants={itemVariants} className="flex w-full flex-col items-start gap-6 lg:flex-row">
                 <HotAlbumsCarousel />
+                {/* Preserving UI design block per Rule 35 & user instruction:
+                    Recent searches search-history endpoint is not available in backend API yet.
+                    Kept intact and commented out.
                 <RecentSearchesPanel />
+                */}
             </motion.div>
+
 
             <motion.div variants={itemVariants}>
                 <TrendingVideosCarousel />

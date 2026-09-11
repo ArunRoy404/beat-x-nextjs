@@ -56,7 +56,7 @@ const AdminDashboardAnalyticsPage = () => {
       {
         id: "total-streams",
         title: "Total Streams",
-        value: `${data?.totalStreams?.value?.toLocaleString() ?? 0}`,
+        value: `${data?.totalStreams?.value?.toLocaleString?.() ?? data?.totalStreams?.value ?? 0}`,
         change: formatChangePercent(data?.totalStreams?.changePercent),
         isPositive: (data?.totalStreams?.changePercent ?? 0) >= 0,
         icon: "Activity",
@@ -66,7 +66,7 @@ const AdminDashboardAnalyticsPage = () => {
       {
         id: "total-listeners",
         title: "Listeners",
-        value: `${data?.listeners?.value?.toLocaleString() ?? 0}`,
+        value: `${data?.listeners?.value?.toLocaleString?.() ?? data?.listeners?.value ?? 0}`,
         change: formatChangePercent(data?.listeners?.changePercent),
         isPositive: (data?.listeners?.changePercent ?? 0) >= 0,
         icon: "Users",
@@ -76,7 +76,7 @@ const AdminDashboardAnalyticsPage = () => {
       {
         id: "follower-growth",
         title: "Follower Growth",
-        value: `${data?.followerGrowth?.value?.toLocaleString() ?? 0}`,
+        value: `${data?.followerGrowth?.value?.toLocaleString?.() ?? data?.followerGrowth?.value ?? 0}`,
         change: formatChangePercent(data?.followerGrowth?.changePercent),
         isPositive: (data?.followerGrowth?.changePercent ?? 0) >= 0,
         icon: "UserPlus",
@@ -97,12 +97,25 @@ const AdminDashboardAnalyticsPage = () => {
   }, [data]);
 
   const growthOverviewData = useMemo(() => {
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
     return (data?.growthOverview || []).map((item) => {
-      const dateObj = item?.bucket ? new Date(item.bucket) : null;
-      const formattedDate =
-        dateObj && !isNaN(dateObj)
-          ? dateObj.toLocaleDateString("en-US", { month: "short", day: "numeric" })
-          : item?.bucket || "Date";
+      const bucket = item?.bucket || "";
+      let formattedDate = bucket;
+
+      if (bucket.includes("-")) {
+        const parts = bucket.split("-");
+        if (parts.length === 3) {
+          const dateObj = new Date(bucket);
+          if (!isNaN(dateObj)) {
+            formattedDate = dateObj.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+          }
+        } else if (parts.length === 2) {
+          const monthIdx = parseInt(parts[1], 10) - 1;
+          formattedDate = monthNames[monthIdx] || bucket;
+        }
+      }
+
       return {
         name: formattedDate,
         stream: item?.streams ?? 0,
@@ -117,6 +130,7 @@ const AdminDashboardAnalyticsPage = () => {
       const period = hr >= 12 ? "pm" : "am";
       const displayHr = hr % 12 === 0 ? 12 : hr % 12;
       return {
+        hour: hr,
         name: `${displayHr}${period}`,
         value: item?.count ?? 0,
       };

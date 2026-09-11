@@ -56,6 +56,7 @@ const ArtistDetailMedia = ({ artist }) => {
     try {
       await reviewMediaAssetsMutation.mutateAsync({
         id: verificationId,
+        body: { reviewed: true },
         reviewed: true,
       })
     } catch {

@@ -1,13 +1,15 @@
 "use client"
 
+import { useState } from "react"
 import { motion } from "framer-motion"
 import GenreFilterBar from "@/components/user/explore/GenreFilterBar"
 import GenreHeroBanner from "@/components/user/explore/GenreHeroBanner"
 import GenreCard from "@/components/user/explore/GenreCard"
 import ArtistsSection from "@/components/user/explore/ArtistsSection"
-import RecentSearchesPanel from "@/components/user/explore/RecentSearchesPanel"
-import LiveSessionsPanel from "@/components/user/explore/LiveSessionsPanel"
-import { useUserExploreStore } from "@/zustandStore/user/userStore/userExploreStore"
+// Preserved per Rule 35 & user instruction: components kept in codebase for when backend endpoints are ready
+// import RecentSearchesPanel from "@/components/user/explore/RecentSearchesPanel"
+// import LiveSessionsPanel from "@/components/user/explore/LiveSessionsPanel"
+import { useUserGenres } from "@/hooks/api/user/genre/useUserGenres"
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -57,7 +59,23 @@ const gridItemVariants = {
 }
 
 const UserExplorePage = () => {
-    const genres = useUserExploreStore((state) => state.genres)
+    const { data: genresData } = useUserGenres()
+    const [activeFilter, setActiveFilter] = useState("All")
+
+    const liveGenres =
+        genresData?.genre ??
+        genresData?.genres ??
+        genresData?.data ??
+        (Array.isArray(genresData) ? genresData : [])
+
+    const allGenres = Array.isArray(liveGenres) ? liveGenres : []
+
+    const displayedGenres = activeFilter === "All"
+        ? allGenres
+        : allGenres.filter(
+            (genre) =>
+                (genre?.name || genre?.title)?.toLowerCase() === activeFilter.toLowerCase()
+        )
 
     return (
         <motion.div
@@ -67,7 +85,11 @@ const UserExplorePage = () => {
             className="flex w-full flex-col gap-6 py-6"
         >
             <motion.div variants={itemVariants}>
-                <GenreFilterBar />
+                <GenreFilterBar
+                    genres={allGenres}
+                    activeFilter={activeFilter}
+                    onSelectFilter={setActiveFilter}
+                />
             </motion.div>
             
             <motion.div variants={itemVariants}>
@@ -85,18 +107,27 @@ const UserExplorePage = () => {
                             View All Clusters
                         </button>
                     </div>
-                    <motion.div 
-                        variants={gridContainerVariants}
-                        className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
-                    >
-                        {genres.map((genre) => (
-                            <motion.div key={genre.id} variants={gridItemVariants}>
-                                <GenreCard genre={genre} />
-                            </motion.div>
-                        ))}
-                    </motion.div>
+                    {displayedGenres.length > 0 ? (
+                        <motion.div 
+                            variants={gridContainerVariants}
+                            className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+                        >
+                            {displayedGenres.map((genre, index) => (
+                                <motion.div key={genre?._id || genre?.id || index} variants={gridItemVariants}>
+                                    <GenreCard genre={genre} index={index} />
+                                </motion.div>
+                            ))}
+                        </motion.div>
+                    ) : (
+                        <div className="flex w-full flex-col items-center justify-center rounded-[16px] border border-dashed border-white/10 py-12 text-center">
+                            <p className="text-base text-light-gray">No genres found</p>
+                        </div>
+                    )}
                 </motion.section>
 
+                {/* Preserving UI design blocks per Rule 35 & user instructions:
+                    RecentSearchesPanel and LiveSessionsPanel do not have backend endpoints yet.
+                    Kept intact and commented out.
                 <div className="flex w-full flex-col gap-6 lg:w-88 lg:shrink-0">
                     <motion.div variants={itemVariants}>
                         <RecentSearchesPanel />
@@ -105,6 +136,7 @@ const UserExplorePage = () => {
                         <LiveSessionsPanel />
                     </motion.div>
                 </div>
+                */}
             </div>
 
             <motion.div variants={itemVariants}>
@@ -115,3 +147,4 @@ const UserExplorePage = () => {
 }
 
 export default UserExplorePage
+

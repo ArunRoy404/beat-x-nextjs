@@ -1,22 +1,51 @@
 "use client";
 
 import React, { useRef, useEffect } from "react";
-import Image from "next/image";
 import { format } from "date-fns";
-import { Play, Pause, Music, RotateCcw, RotateCw, Volume2, Volume1, VolumeX } from "lucide-react";
+import { Music, SkipBack, SkipForward, Volume2, VolumeX } from "lucide-react";
 import CommonInfoBox from "@/components/shared/CommonInfoBox/CommonInfoBox";
+import CommonCoverImage from "@/components/shared/CommonCoverImage/CommonCoverImage";
+import GradientPlayButton from "@/components/shared/GradientPlayButton";
+import PlayerSlider from "@/components/shared/MediaPlayerControls/PlayerSlider";
 import { formatDurationMs } from "@/lib/format/formatDuration";
+import { SONG_STATUS_LABELS, normalizeSongStatus } from "@/lib/constants/songStatus";
 import { useVolumeStore } from "@/zustandStore/audio/useVolumeStore";
 import { useGlobalMediaPlayerStore } from "@/zustandStore/media/useGlobalMediaPlayerStore";
 
 import { getSongAudioUrl, getSongCoverUrl } from "@/lib/format/resolveMediaUrl";
 import { toast } from "sonner";
 
+/**
+ * `album`, `ownerId` and `reviewedBy` are Mongo refs: sometimes populated
+ * objects, sometimes bare ObjectIds. Either way they must be reduced to a
+ * string — rendering the object itself throws "Objects are not valid as a
+ * React child".
+ */
+const refToText = (ref, ...fields) => {
+  if (!ref) return "";
+  if (typeof ref === "string") return ref;
+  if (typeof ref === "object") {
+    for (const field of fields) {
+      if (ref?.[field]) return ref[field];
+    }
+    return ref?._id || "";
+  }
+  return "";
+};
+
+const formatDate = (value) => {
+  if (!value) return "";
+  const date = new Date(value);
+  return isNaN(date.getTime()) ? "" : format(date, "MMM d, yyyy");
+};
+
+// Mirrors the floating stream bar's mm:ss so the two players read identically.
 const formatTime = (seconds) => {
-  if (!seconds || isNaN(seconds)) return "0:00";
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  if (!Number.isFinite(seconds)) return "00:00";
+  const total = Math.max(0, Math.floor(seconds));
+  const mins = Math.floor(total / 60);
+  const secs = total % 60;
+  return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 };
 
 const SongDetailContent = ({ song }) => {
@@ -84,11 +113,6 @@ const SongDetailContent = ({ song }) => {
     setVolume(val);
   };
 
-  const renderVolumeIcon = () => {
-    if (isMuted || volume === 0) return <VolumeX className="w-4 h-4 text-red-error" />;
-    if (volume < 0.5) return <Volume1 className="w-4 h-4 text-light-gray" />;
-    return <Volume2 className="w-4 h-4 text-light-gray" />;
-  };
 
   return (
     /* Scrollable Body Content */
@@ -101,105 +125,109 @@ const SongDetailContent = ({ song }) => {
             Song
           </span>
 
-          <div className="border border-dashed border-secondary/30 bg-secondary/5 rounded-[16px] p-3 flex flex-col items-center justify-center text-center flex-1 relative overflow-hidden gap-2.5">
-            {/* Icon & Track Info */}
-            <div className="flex flex-col items-center gap-0.5">
-              <Music className={`w-5 h-5 text-secondary ${isPlaying ? "animate-pulse" : ""}`} />
-              <span className="text-[12px] sm:text-[13px] font-medium text-whitetext truncate max-w-[180px] sm:max-w-[220px]">
-                Audio file {song?.title ? `(${song.title})` : ""}
+          <div className="flex flex-1 flex-col justify-center gap-3 rounded-[16px] border border-border bg-(--player-bar-bg) p-3 backdrop-blur-md sm:p-4">
+            {/* Track identity — mirrors the floating bar's left block */}
+            <div className="flex min-w-0 items-center gap-2.5">
+              <div className="relative size-10 shrink-0 overflow-hidden rounded-full bg-dark-accent">
+                <CommonCoverImage
+                  src={coverUrl}
+                  alt={song?.title || "Track artwork"}
+                  fallback={
+                    <div className="flex size-full items-center justify-center bg-white/10">
+                      <Music className={`size-5 text-secondary ${isPlaying ? "animate-pulse" : ""}`} />
+                    </div>
+                  }
+                />
+              </div>
+              <div className="flex min-w-0 flex-col gap-0.5">
+                <span className="truncate text-sm font-semibold text-whitetext">
+                  {song?.title || "Audio Track"}
+                </span>
+                <span className="truncate text-[11px] text-light-gray">
+                  {song?.transcodeStatus === "ready" ? "HLS Master Stream" : "Audio Track"} &middot;{" "}
+                  {formatDurationMs(song?.durationMs)}
+                </span>
+              </div>
+            </div>
+
+            {/* Seek */}
+            <div className="flex w-full items-center gap-2">
+              <span className="w-9 shrink-0 font-mono text-[11px] text-light-gray">
+                {formatTime(currentTime)}
               </span>
-              <span className="text-[10px] sm:text-[11px] text-light-gray font-mono">
-                {song?.transcodeStatus === "ready" ? "HLS Master Stream" : "Audio Track"} ·{" "}
-                {formatDurationMs(song?.durationMs)}
+              <PlayerSlider
+                value={currentTime}
+                max={duration || 0}
+                step={0.1}
+                onChange={handleSeek}
+                disabled={!audioSrc || !isThisSongActive}
+                ariaLabel="Seek"
+              />
+              <span className="w-9 shrink-0 text-right font-mono text-[11px] text-light-gray">
+                {formatTime(duration)}
               </span>
             </div>
 
-            {/* Media Control Buttons & Volume */}
-            <div className="flex items-center justify-between w-full px-1 sm:px-2 gap-2">
-              {/* Media Controls (Rewind, Play/Pause, Forward) */}
-              <div className="flex items-center gap-3 sm:gap-4 mx-auto">
+            {/* Transport + volume */}
+            <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-6">
+              <div className="flex items-center gap-5">
                 <button
                   type="button"
                   onClick={handleRewind}
                   disabled={!audioSrc || !isThisSongActive}
-                  className="text-light-gray hover:text-secondary active:scale-90 transition-all disabled:opacity-30 cursor-pointer p-1"
+                  className="cursor-pointer text-whitetext transition-colors hover:text-secondary disabled:cursor-not-allowed disabled:opacity-30"
+                  aria-label="Rewind 10 seconds"
                   title="Rewind 10 seconds"
                 >
-                  <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <SkipBack className="size-5" fill="currentColor" />
                 </button>
 
-                <button
-                  type="button"
+                <GradientPlayButton
+                  size="sm"
+                  playing={isPlaying}
                   onClick={togglePlay}
                   disabled={!audioSrc}
-                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-secondary text-black flex items-center justify-center shrink-0 hover:scale-105 active:scale-95 transition-all disabled:opacity-40 cursor-pointer shadow-md shadow-secondary/20"
-                  title={isPlaying ? "Pause" : "Play globally"}
-                >
-                  {isPlaying ? (
-                    <Pause className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" />
-                  ) : (
-                    <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current ml-0.5" />
-                  )}
-                </button>
+                  className="disabled:cursor-not-allowed disabled:opacity-40"
+                />
 
                 <button
                   type="button"
                   onClick={handleForward}
                   disabled={!audioSrc || !isThisSongActive}
-                  className="text-light-gray hover:text-secondary active:scale-90 transition-all disabled:opacity-30 cursor-pointer p-1"
+                  className="cursor-pointer text-whitetext transition-colors hover:text-secondary disabled:cursor-not-allowed disabled:opacity-30"
+                  aria-label="Forward 10 seconds"
                   title="Forward 10 seconds"
                 >
-                  <RotateCw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <SkipForward className="size-5" fill="currentColor" />
                 </button>
               </div>
 
-              {/* Volume Option (Bound to Zustand Store) */}
-              <div className="flex items-center gap-1.5 group relative shrink-0">
+              <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={toggleMute}
                   disabled={!audioSrc}
-                  className="p-1 hover:bg-white/10 rounded-full transition-all disabled:opacity-30 cursor-pointer"
-                  title={isMuted ? "Unmute" : "Mute"}
+                  aria-label={isMuted ? "Unmute" : "Mute"}
+                  className="cursor-pointer transition-colors hover:text-whitetext disabled:cursor-not-allowed disabled:opacity-30"
                 >
-                  {renderVolumeIcon()}
+                  {isMuted || volume === 0 ? (
+                    <VolumeX className="size-4 text-light-gray" />
+                  ) : (
+                    <Volume2 className="size-4 text-light-gray" />
+                  )}
                 </button>
-                <input
-                  type="range"
-                  min={0}
-                  max={1}
-                  step={0.05}
-                  value={isMuted ? 0 : volume}
-                  onChange={handleVolumeChange}
-                  disabled={!audioSrc}
-                  className="w-12 sm:w-16 h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-secondary focus:outline-none"
-                  title={`Volume: ${Math.round((isMuted ? 0 : volume) * 100)}%`}
-                />
+                <div className="w-24 sm:w-20">
+                  <PlayerSlider
+                    variant="volume"
+                    value={isMuted ? 0 : volume}
+                    max={1}
+                    step={0.01}
+                    onChange={handleVolumeChange}
+                    disabled={!audioSrc}
+                    ariaLabel="Volume"
+                  />
+                </div>
               </div>
-            </div>
-
-            {/* Audio Progress Bar & Time */}
-            <div className="w-full flex items-center gap-2 px-1 sm:px-2 mt-0.5">
-              <span className="text-[10px] text-light-gray font-mono min-w-[28px] text-right">
-                {formatTime(currentTime)}
-              </span>
-
-              <div className="relative flex-1 flex items-center">
-                <input
-                  type="range"
-                  min={0}
-                  max={duration || 100}
-                  step={0.1}
-                  value={currentTime}
-                  onChange={handleSeek}
-                  disabled={!audioSrc || !isThisSongActive}
-                  className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-secondary focus:outline-none"
-                />
-              </div>
-
-              <span className="text-[10px] text-light-gray font-mono min-w-[28px] text-left">
-                {formatTime(duration)}
-              </span>
             </div>
           </div>
         </div>
@@ -210,19 +238,16 @@ const SongDetailContent = ({ song }) => {
             Thumbnail
           </span>
           <div className="relative w-full h-[130px] sm:h-[135px] rounded-[16px] overflow-hidden border border-white/10 bg-black/40">
-            {song?.coverUrl ? (
-              <Image
-                src={song.coverUrl}
-                alt={song?.title || "Cover Thumbnail"}
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover rounded-[16px]"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-dark-gray text-xs">
-                No Cover Image
-              </div>
-            )}
+            <CommonCoverImage
+              src={coverUrl}
+              alt={song?.title || "Cover Thumbnail"}
+              className="rounded-[16px]"
+              fallback={
+                <div className="w-full h-full flex items-center justify-center text-dark-gray text-xs">
+                  No Cover Image
+                </div>
+              }
+            />
           </div>
         </div>
       </div>
@@ -230,27 +255,35 @@ const SongDetailContent = ({ song }) => {
       {/* Details Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <CommonInfoBox label="Artist" value={song?.artist} />
-        <CommonInfoBox label="Album" value={song?.album?.name || song?.album} />
+        <CommonInfoBox label="Album" value={refToText(song?.album, "title", "name")} />
         <CommonInfoBox label="Genre" value={song?.genre?.name} />
         <CommonInfoBox label="Duration" value={formatDurationMs(song?.durationMs)} />
-        <CommonInfoBox
-          label="Release Date"
-          value={song?.publishedAt ? format(new Date(song.publishedAt), "MMM d, yyyy") : "-"}
-        />
+        <CommonInfoBox label="Release Date" value={formatDate(song?.publishedAt)} />
+        <CommonInfoBox label="Scheduled For" value={formatDate(song?.scheduledAt)} />
         <CommonInfoBox label="Total Streams" value={song?.playCount ?? 0} />
         <CommonInfoBox label="Weekly Streams" value={song?.playCountWeek ?? 0} />
         <CommonInfoBox label="Likes" value={song?.likeCount ?? 0} />
         <CommonInfoBox label="Explicit" value={song?.explicit ? "Yes" : "No"} />
         <CommonInfoBox
           label="Trending"
-          value={song?.isTrending ? `Yes (${song?.trendDirection || "stable"})` : "No"}
+          value={song?.isTrending ? (song?.trendDirection ? `Yes (${song.trendDirection})` : "Yes") : "No"}
         />
         <CommonInfoBox label="Featured" value={song?.isFeatured ? "Yes" : "No"} />
-        <CommonInfoBox label="Owner ID" value={song?.ownerId || "-"} />
+        <CommonInfoBox label="Owner" value={refToText(song?.ownerId, "name", "email")} />
+      </div>
+
+      {/* Moderation / review trail — populated once a song goes through the
+          artist submission queue (approve/reject). */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <CommonInfoBox
-          label="Reviewed At"
-          value={song?.reviewedAt ? format(new Date(song.reviewedAt), "MMM d, yyyy") : "-"}
+          label="Submitted Status"
+          value={SONG_STATUS_LABELS[normalizeSongStatus(song?.submittedStatus)] || ""}
         />
+        <CommonInfoBox label="Submitted At" value={formatDate(song?.submittedAt)} />
+        <CommonInfoBox label="Reviewed By" value={refToText(song?.reviewedBy, "name", "email")} />
+        <CommonInfoBox label="Reviewed At" value={formatDate(song?.reviewedAt)} />
+        <CommonInfoBox label="Rejection Reason" value={song?.rejectionReason} />
+        <CommonInfoBox label="Transcode Status" value={song?.transcodeStatus} />
       </div>
     </div>
   );

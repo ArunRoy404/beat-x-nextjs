@@ -1,3 +1,5 @@
+"use client"
+
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { deleteReviewRequest } from "@/services/admin/podcastReviewsServices"
@@ -17,4 +19,3 @@ export function useDeleteReview() {
     },
   })
 }
-

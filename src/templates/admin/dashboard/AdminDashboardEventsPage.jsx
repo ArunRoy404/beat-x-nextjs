@@ -13,7 +13,7 @@ const AdminDashboardEventsPage = () => {
     {
       id: 1,
       title: "Total Events",
-      value: String(statsData?.totalEvents ?? 0),
+      value: String(Number(statsData?.totalEvents ?? 0).toLocaleString()),
       icon: "Calendar",
       iconColor: "#3ADFFA",
       iconBg: "rgba(58, 223, 250, 0.15)",
@@ -21,7 +21,7 @@ const AdminDashboardEventsPage = () => {
     {
       id: 2,
       title: "Ticket Revenue",
-      value: `৳${statsData?.ticketRevenue ?? 0}`,
+      value: `৳${Number(statsData?.ticketRevenue ?? 0).toLocaleString()}`,
       icon: "Wallet",
       iconColor: "#34C759",
       iconBg: "rgba(52, 199, 89, 0.15)",
@@ -29,7 +29,7 @@ const AdminDashboardEventsPage = () => {
     {
       id: 3,
       title: "Ticket Sold",
-      value: String(statsData?.ticketsSold ?? 0),
+      value: String(Number(statsData?.ticketsSold ?? 0).toLocaleString()),
       icon: "Ticket",
       iconColor: "#CC97FF",
       iconBg: "rgba(204, 151, 255, 0.15)",
@@ -37,7 +37,7 @@ const AdminDashboardEventsPage = () => {
     {
       id: 4,
       title: "Completed",
-      value: String(statsData?.completedCount ?? 0),
+      value: String(Number(statsData?.completedCount ?? 0).toLocaleString()),
       icon: "CheckCircle",
       iconColor: "#FFAE00",
       iconBg: "rgba(254, 174, 0, 0.15)",

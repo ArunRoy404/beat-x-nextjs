@@ -1,15 +1,30 @@
 import React from "react"
-import Image from "next/image"
+import CommonCoverImage from "@/components/shared/CommonCoverImage/CommonCoverImage"
 import { formatDurationMs } from "@/lib/format/formatDuration"
+import { SONG_STATUS, SONG_STATUS_LABELS, normalizeSongStatus } from "@/lib/constants/songStatus"
+import { getSongCoverUrl } from "@/lib/format/resolveMediaUrl"
 
 const STATUS_COLORS = {
-    active: "bg-green-success/15 text-green-success border-green-success/20",
-    draft: "bg-white/[0.05] text-light-gray border-white/10",
-    archived: "bg-yellow-warning/15 text-yellow-warning border-yellow-warning/20",
+    [SONG_STATUS.ACTIVE]: "bg-green-success/15 text-green-success border-green-success/20",
+    [SONG_STATUS.DRAFT]: "bg-white/[0.05] text-light-gray border-white/10",
+    [SONG_STATUS.SCHEDULED]: "bg-primary/15 text-primary border-primary/20",
+    [SONG_STATUS.ARCHIVED]: "bg-yellow-warning/15 text-yellow-warning border-yellow-warning/20",
+    [SONG_STATUS.PENDING]: "bg-yellow-warning/15 text-yellow-warning border-yellow-warning/20",
+    [SONG_STATUS.REJECTED]: "bg-red-error/15 text-red-error border-red-error/20",
 }
 
 const SongDetailHeader = ({ song }) => {
-    const statusClass = STATUS_COLORS[song?.status] || STATUS_COLORS.draft
+    const status = normalizeSongStatus(song?.status)
+    const statusClass = STATUS_COLORS[status] || STATUS_COLORS[SONG_STATUS.DRAFT]
+
+    // `album` comes back as a populated ref (Album.title) or a bare ObjectId,
+    // which must never be rendered straight into JSX.
+    const albumName =
+        typeof song?.album === "object" && song?.album !== null
+            ? song?.album?.title || song?.album?.name || ""
+            : typeof song?.album === "string"
+                ? song.album
+                : ""
 
     return (
         <div
@@ -19,15 +34,10 @@ const SongDetailHeader = ({ song }) => {
             <div className="flex items-start gap-3 sm:gap-4 w-full">
                 {/* Cover Art */}
                 <div className="relative w-[60px] h-[60px] sm:w-[80px] sm:h-[80px] rounded-[12px] sm:rounded-[16px] bg-white/5 border border-white/10 overflow-hidden shrink-0">
-                    {song?.coverUrl && (
-                        <Image
-                            src={song.coverUrl}
-                            alt={song?.title || "Song Cover"}
-                            fill
-                            sizes="(max-width: 640px) 60px, 80px"
-                            className="object-cover"
-                        />
-                    )}
+                    <CommonCoverImage
+                        src={getSongCoverUrl(song)}
+                        alt={song?.title || "Song Cover"}
+                    />
                 </div>
 
                 {/* Metadata */}
@@ -40,16 +50,16 @@ const SongDetailHeader = ({ song }) => {
                             </h2>
                             <span className={`inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-medium px-2 sm:px-2.5 py-0.5 rounded-full border capitalize ${statusClass}`}>
                                 <span className="w-1.5 h-1.5 rounded-full bg-current shrink-0" />
-                                {song?.status || "-"}
+                                {SONG_STATUS_LABELS[status] || song?.status || "-"}
                             </span>
-                            <span className="inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-medium px-2 sm:px-2.5 py-0.5 rounded-full border bg-[#CC97FF]/15 text-[#CC97FF] border-[#CC97FF]/20 select-none">
+                            <span className="inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-medium px-2 sm:px-2.5 py-0.5 rounded-full border bg-primary/15 text-primary border-primary/20 select-none">
                                 {song?.genre?.name || "-"}
                             </span>
                         </div>
 
                         {/* Subtitle / Artist */}
                         <p className="text-[12px] sm:text-[14px] font-normal not-italic text-light-gray leading-none truncate">
-                            {song?.artist || "-"} {song?.album?.name || song?.album ? `· ${song.album?.name || song.album}` : ""}
+                            {song?.artist || "-"}{albumName ? ` · ${albumName}` : ""}
                         </p>
                     </div>
 

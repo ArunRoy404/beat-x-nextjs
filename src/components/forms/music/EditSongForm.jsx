@@ -7,13 +7,25 @@ import { Button } from "@/components/ui/button"
 import { DialogClose } from "@/components/ui/dialog"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
 import { useUpdateSong } from "@/hooks/api/admin/songs/useUpdateSong"
+import { SONG_STATUS, normalizeSongStatus } from "@/lib/constants/songStatus"
 import { songSchema } from "./adminSongSchema"
+import { buildSongFormData } from "./buildSongFormData"
 import AdminSongFormFields from "./AdminSongFormFields"
 
 const getDefaultVisibility = (song) => {
-    if (song?.status === "active") return "publish"
-    if (song?.status === "draft" && song?.scheduledAt) return "schedule"
+    const status = normalizeSongStatus(song?.status)
+    if (status === SONG_STATUS.ACTIVE) return "publish"
+    if (status === SONG_STATUS.SCHEDULED) return "schedule"
+    // A published song keeps the `scheduledAt` it was released with, so only
+    // a still-unreleased draft counts as scheduled.
+    if (status === SONG_STATUS.DRAFT && song?.scheduledAt) return "schedule"
     return "draft"
+}
+
+const getIdValue = (value) => {
+    if (!value) return ""
+    if (typeof value === "string") return value
+    return value?._id || value?.id || ""
 }
 
 const EditSongForm = ({ song, onSuccess, onCancel }) => {
@@ -33,30 +45,27 @@ const EditSongForm = ({ song, onSuccess, onCancel }) => {
         defaultValues: {
             title: song?.title || "",
             artist: song?.artist || "",
-            genre: song?.genre?._id || (typeof song?.genre === "string" ? song.genre : ""),
+            genre: getIdValue(song?.genre),
+            album: getIdValue(song?.album) || "none",
             explicit: song?.explicit || false,
+            isFeatured: song?.isFeatured || false,
+            isTrending: song?.isTrending || false,
             visibility: getDefaultVisibility(song),
             scheduledAt: song?.scheduledAt ? new Date(song.scheduledAt) : undefined,
         },
     })
 
     const onSubmit = (data) => {
-        const formData = new FormData()
-        formData.append("title", data.title)
-        formData.append("artist", data.artist)
-        formData.append("genre", data.genre)
-        formData.append("explicit", String(data.explicit))
-
         // Editing content shouldn't silently un-archive a taken-down song —
         // that's what the dedicated Restore action is for.
-        const status = song?.status === "archived" ? "archived" : (data.visibility === "publish" ? "active" : "draft")
-        formData.append("status", status)
-        if (data.visibility === "schedule" && data.scheduledAt) {
-            formData.append("scheduledAt", data.scheduledAt.toISOString())
-        }
+        const isArchived = normalizeSongStatus(song?.status) === SONG_STATUS.ARCHIVED
 
-        if (audio instanceof File) formData.append("audio", audio)
-        if (cover instanceof File) formData.append("cover", cover)
+        const formData = buildSongFormData({
+            ...data,
+            ...(isArchived && { status: SONG_STATUS.ARCHIVED }),
+            audio,
+            cover,
+        })
 
         updateSong(
             { id: song?._id, formData },
@@ -79,6 +88,7 @@ const EditSongForm = ({ song, onSuccess, onCancel }) => {
                 onAudioChange={setAudio}
                 cover={cover}
                 onCoverChange={setCover}
+                showAdminFlags
             />
 
             {/* Footer Actions */}

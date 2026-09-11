@@ -18,7 +18,6 @@ import CommonSelectCards from "@/components/shared/CommonInputs/CommonInput/Comm
 import { Switch } from "@/components/ui/switch"
 import { useVideoDetail } from "@/hooks/api/admin/videos/useVideoDetail"
 import { useUpdateVideo } from "@/hooks/api/admin/videos/useUpdateVideo"
-import { useUpdateVideoCover } from "@/hooks/api/admin/videos/useUpdateVideoCover"
 import { useGenres } from "@/hooks/api/admin/genre/useGenres"
 
 const VISIBILITY_OPTIONS = [
@@ -34,9 +33,7 @@ const EditVideoDialog = ({ video: summary, children }) => {
 
   const imageInputRef = useRef(null)
 
-  const { mutateAsync: updateVideo, isPending: isUpdatingData } = useUpdateVideo()
-  const { mutateAsync: updateCover, isPending: isUpdatingCover } = useUpdateVideoCover()
-  const isPending = isUpdatingData || isUpdatingCover
+  const { mutateAsync: updateVideo, isPending } = useUpdateVideo()
 
   const genresQuery = useGenres()
   const genresData = genresQuery?.data
@@ -90,10 +87,6 @@ const EditVideoDialog = ({ video: summary, children }) => {
       }
 
       await updateVideo({ id: video?._id, body })
-
-      if (newCoverFile) {
-        await updateCover({ id: video?._id, file: newCoverFile })
-      }
 
       setOpen(false)
     } catch {

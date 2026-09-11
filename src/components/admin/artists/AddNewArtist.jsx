@@ -2,7 +2,9 @@
 
 import React from "react"
 import { UserPlus } from "lucide-react"
-import AddArtistDialog from "@/components/dialogs/admin/artists/AddArtistDialog"
+import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
+// import AddArtistDialog from "@/components/dialogs/admin/artists/AddArtistDialog"
 
 const AddNewArtist = () => {
   return (
@@ -24,8 +26,14 @@ const AddNewArtist = () => {
         </div>
       </div>
 
-      {/* Upload Dialog */}
-      <AddArtistDialog />
+      {/* Upload Dialog — preserved for future backend integration */}
+      {/* <AddArtistDialog /> */}
+      <Button
+        variant="gradient"
+        onClick={() => toast.info("Artist registration is managed through applicant verification submissions.")}
+      >
+        <UserPlus className="w-4 h-4 shrink-0 mr-1.5" /> Add Artist
+      </Button>
     </div>
   )
 }

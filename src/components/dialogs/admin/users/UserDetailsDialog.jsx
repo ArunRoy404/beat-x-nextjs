@@ -13,6 +13,7 @@ import { Mail, Calendar, Coins, Music, Mic2, Video, Pencil, Trash2 } from "lucid
 import { format } from "date-fns"
 import CommonAvatar from "@/components/shared/CommonAvatar"
 import CommonCard from "@/components/shared/CommonCard/CommonCard"
+import { toast } from "sonner"
 
 const UserDetailsDialog = ({ user, children }) => {
     const [open, setOpen] = useState(false)
@@ -56,39 +57,39 @@ const UserDetailsDialog = ({ user, children }) => {
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/5">
                         {/* Left details info */}
                         <div className="flex items-center gap-4">
-                            {user.avatar ? (
+                            {user?.avatar ? (
                                 <CommonAvatar
-                                    src={user.avatar}
-                                    alt={user.name}
+                                    src={user?.avatar}
+                                    alt={user?.name || "User"}
                                     className="w-12 h-12 rounded-full border border-white/10"
                                 />
                             ) : (
                                 <div className="w-12 h-12 rounded-full bg-[#3E1F1F] text-[#FF453A] border border-[#FF453A]/25 flex items-center justify-center font-bold text-base shrink-0">
-                                    {getInitials(user.name)}
+                                    {getInitials(user?.name)}
                                 </div>
                             )}
 
                             <div className="flex flex-col gap-1.5">
                                 <div className="flex items-center flex-wrap gap-2.5">
                                     <span className="text-whitetext text-[18px] font-bold tracking-tight">
-                                        {user.name?.toUpperCase()}
+                                        {(user?.name || "-").toUpperCase()}
                                     </span>
                                     <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium border text-light-gray border-white/10 bg-white/5">
                                         {providerLabel}
                                     </span>
                                     <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${verifiedClass}`}>
-                                        {user.isVerified ? "Verified" : "Unverified"}
+                                        {user?.isVerified ? "Verified" : "Unverified"}
                                     </span>
                                 </div>
 
                                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-light-gray/40 text-[12px] font-medium">
                                     <span className="flex items-center gap-1">
                                         <Mail className="w-3.5 h-3.5 shrink-0" />
-                                        {user.email}
+                                        {user?.email || "-"}
                                     </span>
                                     <span className="flex items-center gap-1">
                                         <Calendar className="w-3.5 h-3.5 shrink-0" />
-                                        Joined : {user.createdAt ? format(new Date(user.createdAt), "MMM d, yyyy") : "-"}
+                                        Joined : {user?.createdAt ? format(new Date(user.createdAt), "MMM d, yyyy") : "-"}
                                     </span>
                                 </div>
                             </div>
@@ -99,6 +100,7 @@ const UserDetailsDialog = ({ user, children }) => {
                             <Button
                                 variant="outline"
                                 size="sm"
+                                onClick={() => toast.info("This action will be enabled once backend user management endpoints are released.")}
                                 className="rounded-lg h-9 border-white/10 bg-white/5 text-whitetext hover:bg-white/10 gap-1.5 px-3 font-semibold text-xs cursor-pointer"
                             >
                                 <Pencil className="w-3.5 h-3.5" /> Edit
@@ -106,6 +108,7 @@ const UserDetailsDialog = ({ user, children }) => {
                             <Button
                                 variant="outline"
                                 size="sm"
+                                onClick={() => toast.info("This action will be enabled once backend user management endpoints are released.")}
                                 className="rounded-lg h-9 border-red-error/20 bg-[#FF453A]/10 text-[#FF453A] hover:bg-[#FF453A]/20 gap-1.5 px-3 font-semibold text-xs cursor-pointer border-0"
                             >
                                 Suspend User
@@ -113,6 +116,7 @@ const UserDetailsDialog = ({ user, children }) => {
                             <Button
                                 variant="outline"
                                 size="sm"
+                                onClick={() => toast.info("This action will be enabled once backend user management endpoints are released.")}
                                 className="rounded-lg h-9 border-red-error/20 bg-[#FF453A]/10 text-[#FF453A] hover:bg-[#FF453A]/20 gap-1.5 px-3 font-semibold text-xs cursor-pointer border-0"
                             >
                                 <Trash2 className="w-3.5 h-3.5" /> Delete
@@ -128,7 +132,7 @@ const UserDetailsDialog = ({ user, children }) => {
                                 <Coins className="w-5 h-5" />
                             </div>
                             <span className="relative z-10 text-whitetext font-bold text-[24px] leading-tight">
-                                {(user.coinBalance || 0).toLocaleString()}
+                                {(user?.coinBalance || 0).toLocaleString()}
                             </span>
                             <span className="relative z-10 text-light-gray/40 text-[12px] font-medium uppercase tracking-wider">
                                 Coin Balance
@@ -141,7 +145,7 @@ const UserDetailsDialog = ({ user, children }) => {
                                 <Music className="w-5 h-5" />
                             </div>
                             <span className="relative z-10 text-whitetext font-bold text-[24px] leading-tight">
-                                {(user.favoriteSongs || []).length}
+                                {(user?.favoriteSongs || []).length}
                             </span>
                             <span className="relative z-10 text-light-gray/40 text-[12px] font-medium uppercase tracking-wider">
                                 Favorite Songs
@@ -154,7 +158,7 @@ const UserDetailsDialog = ({ user, children }) => {
                                 <Mic2 className="w-5 h-5" />
                             </div>
                             <span className="relative z-10 text-whitetext font-bold text-[24px] leading-tight">
-                                {(user.favoriteArtists || []).length}
+                                {(user?.favoriteArtists || []).length}
                             </span>
                             <span className="relative z-10 text-light-gray/40 text-[12px] font-medium uppercase tracking-wider">
                                 Favorite Artists
@@ -167,7 +171,7 @@ const UserDetailsDialog = ({ user, children }) => {
                                 <Video className="w-5 h-5" />
                             </div>
                             <span className="relative z-10 text-whitetext font-bold text-[24px] leading-tight">
-                                {(user.likedVideos || []).length}
+                                {(user?.likedVideos || []).length}
                             </span>
                             <span className="relative z-10 text-light-gray/40 text-[12px] font-medium uppercase tracking-wider">
                                 Liked Videos

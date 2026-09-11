@@ -13,6 +13,12 @@ export async function getMyProfileRequest() {
   return res?.data?.data;
 }
 
+export async function getMyFavoritesRequest() {
+  const res = await axiosPrivate.get("/users/me/favorites");
+  return res?.data?.data ?? res?.data;
+}
+
+
 /**
  * PATCH /users/profile takes multipart form-data (name, phone, avatar file),
  * so callers build a FormData — axiosPrivate strips its JSON content-type

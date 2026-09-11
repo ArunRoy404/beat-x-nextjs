@@ -6,7 +6,7 @@ import { queryKeys } from "@/lib/reactQuery/queryKeys"
 
 export function useEventAnalytics(eventId) {
   return useQuery({
-    queryKey: queryKeys.events.detail(eventId),
+    queryKey: queryKeys.events.analytics(eventId),
     queryFn: () => getEventAnalyticsRequest(eventId),
     enabled: Boolean(eventId),
   })

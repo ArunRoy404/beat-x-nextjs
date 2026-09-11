@@ -27,7 +27,7 @@ const DashboardStatCard = ({ card }) => {
           )}
           {card?.badge && (
             <span className="text-[10px] font-medium text-green-success bg-green-success/15 border border-green-success/20 px-1.5 py-0.5 rounded-[4px] shrink-0">
-              {card.badge}
+              {card?.badge}
             </span>
           )}
         </div>
@@ -93,7 +93,7 @@ const DashboardStatCard = ({ card }) => {
             ) : (
               <LucideIcons.TrendingDown className="w-3.5 h-3.5" />
             )}
-            <span>{card.change}</span>
+            <span>{card?.change}</span>
           </div>
         </div>
       )}

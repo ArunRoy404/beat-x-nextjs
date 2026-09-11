@@ -6,11 +6,15 @@ const RecentUploadCard = ({ item, index }) => {
 
     const statusStyles = {
         Published: "text-green-success bg-green-success/10",
+        published: "text-green-success bg-green-success/10",
+        active: "text-green-success bg-green-success/10",
         Draft: "text-light-gray bg-white/10",
-        Scheduled: "text-yellow-warning bg-yellow-warning/10"
+        draft: "text-light-gray bg-white/10",
+        Scheduled: "text-yellow-warning bg-yellow-warning/10",
+        scheduled: "text-yellow-warning bg-yellow-warning/10",
     }
 
-    const statusClass = statusStyles[item?.status] || statusStyles.Draft
+    const statusClass = statusStyles[item?.status] || statusStyles[item?.status?.toLowerCase?.()] || statusStyles.Draft
 
     return (
         <div className="flex items-center justify-between px-4 py-3 rounded-[16px] bg-[#20201F99] gap-4">

@@ -58,3 +58,8 @@ export async function deleteChapterRequest({ audiobookId, chapterId }) {
   const res = await axiosPrivate.delete(`/admin/audiobooks/${audiobookId}/chapters/${chapterId}`);
   return res.data.data;
 }
+
+export async function getChapterUploadUrlRequest({ fileName, contentType }) {
+  const res = await axiosPrivate.post("/admin/audiobooks/upload-url", { fileName, contentType });
+  return res?.data?.data;
+}

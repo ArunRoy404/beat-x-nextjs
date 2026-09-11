@@ -1,8 +1,36 @@
-import React from "react"
+import React, { useMemo } from "react"
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
 import CommonCard from "@/components/shared/CommonCard/CommonCard"
 
 const PeakListeningHours = ({ data }) => {
+  const mostlyActiveText = useMemo(() => {
+    if (!Array.isArray(data) || data.length === 0) return "-";
+    const hasValues = data.some((d) => (d?.value ?? 0) > 0);
+    if (!hasValues) return "-";
+
+    const windowSize = Math.min(4, data.length);
+    let bestSum = -1;
+    let bestStart = 0;
+    let bestEnd = 0;
+
+    for (let i = 0; i <= data.length - windowSize; i++) {
+      let sum = 0;
+      for (let j = 0; j < windowSize; j++) {
+        sum += data[i + j]?.value ?? 0;
+      }
+      if (sum > bestSum) {
+        bestSum = sum;
+        bestStart = i;
+        bestEnd = i + windowSize - 1;
+      }
+    }
+
+    if (bestSum <= 0) return "-";
+    const startLabel = data[bestStart]?.name || "";
+    const endLabel = data[bestEnd]?.name || "";
+    return startLabel && endLabel ? `${startLabel} to ${endLabel}` : startLabel || endLabel || "-";
+  }, [data]);
+
   return (
     <CommonCard 
       title="Peak Listening Hours"
@@ -35,9 +63,9 @@ const PeakListeningHours = ({ data }) => {
                 if (active && payload && payload.length) {
                   return (
                     <div className="bg-[#0E0E0E] border border-border p-2.5 rounded-[8px] shadow-lg flex flex-col gap-1 text-xs">
-                      <p className="text-light-gray font-medium">{payload[0].payload.name}</p>
+                      <p className="text-light-gray font-medium">{payload?.[0]?.payload?.name}</p>
                       <p className="font-semibold text-secondary">
-                        Listeners: {payload[0].value}
+                        Listeners: {payload?.[0]?.value?.toLocaleString?.() ?? payload?.[0]?.value ?? 0}
                       </p>
                     </div>
                   )
@@ -52,7 +80,7 @@ const PeakListeningHours = ({ data }) => {
 
       {/* Subtext info */}
       <div className="text-center z-10 relative text-xs text-light-gray select-none">
-        Mostly Active : <span className="text-secondary font-semibold">12pm to 9pm</span>
+        Mostly Active : <span className="text-secondary font-semibold">{mostlyActiveText}</span>
       </div>
     </CommonCard>
   )

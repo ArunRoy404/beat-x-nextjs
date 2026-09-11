@@ -1,17 +1,32 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
-import { Play, ChevronLeft, ChevronRight } from "lucide-react"
+import { Play, Pause, ChevronLeft, ChevronRight } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
-import { useUserExploreStore } from "@/zustandStore/user/userStore/userExploreStore"
+import { useFeaturedSongs } from "@/hooks/api/user/songs/useFeaturedSongs"
+import { usePlaySong } from "@/hooks/api/user/songs/usePlaySong"
 
 const GenreHeroBanner = () => {
-    const exploreHero = useUserExploreStore((state) => state.exploreHero)
+    const { data: featuredData } = useFeaturedSongs()
+    const { playSong, currentSongId, isPlaying, isPending } = usePlaySong()
+    
     const [currentIndex, setCurrentIndex] = useState(0)
     const isHovered = useRef(false)
 
-    const slides = Array.isArray(exploreHero) ? exploreHero : (exploreHero ? [exploreHero] : [])
-    const currentSlide = slides[currentIndex] || {}
+    const featuredList = Array.isArray(featuredData)
+        ? featuredData
+        : (featuredData?.data || [])
+
+    const slides = featuredList
+    const rawSlide = slides[currentIndex] || {}
+    const currentSlide = rawSlide?.song || rawSlide || {}
+    const isCurrentPlaying = currentSongId === (currentSlide?._id || currentSlide?.id) && isPlaying
+
+    const artworkSrc = currentSlide?.coverUrl || currentSlide?.artwork || "/user-explore/images/hero-tor-lagiya.jpg"
+    const badgeText = currentSlide?.genre?.name || currentSlide?.badge || (currentSlide?.isFeatured ? "FEATURED TRACK" : "SPOTLIGHT")
+    const titleLine1 = currentSlide?.titleLine1 || currentSlide?.title || "EXPLORE"
+    const titleLine2 = currentSlide?.titleLine2 || (currentSlide?.artist ? `BY ${currentSlide.artist.toUpperCase()}` : "")
+    const descriptionText = currentSlide?.description || (currentSlide?.album ? `From the album "${currentSlide.album}". Discover top trending tracks and exclusive releases.` : "Dive into curated sounds, emerging artists, and viral hits on Beat-X.")
 
     const handleNext = useCallback(() => {
         if (slides.length <= 1) return
@@ -52,7 +67,7 @@ const GenreHeroBanner = () => {
                 <motion.img
                     key={currentIndex}
                     alt=""
-                    src={currentSlide.artwork}
+                    src={artworkSrc}
                     initial={{ opacity: 0, scale: 1.02 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0 }}
@@ -75,15 +90,15 @@ const GenreHeroBanner = () => {
                         transition={{ duration: 0.45, ease: "easeOut" }}
                         className="flex flex-col gap-4"
                     >
-                        <span className="w-fit rounded-full bg-trending-badge-bg/10 px-3 py-1 text-xs text-trending-badge-bg">
-                            {currentSlide.badge}
+                        <span className="w-fit rounded-full bg-trending-badge-bg/10 px-3 py-1 text-xs text-trending-badge-bg uppercase font-medium tracking-wide">
+                            {badgeText}
                         </span>
                         <h1 className="text-5xl leading-none font-semibold text-whitetext sm:text-6xl lg:text-[72px]">
-                            <span className="block">{currentSlide.titleLine1}</span>
-                            <span className="block text-primary">{currentSlide.titleLine2}</span>
+                            <span className="block">{titleLine1}</span>
+                            {titleLine2 && <span className="block text-primary">{titleLine2}</span>}
                         </h1>
                         <p className="text-lg text-light-gray leading-relaxed">
-                            {currentSlide.description}
+                            {descriptionText}
                         </p>
                     </motion.div>
                 </AnimatePresence>
@@ -91,10 +106,20 @@ const GenreHeroBanner = () => {
                 {/* Constant Action Button (remains static for seamless clicks) */}
                 <button
                     type="button"
-                    className="flex w-fit cursor-pointer items-center gap-2 rounded-[32px] bg-secondary px-8 py-4 text-base font-semibold text-button-text transition-transform active:scale-95 shadow-md"
+                    disabled={isPending}
+                    onClick={() => {
+                        if (currentSlide?._id || currentSlide?.id) {
+                            playSong(currentSlide)
+                        }
+                    }}
+                    className="flex w-fit cursor-pointer items-center gap-2 rounded-[32px] bg-secondary px-8 py-4 text-base font-semibold text-button-text transition-transform active:scale-95 shadow-md disabled:opacity-75"
                 >
-                    <Play className="size-5" fill="currentColor" />
-                    LISTEN NOW
+                    {isCurrentPlaying ? (
+                        <Pause className="size-5" fill="currentColor" />
+                    ) : (
+                        <Play className="size-5" fill="currentColor" />
+                    )}
+                    {isCurrentPlaying ? "PAUSE" : "LISTEN NOW"}
                 </button>
             </div>
 
@@ -139,3 +164,4 @@ const GenreHeroBanner = () => {
 }
 
 export default GenreHeroBanner
+
