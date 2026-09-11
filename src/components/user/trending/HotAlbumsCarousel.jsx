@@ -6,6 +6,8 @@ import { useUserTrendingStore } from "@/zustandStore/user/userStore/userTrending
 import { Carousel, CarouselContent, CarouselItem, useCarousel } from "@/components/ui/carousel"
 import RankedChartCard from "./RankedChartCard"
 
+import { useFeaturedAlbums } from "@/hooks/api/user/albums/useFeaturedAlbums"
+
 const NavButton = ({ direction, onClick, disabled }) => (
     <button
         type="button"
@@ -32,7 +34,24 @@ const HotAlbumsCarouselNav = () => {
 }
 
 const HotAlbumsCarousel = () => {
-    const hotAlbums = useUserTrendingStore((state) => state.hotAlbums)
+    const { data: albumsData } = useFeaturedAlbums()
+    const dummyAlbums = useUserTrendingStore((state) => state.hotAlbums)
+
+    const liveAlbums =
+        albumsData?.albums ??
+        albumsData?.data ??
+        (Array.isArray(albumsData) ? albumsData : [])
+
+    const albums = liveAlbums.length > 0
+        ? liveAlbums.map((album, index) => ({
+            id: album?._id || album?.id || index,
+            rank: `#${index + 1}`,
+            title: album?.title || "Album",
+            subtitle: album?.artist?.name || album?.artist || (album?.year ? `${album.year}` : ""),
+            art: album?.coverUrl || album?.art,
+            album,
+        }))
+        : dummyAlbums
 
     return (
         <Carousel opts={{ align: "start" }} className="w-full min-w-0 flex-1">
@@ -44,7 +63,7 @@ const HotAlbumsCarousel = () => {
                 </div>
             </div>
             <CarouselContent className="mt-4 -ml-3 sm:-ml-4">
-                {hotAlbums.map((album) => (
+                {albums.map((album) => (
                     <CarouselItem key={album.id} className="basis-[70%] pl-3 sm:basis-1/3 sm:pl-4">
                         <RankedChartCard item={album} />
                     </CarouselItem>
@@ -55,3 +74,4 @@ const HotAlbumsCarousel = () => {
 }
 
 export default HotAlbumsCarousel
+

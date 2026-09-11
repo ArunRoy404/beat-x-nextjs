@@ -5,13 +5,16 @@ import { cn } from "@/lib/utils"
 import { useUserTrendingStore } from "@/zustandStore/user/userStore/userTrendingStore"
 import { Carousel, CarouselContent, CarouselItem, useCarousel } from "@/components/ui/carousel"
 import TrendingVideoCard from "@/components/user/watch/TrendingVideoCard"
+import { useTrendingVideos } from "@/hooks/api/user/videos/useTrendingVideos"
 
 const NavButton = ({ direction, onClick, disabled }) => (
     <button
         type="button"
         onClick={onClick}
         disabled={disabled}
-        className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full border border-dark-gray text-whitetext transition-colors hover:border-secondary hover:text-secondary disabled:pointer-events-none disabled:opacity-30"
+        className={cn(
+            "flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full border border-dark-gray text-whitetext transition-colors hover:border-secondary hover:text-secondary disabled:pointer-events-none disabled:opacity-30"
+        )}
         aria-label={direction === "left" ? "Previous" : "Next"}
     >
         {direction === "left" ? <ChevronLeft className="size-4" /> : <ChevronRight className="size-4" />}
@@ -30,7 +33,15 @@ const TrendingVideosCarouselNav = () => {
 }
 
 const TrendingVideosCarousel = () => {
-    const trendingVideos = useUserTrendingStore((state) => state.trendingVideos)
+    const { data: videosData } = useTrendingVideos()
+    const dummyVideos = useUserTrendingStore((state) => state.trendingVideos)
+
+    const liveVideos =
+        videosData?.videos ??
+        videosData?.data ??
+        (Array.isArray(videosData) ? videosData : [])
+
+    const videos = liveVideos.length > 0 ? liveVideos : dummyVideos
 
     return (
         <Carousel opts={{ align: "start" }} className="w-full min-w-0">
@@ -39,8 +50,8 @@ const TrendingVideosCarousel = () => {
                 <span className="cursor-pointer text-sm text-secondary sm:text-base">Explore All</span>
             </div>
             <CarouselContent className="mt-4 -ml-3 sm:-ml-4">
-                {trendingVideos.map((video) => (
-                    <CarouselItem key={video.id} className={cn("basis-[80%] pl-3 sm:basis-1/3 sm:pl-4 lg:basis-1/4")}>
+                {videos.map((video, idx) => (
+                    <CarouselItem key={video?._id || video?.id || idx} className={cn("basis-[80%] pl-3 sm:basis-1/3 sm:pl-4 lg:basis-1/4")}>
                         <TrendingVideoCard video={video} showPlayButton />
                     </CarouselItem>
                 ))}
