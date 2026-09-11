@@ -176,9 +176,18 @@ const FloatingPlayerBar = () => {
         }
     }, [])
 
+    // Helper to reliably enforce volume to the HTML5 audio element
+    const applyVolume = useCallback(() => {
+        if (audioRef.current) {
+            const target = isMuted ? 0 : Math.max(0, Math.min(1, Number(volume ?? 0.8)))
+            audioRef.current.volume = target
+        }
+    }, [isMuted, volume])
+
+    // Always re-apply volume when volume, mute state, or track src changes
     useEffect(() => {
-        if (audioRef.current) audioRef.current.volume = isMuted ? 0 : volume
-    }, [volume, isMuted])
+        applyVolume()
+    }, [applyVolume, src])
 
     useEffect(() => {
         if (audioRef.current) audioRef.current.loop = repeat
@@ -188,7 +197,9 @@ const FloatingPlayerBar = () => {
     useEffect(() => {
         const audio = audioRef.current
         if (src && audio) {
+            applyVolume()
             audio.play().then(() => {
+                applyVolume()
                 setIsPlaying(true)
                 setStoreIsPlaying?.(true)
             }).catch(() => {
@@ -196,18 +207,19 @@ const FloatingPlayerBar = () => {
                 setStoreIsPlaying?.(false)
             })
         }
-    }, [src, setStoreIsPlaying])
+    }, [src, setStoreIsPlaying, applyVolume])
 
     // Sync play state from store if changed externally
     useEffect(() => {
         const audio = audioRef.current
         if (!audio) return
         if (storeIsPlaying && audio.paused) {
-            audio.play().catch(() => {})
+            applyVolume()
+            audio.play().then(() => applyVolume()).catch(() => {})
         } else if (!storeIsPlaying && !audio.paused) {
             audio.pause()
         }
-    }, [storeIsPlaying])
+    }, [storeIsPlaying, applyVolume])
 
     const togglePlay = () => {
         const audio = audioRef.current
@@ -217,7 +229,9 @@ const FloatingPlayerBar = () => {
             setIsPlaying(false)
             setStoreIsPlaying?.(false)
         } else {
+            applyVolume()
             audio.play().then(() => {
+                applyVolume()
                 setIsPlaying(true)
                 setStoreIsPlaying?.(true)
             }).catch(() => {})
@@ -240,6 +254,9 @@ const FloatingPlayerBar = () => {
     const handleVolumeChange = (e) => {
         const value = Number(e.target.value)
         setVolume(value)
+        if (audioRef.current) {
+            audioRef.current.volume = isMuted ? 0 : Math.max(0, Math.min(1, value))
+        }
     }
 
     const progress = duration ? currentTime / duration : 0
@@ -263,14 +280,19 @@ const FloatingPlayerBar = () => {
                 src={src}
                 preload="metadata"
                 onPlay={() => {
+                    applyVolume()
                     setIsPlaying(true)
                     setStoreIsPlaying?.(true)
+                }}
+                onCanPlay={applyVolume}
+                onLoadedMetadata={(e) => {
+                    applyVolume()
+                    setDuration(e.currentTarget.duration)
                 }}
                 onPause={() => {
                     setIsPlaying(false)
                     setStoreIsPlaying?.(false)
                 }}
-                onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
                 onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
                 onEnded={() => {
                     setIsPlaying(false)
