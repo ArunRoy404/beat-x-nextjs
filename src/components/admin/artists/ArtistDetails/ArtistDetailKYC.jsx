@@ -78,7 +78,7 @@ const ArtistDetailKYC = ({ artist }) => {
     try {
       await updateChecklistMutation.mutateAsync({
         id: verificationId,
-        data: updatedData,
+        body: updatedData,
       })
     } catch {
       // Handled by hook

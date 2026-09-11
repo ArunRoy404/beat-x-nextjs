@@ -33,6 +33,7 @@ const ArtistDetailOverview = ({ artist }) => {
     try {
       await reviewOverviewMutation.mutateAsync({
         id: verificationId,
+        body: { reviewed: true },
         reviewed: true,
       })
     } catch {

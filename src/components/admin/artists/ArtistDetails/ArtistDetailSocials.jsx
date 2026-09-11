@@ -88,7 +88,7 @@ const ArtistDetailSocials = ({ artist }) => {
     try {
       await updateSocialChecklistMutation.mutateAsync({
         id: verificationId,
-        data: updatedData,
+        body: updatedData,
       })
     } catch {
       // Handled by hook

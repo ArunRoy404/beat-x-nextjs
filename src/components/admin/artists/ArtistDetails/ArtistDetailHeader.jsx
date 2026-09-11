@@ -52,6 +52,7 @@ const ArtistDetailHeader = ({ artist, onClose }) => {
     try {
       await updateGenresMutation.mutateAsync({
         id: verificationId,
+        body: { genres: newGenres },
         genres: newGenres,
       })
       setIsEditingGenres(false)
