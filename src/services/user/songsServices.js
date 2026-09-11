@@ -33,6 +33,12 @@ export async function getFeaturedSongsRequest() {
   return res?.data?.data;
 }
 
+export async function getLikedSongsRequest() {
+  const res = await axiosPrivate.get("/songs/liked");
+  return res?.data?.data ?? res?.data;
+}
+
+
 export async function getSongStreamUrlRequest(id) {
   if (!id) return null;
   const res = await axiosPrivate.get(`/songs/${id}/stream`);

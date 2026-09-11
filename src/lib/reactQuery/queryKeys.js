@@ -15,6 +15,7 @@ export const queryKeys = {
     me: () => [...queryKeys.user.all, "me"],
     settings: () => [...queryKeys.user.all, "settings"],
     artists: () => [...queryKeys.user.all, "artists"],
+    favorites: () => [...queryKeys.user.all, "favorites"],
   },
   songs: {
     all: ["songs"],
@@ -24,6 +25,7 @@ export const queryKeys = {
     trending: () => [...queryKeys.songs.all, "trending"],
     featured: () => [...queryKeys.songs.all, "featured"],
     list: (params) => [...queryKeys.songs.all, "list", params],
+    liked: () => [...queryKeys.songs.all, "liked"],
     detail: (id) => [...queryKeys.songs.all, "detail", id],
     stream: (id) => [...queryKeys.songs.all, "stream", id],
     like: (id) => [...queryKeys.songs.all, "like", id],
@@ -65,7 +67,13 @@ export const queryKeys = {
     all: ["albums"],
     list: (params) => [...queryKeys.albums.all, "list", params],
     featured: () => [...queryKeys.albums.all, "featured"],
+    newReleases: (params) => [...queryKeys.albums.all, "newReleases", params],
     detail: (id) => [...queryKeys.albums.all, "detail", id],
+  },
+  playlists: {
+    all: ["playlists"],
+    mine: (params) => [...queryKeys.playlists.all, "mine", params],
+    detail: (id) => [...queryKeys.playlists.all, "detail", id],
   },
   dashboard: {
     all: ["dashboard"],
