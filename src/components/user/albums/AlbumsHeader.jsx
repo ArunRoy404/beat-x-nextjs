@@ -12,9 +12,9 @@ const AlbumsHeader = ({ totalCollection, recentAdditions }) => {
             </div>
             <div className="flex flex-wrap items-center gap-3 text-sm sm:text-base">
                 <span className="border-r border-dark-gray pr-3 font-semibold text-secondary sm:pr-6">
-                    Total Collection: {totalCollection}
+                    Total Collection: {totalCollection ?? 0}
                 </span>
-                <span className="font-semibold text-light-gray">{recentAdditions} Recent Additions</span>
+                <span className="font-semibold text-light-gray">{recentAdditions ?? 0} Recent Additions</span>
             </div>
         </div>
     )

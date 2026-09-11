@@ -24,6 +24,7 @@ export const isrPaths = [
   "/explore",
   "/trending",
   "/library",
+  "/albums",
   "/",
 ];
 
