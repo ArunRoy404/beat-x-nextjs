@@ -91,6 +91,17 @@ export const authOptions = {
     }),
   ],
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith("/")) return url;
+      try {
+        const parsed = new URL(url);
+        if (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") {
+          return `${parsed.pathname}${parsed.search}`;
+        }
+        if (parsed.origin === baseUrl) return url;
+      } catch {}
+      return baseUrl;
+    },
     async jwt({ token, user }) {
       if (user) {
         return {

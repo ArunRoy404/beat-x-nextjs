@@ -35,7 +35,10 @@ axiosPrivate.interceptors.response.use(
     if (error?.response?.status === 401 && typeof window !== "undefined") {
       const { signOut } = await import("next-auth/react");
       const { getSignInPath } = await import("@/lib/auth/authRoutes");
-      await signOut({ callbackUrl: getSignInPath(window.location.pathname) });
+      const signInPath = getSignInPath(window.location.pathname);
+      await signOut({ redirect: false });
+      const currentPath = window.location.pathname + window.location.search;
+      window.location.href = `${signInPath}?callbackUrl=${encodeURIComponent(currentPath)}`;
     }
 
     return Promise.reject(normalizeAxiosError(error));

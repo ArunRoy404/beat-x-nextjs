@@ -33,7 +33,7 @@ export async function proxy(request) {
   const isAdmin = token?.role === "admin";
 
   if (pathname.startsWith(ADMIN_DASHBOARD_PATH) && !isAdmin) {
-    const loginUrl = new URL(ADMIN_LOGIN_PATH, request.url);
+    const loginUrl = new URL(ADMIN_LOGIN_PATH, request.nextUrl);
     const targetPath =
       pathname === ADMIN_DASHBOARD_PATH || pathname === `${ADMIN_DASHBOARD_PATH}/`
         ? ADMIN_DASHBOARD_HOME_PATH
@@ -43,21 +43,21 @@ export async function proxy(request) {
   }
 
   if (ADMIN_AUTH_PAGES.some((page) => pathname.startsWith(page)) && isAdmin) {
-    return redirectNoStore(new URL(ADMIN_DASHBOARD_HOME_PATH, request.url));
+    return redirectNoStore(new URL(ADMIN_DASHBOARD_HOME_PATH, request.nextUrl));
   }
 
   // --- Listener ("user" role) area ------------------------------------------
   // The user's own auth screens: anyone already signed in goes to their home.
   if (isUserGuestOnlyPath(pathname)) {
     if (token) {
-      return redirectNoStore(new URL(getRoleHomePath(token.role), request.url));
+      return redirectNoStore(new URL(getRoleHomePath(token.role), request.nextUrl));
     }
     return NextResponse.next();
   }
 
   if (isUserProtectedPath(pathname)) {
     if (!token) {
-      const loginUrl = new URL(USER_SIGN_IN_PATH, request.url);
+      const loginUrl = new URL(USER_SIGN_IN_PATH, request.nextUrl);
       loginUrl.searchParams.set("callbackUrl", `${pathname}${request.nextUrl.search}`);
       return redirectNoStore(loginUrl);
     }
@@ -67,7 +67,7 @@ export async function proxy(request) {
     if (token.role !== "user") {
       const roleHome = getRoleHomePath(token.role);
       if (roleHome !== pathname) {
-        return redirectNoStore(new URL(roleHome, request.url));
+        return redirectNoStore(new URL(roleHome, request.nextUrl));
       }
     }
   }
