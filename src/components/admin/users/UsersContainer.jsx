@@ -101,34 +101,34 @@ const UsersContainer = () => {
           <div className="block md:hidden">
             <div className="flex flex-col gap-3">
               {usersList.map((user) => (
-                <div key={user._id || user.id} className="border border-white/10 bg-[#0E0E0E] rounded-[12px] p-4 flex flex-col gap-3">
+                <div key={user?._id || user?.id} className="border border-white/10 bg-[#0E0E0E] rounded-[12px] p-4 flex flex-col gap-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <CommonAvatar src={user.avatar || ""} alt={user.name} className="w-10 h-10 rounded-full border border-white/5" />
+                      <CommonAvatar src={user?.avatar || ""} alt={user?.name || "User"} className="w-10 h-10 rounded-full border border-white/5" />
                       <div className="flex flex-col">
-                        <span className="text-whitetext font-semibold text-sm">{user.name}</span>
-                        <span className="text-light-gray/60 text-xs">{user.email}</span>
+                        <span className="text-whitetext font-semibold text-sm">{user?.name || "-"}</span>
+                        <span className="text-light-gray/60 text-xs">{user?.email || "-"}</span>
                       </div>
                     </div>
                     <span className={`text-[12px] font-semibold select-none ${
-                      user.isVerified ? "text-[#34C759]" : "text-[#FFCC00]"
+                      user?.isVerified ? "text-[#34C759]" : "text-[#FFCC00]"
                     }`}>
-                      {user.isVerified ? "Verified" : "Unverified"}
+                      {user?.isVerified ? "Verified" : "Unverified"}
                     </span>
                   </div>
 
                   <div className="flex flex-wrap gap-2 text-xs">
                     <span className="px-2 py-0.5 rounded-full border border-white/10 text-light-gray">
-                      {user.provider ? user.provider.charAt(0).toUpperCase() + user.provider.slice(1) : "-"}
+                      {user?.provider ? user.provider.charAt(0).toUpperCase() + user.provider.slice(1) : "-"}
                     </span>
                     <span className="px-2 py-0.5 rounded-full border border-white/5 bg-white/[0.02] text-light-gray">
-                      {(user.coinBalance || 0).toLocaleString()} coins
+                      {(user?.coinBalance || 0).toLocaleString()} coins
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between border-t border-white/5 pt-3">
                     <span className="text-white/40 text-[10px] uppercase font-semibold">
-                      Joined {user.createdAt ? format(new Date(user.createdAt), "MMM d, yyyy") : "-"}
+                      Joined {user?.createdAt ? format(new Date(user.createdAt), "MMM d, yyyy") : "-"}
                     </span>
                     <div className="flex items-center gap-2">
                       <UserDetailsDialog user={user}>

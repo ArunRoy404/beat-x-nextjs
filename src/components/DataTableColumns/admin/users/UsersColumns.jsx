@@ -17,13 +17,13 @@ export const getUsersColumns = () => [
       return (
         <div className="flex items-center gap-3">
           <CommonAvatar
-            src={user.avatar || ""}
-            alt={user.name}
+            src={user?.avatar || ""}
+            alt={user?.name || "User"}
             className="w-10 h-10 rounded-full border border-white/5 shrink-0"
           />
           <div className="flex flex-col min-w-0">
-            <span className="text-whitetext font-semibold text-sm truncate">{user.name}</span>
-            <span className="text-light-gray/60 text-xs truncate">{user.email}</span>
+            <span className="text-whitetext font-semibold text-sm truncate">{user?.name || "-"}</span>
+            <span className="text-light-gray/60 text-xs truncate">{user?.email || "-"}</span>
           </div>
         </div>
       )
