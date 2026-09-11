@@ -1167,7 +1167,7 @@
               "response": []
             },
             {
-              "name": "Browse",
+              "name": "✅ Browse",
               "event": [
                 {
                   "listen": "test",
@@ -1246,7 +1246,7 @@
               "response": []
             },
             {
-              "name": "Trending",
+              "name": "✅ Trending",
               "request": {
                 "method": "GET",
                 "header": [
@@ -1626,7 +1626,7 @@
               "response": []
             },
             {
-              "name": "Featured",
+              "name": "✅ Featured",
               "request": {
                 "method": "GET",
                 "header": [
@@ -1797,7 +1797,7 @@
               "response": []
             },
             {
-              "name": "Trending",
+              "name": "✅ Trending",
               "request": {
                 "method": "GET",
                 "header": [
