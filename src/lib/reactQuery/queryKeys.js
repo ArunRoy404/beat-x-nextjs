@@ -23,6 +23,7 @@ export const queryKeys = {
     newReleases: (params) => [...queryKeys.songs.all, "newReleases", params],
     trending: () => [...queryKeys.songs.all, "trending"],
     featured: () => [...queryKeys.songs.all, "featured"],
+    list: (params) => [...queryKeys.songs.all, "list", params],
     detail: (id) => [...queryKeys.songs.all, "detail", id],
     stream: (id) => [...queryKeys.songs.all, "stream", id],
     like: (id) => [...queryKeys.songs.all, "like", id],
@@ -63,6 +64,7 @@ export const queryKeys = {
   albums: {
     all: ["albums"],
     list: (params) => [...queryKeys.albums.all, "list", params],
+    featured: () => [...queryKeys.albums.all, "featured"],
     detail: (id) => [...queryKeys.albums.all, "detail", id],
   },
   dashboard: {
@@ -72,6 +74,7 @@ export const queryKeys = {
   videos: {
     all: ["videos"],
     list: (params) => [...queryKeys.videos.all, "list", params],
+    trending: () => [...queryKeys.videos.all, "trending"],
     detail: (id) => [...queryKeys.videos.all, "detail", id],
   },
   analytics: {

@@ -51,6 +51,13 @@ export async function toggleLikeSongRequest(id) {
   return res?.data?.data;
 }
 
+export async function getBrowseSongsRequest({ page = 1, limit = 50 } = {}) {
+  const res = await axiosPrivate.get("/songs", {
+    params: { page, limit },
+  });
+  return res?.data?.data ?? res?.data;
+}
+
 export async function saveSongProgressRequest({ id, positionMs = 0, completed = false }) {
   if (!id) return null;
   const res = await axiosPrivate.post(`/songs/${id}/progress`, {
@@ -59,5 +66,6 @@ export async function saveSongProgressRequest({ id, positionMs = 0, completed = 
   });
   return res?.data?.data;
 }
+
 
 
