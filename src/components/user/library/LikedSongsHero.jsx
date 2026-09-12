@@ -4,8 +4,9 @@ import { Heart, Play, Pause } from "lucide-react"
 import { useLikedSongs } from "@/hooks/api/user/songs/useLikedSongs"
 import { usePlaySong } from "@/hooks/api/user/songs/usePlaySong"
 
-const LikedSongsHero = () => {
-    const { data: likedData } = useLikedSongs()
+const LikedSongsHero = ({ data: propData } = {}) => {
+    const { data: queryData } = useLikedSongs()
+    const likedData = propData ?? queryData
     const { playSong, currentSongId, isPlaying, isPending } = usePlaySong()
 
     const likedList =
