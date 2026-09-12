@@ -7,6 +7,7 @@ import {
   ChevronUp,
   Heart,
   ListMusic,
+  Loader2,
   Maximize2,
   Mic2,
   Minimize2,
@@ -60,6 +61,10 @@ const GlobalFloatingMediaPlayer = () => {
     coverUrl: rawCoverUrl,
     currentTime,
     duration,
+    isBuffering,
+    setIsBuffering,
+    pendingSeekTime,
+    clearPendingSeek,
     togglePlay,
     pauseMedia,
     resumeMedia,
@@ -77,6 +82,15 @@ const GlobalFloatingMediaPlayer = () => {
     toggleShuffle,
     toggleRepeatMode,
   } = useGlobalMediaPlayerStore();
+
+  const displayTitle =
+    typeof title === "object" && title !== null
+      ? title?.name || title?.title || (mediaType === "video" ? "Video Stream" : "Audio Track")
+      : title || (mediaType === "video" ? "Video Stream" : "Audio Track");
+  const displayArtist =
+    typeof artist === "object" && artist !== null
+      ? artist?.name || artist?.title || "BeatX"
+      : artist || "BeatX";
 
   const src = resolveMediaUrl(rawSrc);
   const coverUrl = resolveMediaUrl(rawCoverUrl);
@@ -146,6 +160,14 @@ const GlobalFloatingMediaPlayer = () => {
     document.addEventListener("pointerdown", onPointerDown);
     return () => document.removeEventListener("pointerdown", onPointerDown);
   }, [mobileVolumeOpen]);
+
+  // Synchronize external seek requests (e.g. from admin SongDetailContent or user player)
+  useEffect(() => {
+    if (typeof pendingSeekTime === "number" && mediaRef.current) {
+      mediaRef.current.currentTime = pendingSeekTime;
+      clearPendingSeek();
+    }
+  }, [pendingSeekTime, clearPendingSeek]);
 
   // Helper to reliably apply volume to the HTML5 media element
   const applyVolume = useCallback(() => {
@@ -423,6 +445,7 @@ const GlobalFloatingMediaPlayer = () => {
 
   const handleMediaLoaded = () => {
     applyVolume();
+    setIsBuffering(false);
     if (mediaRef.current?.duration) {
       setDuration(mediaRef.current.duration);
     }
@@ -447,7 +470,7 @@ const GlobalFloatingMediaPlayer = () => {
               damping: 24,
             }}
             className={cn(
-              "fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 rounded-xl border border-border/80 bg-(--player-bar-bg) shadow-2xl backdrop-blur-xl overflow-hidden select-none transition-all duration-300",
+              "fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[1000] rounded-xl border border-border/80 bg-(--player-bar-bg) shadow-2xl backdrop-blur-xl overflow-hidden select-none transition-all duration-300",
               isMinimized
                 ? "flex items-center gap-2.5 p-2.5 w-[290px] sm:w-[330px]"
                 : "flex flex-col w-[340px] sm:w-[410px] md:w-[450px]"
@@ -469,11 +492,25 @@ const GlobalFloatingMediaPlayer = () => {
                 poster={coverUrl}
                 onLoadedMetadata={handleMediaLoaded}
                 onTimeUpdate={() => {
-                  if (mediaRef.current) setCurrentTime(mediaRef.current.currentTime);
+                  if (mediaRef.current) {
+                    setCurrentTime(mediaRef.current.currentTime);
+                    if (isBuffering) setIsBuffering(false);
+                  }
                 }}
-                onCanPlay={applyVolume}
-                onPlay={applyVolume}
+                onWaiting={() => setIsBuffering(true)}
+                onCanPlay={() => {
+                  setIsBuffering(false);
+                  applyVolume();
+                }}
+                onPlaying={() => setIsBuffering(false)}
+                onSeeked={() => setIsBuffering(false)}
+                onPause={() => setIsBuffering(false)}
+                onPlay={() => {
+                  setIsBuffering(false);
+                  applyVolume();
+                }}
                 onEnded={() => {
+                  setIsBuffering(false);
                   if (repeatMode === "one") {
                     if (mediaRef.current) {
                       mediaRef.current.currentTime = 0;
@@ -487,6 +524,7 @@ const GlobalFloatingMediaPlayer = () => {
                 }}
                 onError={() => {
                   pauseMedia();
+                  setIsBuffering(false);
                   toast.error("Video stream source failed to load.");
                 }}
                 className={cn(
@@ -497,10 +535,22 @@ const GlobalFloatingMediaPlayer = () => {
                 playsInline
               />
 
-              {/* In minimized mode: Mini expand overlay */}
+              {/* In full mode: Buffering Spinner Overlay */}
+              {!isMinimized && isBuffering && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/55 backdrop-blur-[2px] z-20 pointer-events-none transition-all">
+                  <Loader2 className="size-10 text-secondary animate-spin drop-shadow-[0_0_12px_rgba(204,151,255,0.6)]" />
+                  <span className="mt-2 text-xs font-medium text-white/90 drop-shadow">Buffering...</span>
+                </div>
+              )}
+
+              {/* In minimized mode: Mini expand overlay or buffering overlay */}
               {isMinimized && (
-                <div className="absolute inset-0 bg-black/35 group-hover:bg-black/15 transition-colors flex items-center justify-center">
-                  <ChevronUp className="size-3.5 text-white/90 drop-shadow" />
+                <div className="absolute inset-0 bg-black/35 group-hover:bg-black/15 transition-colors flex items-center justify-center z-10">
+                  {isBuffering ? (
+                    <Loader2 className="size-3.5 text-secondary animate-spin" />
+                  ) : (
+                    <ChevronUp className="size-3.5 text-white/90 drop-shadow" />
+                  )}
                 </div>
               )}
 
@@ -513,7 +563,7 @@ const GlobalFloatingMediaPlayer = () => {
                       Video
                     </span>
                     <span className="text-xs font-medium text-whitetext truncate drop-shadow-md">
-                      {title || "Video Stream"}
+                      {displayTitle}
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
@@ -567,8 +617,8 @@ const GlobalFloatingMediaPlayer = () => {
                   onClick={toggleMinimize}
                   className="flex min-w-0 flex-1 flex-col cursor-pointer"
                 >
-                  <span className="truncate text-xs font-semibold text-whitetext">{title || "Video Track"}</span>
-                  <span className="truncate text-[10px] text-light-gray">{artist || "BeatX"}</span>
+                  <span className="truncate text-xs font-semibold text-whitetext">{displayTitle}</span>
+                  <span className="truncate text-[10px] text-light-gray">{displayArtist}</span>
                 </div>
                 <div className="flex shrink-0 items-center gap-1">
                   <button
@@ -586,7 +636,7 @@ const GlobalFloatingMediaPlayer = () => {
                       )}
                     />
                   </button>
-                  <GradientPlayButton size="sm" playing={isPlaying} onClick={togglePlay} />
+                  <GradientPlayButton size="sm" playing={isPlaying} loading={isBuffering} onClick={togglePlay} />
                   <button
                     type="button"
                     onClick={toggleMinimize}
@@ -635,9 +685,9 @@ const GlobalFloatingMediaPlayer = () => {
                   {/* Left: Metadata & Like */}
                   <div className="flex items-center gap-1.5 min-w-0 max-w-[150px] sm:max-w-[190px]">
                     <div className="flex flex-col min-w-0 flex-1">
-                      <span className="text-xs font-semibold text-whitetext truncate">{title || "Video Track"}</span>
+                      <span className="text-xs font-semibold text-whitetext truncate">{displayTitle}</span>
                       <span className="text-[11px] text-light-gray truncate">
-                        {artist || "BeatX"} &middot; <span className="font-mono">{formatTime(currentTime)} / {formatTime(duration)}</span>
+                        {displayArtist} &middot; <span className="font-mono">{formatTime(currentTime)} / {formatTime(duration)}</span>
                       </span>
                     </div>
                     <button
@@ -685,7 +735,7 @@ const GlobalFloatingMediaPlayer = () => {
                     >
                       <SkipBack className="size-3.5 sm:size-4" fill="currentColor" />
                     </button>
-                    <GradientPlayButton size="sm" playing={isPlaying} onClick={togglePlay} />
+                    <GradientPlayButton size="sm" playing={isPlaying} loading={isBuffering} onClick={togglePlay} />
                     <button
                       type="button"
                       onClick={playNext}
@@ -791,7 +841,7 @@ const GlobalFloatingMediaPlayer = () => {
               stiffness: 90,
               damping: 15,
             }}
-            className="fixed bottom-4 left-1/2 z-50 flex w-[calc(100%-16px)] max-w-4xl items-center justify-between gap-1.5 rounded-full border border-border bg-(--player-bar-bg) px-2.5 py-2 shadow-(--now-playing-glow) backdrop-blur-md sm:bottom-6 sm:w-[calc(100%-48px)] sm:gap-6 sm:px-6 sm:py-3.5 md:gap-12 overflow-hidden"
+            className="fixed bottom-4 left-1/2 z-[1000] flex w-[calc(100%-16px)] max-w-4xl items-center justify-between gap-1.5 rounded-full border border-border bg-(--player-bar-bg) px-2.5 py-2 shadow-(--now-playing-glow) backdrop-blur-md sm:bottom-6 sm:w-[calc(100%-48px)] sm:gap-6 sm:px-6 sm:py-3.5 md:gap-12 overflow-hidden"
           >
             {/* Mobile Top Edge Seek & Progress Bar (Runs seamlessly along the top border without taking row space) */}
             <div className="absolute top-0 inset-x-6 h-2 sm:hidden z-10 flex items-start cursor-pointer">
@@ -819,11 +869,25 @@ const GlobalFloatingMediaPlayer = () => {
               preload="metadata"
               onLoadedMetadata={handleMediaLoaded}
               onTimeUpdate={() => {
-                if (mediaRef.current) setCurrentTime(mediaRef.current.currentTime);
+                if (mediaRef.current) {
+                  setCurrentTime(mediaRef.current.currentTime);
+                  if (isBuffering) setIsBuffering(false);
+                }
               }}
-              onCanPlay={applyVolume}
-              onPlay={applyVolume}
+              onWaiting={() => setIsBuffering(true)}
+              onCanPlay={() => {
+                setIsBuffering(false);
+                applyVolume();
+              }}
+              onPlaying={() => setIsBuffering(false)}
+              onSeeked={() => setIsBuffering(false)}
+              onPause={() => setIsBuffering(false)}
+              onPlay={() => {
+                setIsBuffering(false);
+                applyVolume();
+              }}
               onEnded={() => {
+                setIsBuffering(false);
                 if (repeatMode === "one") {
                   if (mediaRef.current) {
                     mediaRef.current.currentTime = 0;
@@ -837,6 +901,7 @@ const GlobalFloatingMediaPlayer = () => {
               }}
               onError={() => {
                 pauseMedia();
+                setIsBuffering(false);
                 toast.error("Audio stream source is unavailable or still processing.");
               }}
               className="hidden"
@@ -847,7 +912,7 @@ const GlobalFloatingMediaPlayer = () => {
               <div className="relative size-8 shrink-0 overflow-hidden rounded-full bg-dark-accent sm:size-10">
                 <CommonCoverImage
                   src={coverUrl}
-                  alt={title || "Track artwork"}
+                  alt={displayTitle}
                   fallback={
                     <div className="flex size-full items-center justify-center bg-white/10 text-light-gray">
                       <Music className="size-4 sm:size-5 text-secondary" />
@@ -857,10 +922,10 @@ const GlobalFloatingMediaPlayer = () => {
               </div>
               <div className="flex min-w-0 flex-1 flex-col">
                 <span className="truncate whitespace-nowrap text-xs font-semibold text-whitetext sm:text-base md:text-lg">
-                  {title || "Audio Track"}
+                  {displayTitle}
                 </span>
                 <span className="truncate text-[10px] text-light-gray sm:text-xs leading-tight">
-                  {artist || "BeatX"}
+                  {displayArtist}
                 </span>
               </div>
               <button
@@ -915,9 +980,9 @@ const GlobalFloatingMediaPlayer = () => {
                   <SkipBack className="size-4 sm:size-5" fill="currentColor" />
                 </button>
 
-                {/* Play / Pause button */}
-                <GradientPlayButton size="sm" playing={isPlaying} onClick={togglePlay} className="sm:hidden" />
-                <GradientPlayButton size="md" playing={isPlaying} onClick={togglePlay} className="hidden sm:inline-flex" />
+                {/* Play / Pause button with buffering support */}
+                <GradientPlayButton size="sm" playing={isPlaying} loading={isBuffering} onClick={togglePlay} className="sm:hidden" />
+                <GradientPlayButton size="md" playing={isPlaying} loading={isBuffering} onClick={togglePlay} className="hidden sm:inline-flex" />
 
                 {/* Next Track button - VISIBLE ON MOBILE */}
                 <button

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
-import { Heart, ListMusic, Maximize2, Mic2, Music, Repeat, Repeat1, Shuffle, SkipBack, SkipForward, Volume2, VolumeX, X } from "lucide-react"
+import { Heart, ListMusic, Loader2, Maximize2, Mic2, Music, Repeat, Repeat1, Shuffle, SkipBack, SkipForward, Volume2, VolumeX, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import GradientPlayButton from "@/components/shared/GradientPlayButton"
 import PlayerSlider from "@/components/shared/MediaPlayerControls/PlayerSlider"
@@ -51,6 +51,7 @@ const FloatingPlayerBar = () => {
     const [isPlaying, setIsPlaying] = useState(false)
     const [currentTime, setCurrentTime] = useState(0)
     const [duration, setDuration] = useState(0)
+    const [isBuffering, setIsBuffering] = useState(false)
 
     const [mobileVolumeOpen, setMobileVolumeOpen] = useState(false)
     const mobileVolumeRef = useRef(null)
@@ -337,7 +338,7 @@ const FloatingPlayerBar = () => {
                 delay: 0.65 // Slides up shortly after other page items load
             }}
             className={cn(
-                "absolute bottom-4 left-1/2 z-50 flex w-[calc(100%-16px)] max-w-4xl items-center justify-between gap-1.5 rounded-full border border-border bg-(--player-bar-bg) px-2.5 py-2 shadow-(--now-playing-glow) backdrop-blur-md sm:bottom-6 sm:w-[calc(100%-48px)] sm:gap-6 sm:px-6 sm:py-3.5 md:gap-12 overflow-hidden",
+                "absolute bottom-4 left-1/2 z-[1000] flex w-[calc(100%-16px)] max-w-4xl items-center justify-between gap-1.5 rounded-full border border-border bg-(--player-bar-bg) px-2.5 py-2 shadow-(--now-playing-glow) backdrop-blur-md sm:bottom-6 sm:w-[calc(100%-48px)] sm:gap-6 sm:px-6 sm:py-3.5 md:gap-12 overflow-hidden",
                 isGlobalOpen && globalMediaType === "video" && "hidden sm:flex"
             )}
         >
@@ -366,6 +367,7 @@ const FloatingPlayerBar = () => {
                 src={resolvedSrc}
                 preload="metadata"
                 onPlay={() => {
+                    setIsBuffering(false)
                     try {
                         useGlobalMediaPlayerStore.getState().pauseMedia()
                     } catch (e) {}
@@ -373,22 +375,35 @@ const FloatingPlayerBar = () => {
                     setIsPlaying(true)
                     setStoreIsPlaying?.(true)
                 }}
-                onCanPlay={applyVolume}
+                onWaiting={() => setIsBuffering(true)}
+                onCanPlay={() => {
+                    setIsBuffering(false)
+                    applyVolume()
+                }}
+                onPlaying={() => setIsBuffering(false)}
+                onSeeked={() => setIsBuffering(false)}
                 onLoadedMetadata={(e) => {
                     applyVolume()
+                    setIsBuffering(false)
                     setDuration(e.currentTarget.duration)
                 }}
                 onPause={() => {
+                    setIsBuffering(false)
                     setIsPlaying(false)
                     setStoreIsPlaying?.(false)
                 }}
-                onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
+                onTimeUpdate={(e) => {
+                    setCurrentTime(e.currentTarget.currentTime)
+                    if (isBuffering) setIsBuffering(false)
+                }}
                 onError={() => {
+                    setIsBuffering(false)
                     setIsPlaying(false)
                     setStoreIsPlaying?.(false)
                     toast.error("Audio stream source is unavailable or still processing.")
                 }}
                 onEnded={() => {
+                    setIsBuffering(false)
                     setIsPlaying(false)
                     setStoreIsPlaying?.(false)
                     if (songId) {
@@ -483,8 +498,8 @@ const FloatingPlayerBar = () => {
                     </button>
 
                     {/* Play / Pause button */}
-                    <GradientPlayButton size="sm" playing={isPlaying} onClick={togglePlay} className="sm:hidden" />
-                    <GradientPlayButton size="md" playing={isPlaying} onClick={togglePlay} className="hidden sm:inline-flex" />
+                    <GradientPlayButton size="sm" playing={isPlaying} loading={isBuffering} onClick={togglePlay} className="sm:hidden" />
+                    <GradientPlayButton size="md" playing={isPlaying} loading={isBuffering} onClick={togglePlay} className="hidden sm:inline-flex" />
 
                     {/* Next Track button - VISIBLE ON MOBILE */}
                     <button
