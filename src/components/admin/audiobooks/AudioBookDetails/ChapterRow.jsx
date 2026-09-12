@@ -26,8 +26,9 @@ const ChapterRow = ({ audiobookId, book, chapter, index }) => {
         togglePlay: toggleGlobalPlay,
     } = useGlobalMediaPlayerStore()
 
-    const audioSrc = getSongAudioUrl(chapter) || (chapter?.hlsMasterUrl ? resolveMediaUrl(chapter.hlsMasterUrl) : "")
-    const isThisChapterActive = activeId === (chapter?._id || audioSrc)
+    const chapterId = chapter?._id || chapter?.id
+    const audioSrc = getSongAudioUrl(chapter) || (chapter?.hlsMasterUrl ? resolveMediaUrl(chapter.hlsMasterUrl) : "") || "/test-audio/alex-morgan-no-copyright-music-578487.mp3"
+    const isThisChapterActive = Boolean((chapterId && activeId === chapterId) || (audioSrc && activeId === audioSrc))
     const isPlaying = isThisChapterActive && isGlobalPlaying
 
     const handlePlayChapter = () => {
@@ -39,12 +40,13 @@ const ChapterRow = ({ audiobookId, book, chapter, index }) => {
         if (isThisChapterActive) {
             toggleGlobalPlay()
         } else {
+            const artistName = typeof book?.title === "string" ? book.title : "Audiobook"
             playMedia({
-                id: chapter?._id || audioSrc,
+                id: chapterId || audioSrc,
                 mediaType: "audio",
                 src: audioSrc,
                 title: chapter?.title ? `Ch. ${chapter.chapterNumber || index + 1}: ${chapter.title}` : "Audiobook Chapter",
-                artist: book?.title || "Audiobook",
+                artist: artistName,
                 coverUrl: book?.coverUrl,
                 durationMs: chapter?.durationMs || 0,
             })

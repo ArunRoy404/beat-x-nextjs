@@ -28,8 +28,18 @@ const VideoDetailHeader = ({ video }) => {
         togglePlay: toggleGlobalPlay,
     } = useGlobalMediaPlayerStore()
 
-    const videoSrc = video?.hlsMasterUrl ? resolveMediaUrl(video.hlsMasterUrl) : (video?.sourceKey ? resolveMediaUrl(video.sourceKey) : "")
-    const isThisVideoActive = activeId === (video?._id || videoSrc)
+    const videoId = video?._id || video?.id
+    const videoSrc = video?.hlsMasterUrl
+        ? resolveMediaUrl(video.hlsMasterUrl)
+        : (video?.sourceKey
+            ? resolveMediaUrl(video.sourceKey)
+            : (video?.videoUrl
+                ? resolveMediaUrl(video.videoUrl)
+                : (video?.streamUrl
+                    ? resolveMediaUrl(video.streamUrl)
+                    : "")))
+
+    const isThisVideoActive = Boolean((videoId && activeId === videoId) || (videoSrc && activeId === videoSrc))
     const isPlaying = isThisVideoActive && isGlobalPlaying
 
     const handlePlayVideo = () => {
@@ -41,12 +51,17 @@ const VideoDetailHeader = ({ video }) => {
         if (isThisVideoActive) {
             toggleGlobalPlay()
         } else {
+            const artistName =
+                typeof video?.ownerId === "object" && video?.ownerId !== null
+                    ? video?.ownerId?.name || video?.ownerId?.username || "Admin"
+                    : (video?.artist || "Admin")
+
             playMedia({
-                id: video?._id || videoSrc,
+                id: videoId || videoSrc,
                 mediaType: "video",
                 src: videoSrc,
                 title: video?.title || "Video Track",
-                artist: video?.ownerId?.name || "Admin",
+                artist: artistName,
                 coverUrl: video?.coverUrl || video?.cover || "",
                 durationMs: video?.durationMs || 0,
             })

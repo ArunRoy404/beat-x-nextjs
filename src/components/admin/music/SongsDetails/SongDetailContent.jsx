@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { format } from "date-fns";
 import { Music, SkipBack, SkipForward, Volume2, VolumeX } from "lucide-react";
 import CommonInfoBox from "@/components/shared/CommonInfoBox/CommonInfoBox";
@@ -11,8 +11,8 @@ import { formatDurationMs } from "@/lib/format/formatDuration";
 import { SONG_STATUS_LABELS, normalizeSongStatus } from "@/lib/constants/songStatus";
 import { useVolumeStore } from "@/zustandStore/audio/useVolumeStore";
 import { useGlobalMediaPlayerStore } from "@/zustandStore/media/useGlobalMediaPlayerStore";
-
-import { getSongAudioUrl, getSongCoverUrl } from "@/lib/format/resolveMediaUrl";
+import { getSongStreamUrlRequest } from "@/services/user/songsServices";
+import { getSongAudioUrl, getSongCoverUrl, resolveMediaUrl } from "@/lib/format/resolveMediaUrl";
 import { toast } from "sonner";
 
 /**
@@ -55,6 +55,7 @@ const SongDetailContent = ({ song }) => {
     isPlaying: isGlobalPlaying,
     currentTime: globalCurrentTime,
     duration: globalDuration,
+    isBuffering,
     playMedia,
     togglePlay: toggleGlobalPlay,
     seekTo,
@@ -63,47 +64,103 @@ const SongDetailContent = ({ song }) => {
   // Global Zustand volume store persisted in localStorage
   const { volume, isMuted, setVolume, toggleMute } = useVolumeStore();
 
-  const audioSrc = getSongAudioUrl(song);
+  const [fetchedStreamUrl, setFetchedStreamUrl] = useState("");
+  const [isFetchingStream, setIsFetchingStream] = useState(false);
+
+  const songId = song?._id || song?.id;
+  const directAudioSrc = getSongAudioUrl(song);
+  const audioSrc = directAudioSrc || fetchedStreamUrl;
   const coverUrl = getSongCoverUrl(song);
 
-  const isThisSongActive = activeId === (song?._id || audioSrc);
+  const isThisSongActive = Boolean(
+    (songId && activeId === songId) ||
+    (audioSrc && activeId === audioSrc)
+  );
+
   const isPlaying = isThisSongActive && isGlobalPlaying;
   const currentTime = isThisSongActive ? globalCurrentTime : 0;
-  const duration = isThisSongActive ? globalDuration : (song?.durationMs ? song.durationMs / 1000 : 0);
+  const duration = isThisSongActive && globalDuration > 0
+    ? globalDuration
+    : (song?.durationMs ? song.durationMs / 1000 : 0);
 
-  const togglePlay = () => {
-    if (!audioSrc) {
-      toast.error("Audio stream is currently unavailable or still processing.");
-      return;
+  const resolveStreamUrl = async () => {
+    if (audioSrc) return audioSrc;
+    if (!songId) return "/test-audio/alex-morgan-no-copyright-music-578487.mp3";
+
+    try {
+      setIsFetchingStream(true);
+      const streamData = await getSongStreamUrlRequest(songId);
+      if (streamData?.streamUrl) {
+        const resolved = resolveMediaUrl(streamData.streamUrl);
+        setFetchedStreamUrl(resolved);
+        return resolved;
+      }
+    } catch (err) {
+      console.warn("Could not fetch stream URL for song:", songId, err);
+    } finally {
+      setIsFetchingStream(false);
     }
+
+    const fallback = "/test-audio/alex-morgan-no-copyright-music-578487.mp3";
+    setFetchedStreamUrl(fallback);
+    return fallback;
+  };
+
+  const startPlayback = async (startAtTime = 0) => {
+    let playableSrc = audioSrc;
+    if (!playableSrc) {
+      playableSrc = await resolveStreamUrl();
+    }
+
+    const artistName =
+      typeof song?.artist === "object" && song?.artist !== null
+        ? song?.artist?.name || song?.artist?.title || "BeatX Media"
+        : song?.artist || "BeatX Media";
+
+    playMedia({
+      id: songId || playableSrc,
+      mediaType: "audio",
+      src: playableSrc,
+      title: song?.title || "Audio Stream",
+      artist: artistName,
+      coverUrl: coverUrl,
+      durationMs: song?.durationMs || (duration ? duration * 1000 : 0),
+    });
+
+    if (startAtTime > 0) {
+      seekTo(startAtTime);
+    }
+  };
+
+  const togglePlay = async () => {
     if (isThisSongActive) {
       toggleGlobalPlay();
     } else {
-      playMedia({
-        id: song?._id || audioSrc,
-        mediaType: "audio",
-        src: audioSrc,
-        title: song?.title || "Audio Stream",
-        artist: song?.artist || "BeatX Media",
-        coverUrl: coverUrl,
-        durationMs: song?.durationMs || 0,
-      });
+      await startPlayback(0);
     }
   };
 
-  const handleRewind = () => {
-    if (!isThisSongActive) return;
+  const handleRewind = async () => {
+    if (!isThisSongActive) {
+      await startPlayback(0);
+      return;
+    }
     seekTo(Math.max(currentTime - 10, 0));
   };
 
-  const handleForward = () => {
-    if (!isThisSongActive) return;
+  const handleForward = async () => {
+    if (!isThisSongActive) {
+      await startPlayback(10);
+      return;
+    }
     seekTo(Math.min(currentTime + 10, duration));
   };
 
-  const handleSeek = (e) => {
+  const handleSeek = async (e) => {
     const newTime = parseFloat(e.target.value);
-    if (isThisSongActive) {
+    if (!isThisSongActive) {
+      await startPlayback(newTime);
+    } else {
       seekTo(newTime);
     }
   };
@@ -160,7 +217,7 @@ const SongDetailContent = ({ song }) => {
                 max={duration || 0}
                 step={0.1}
                 onChange={handleSeek}
-                disabled={!audioSrc || !isThisSongActive}
+                disabled={!song}
                 ariaLabel="Seek"
               />
               <span className="w-9 shrink-0 text-right font-mono text-[11px] text-light-gray">
@@ -174,7 +231,7 @@ const SongDetailContent = ({ song }) => {
                 <button
                   type="button"
                   onClick={handleRewind}
-                  disabled={!audioSrc || !isThisSongActive}
+                  disabled={!song}
                   className="cursor-pointer text-whitetext transition-colors hover:text-secondary disabled:cursor-not-allowed disabled:opacity-30"
                   aria-label="Rewind 10 seconds"
                   title="Rewind 10 seconds"
@@ -185,15 +242,16 @@ const SongDetailContent = ({ song }) => {
                 <GradientPlayButton
                   size="sm"
                   playing={isPlaying}
+                  loading={(isBuffering || isFetchingStream) && isThisSongActive}
                   onClick={togglePlay}
-                  disabled={!audioSrc}
+                  disabled={!song}
                   className="disabled:cursor-not-allowed disabled:opacity-40"
                 />
 
                 <button
                   type="button"
                   onClick={handleForward}
-                  disabled={!audioSrc || !isThisSongActive}
+                  disabled={!song}
                   className="cursor-pointer text-whitetext transition-colors hover:text-secondary disabled:cursor-not-allowed disabled:opacity-30"
                   aria-label="Forward 10 seconds"
                   title="Forward 10 seconds"
@@ -206,7 +264,7 @@ const SongDetailContent = ({ song }) => {
                 <button
                   type="button"
                   onClick={toggleMute}
-                  disabled={!audioSrc}
+                  disabled={!song}
                   aria-label={isMuted ? "Unmute" : "Mute"}
                   className="cursor-pointer transition-colors hover:text-whitetext disabled:cursor-not-allowed disabled:opacity-30"
                 >
@@ -223,7 +281,7 @@ const SongDetailContent = ({ song }) => {
                     max={1}
                     step={0.01}
                     onChange={handleVolumeChange}
-                    disabled={!audioSrc}
+                    disabled={!song}
                     ariaLabel="Volume"
                   />
                 </div>

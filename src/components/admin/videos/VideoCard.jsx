@@ -20,15 +20,24 @@ const STATUS_COLORS = {
 }
 
 const VideoCard = ({ video }) => {
+  const { playMedia } = useGlobalMediaPlayerStore()
+
   if (!video) return null
 
   const statusKey = (video.status || "draft").toLowerCase()
   const statusColor = STATUS_COLORS[statusKey] || STATUS_COLORS.draft
   const isActive = statusKey === "active" || statusKey === "published"
 
-  const { playMedia } = useGlobalMediaPlayerStore()
-
-  const videoSrc = video.hlsMasterUrl ? resolveMediaUrl(video.hlsMasterUrl) : (video.sourceKey ? resolveMediaUrl(video.sourceKey) : "")
+  const videoId = video?._id || video?.id
+  const videoSrc = video?.hlsMasterUrl
+    ? resolveMediaUrl(video.hlsMasterUrl)
+    : (video?.sourceKey
+      ? resolveMediaUrl(video.sourceKey)
+      : (video?.videoUrl
+        ? resolveMediaUrl(video.videoUrl)
+        : (video?.streamUrl
+          ? resolveMediaUrl(video.streamUrl)
+          : "")))
 
   const handlePlay = (e) => {
     e.stopPropagation()
@@ -36,14 +45,19 @@ const VideoCard = ({ video }) => {
       toast.error("Video stream is currently unavailable or still processing.")
       return
     }
+    const artistName =
+      typeof video?.ownerId === "object" && video?.ownerId !== null
+        ? video?.ownerId?.name || video?.ownerId?.username || "Admin"
+        : (video?.artist || "Admin")
+
     playMedia({
-      id: video._id || videoSrc,
+      id: videoId || videoSrc,
       mediaType: "video",
       src: videoSrc,
-      title: video.title || "Video Track",
-      artist: video.ownerId?.name || "Admin",
-      coverUrl: video.coverUrl || "",
-      durationMs: video.durationMs || 0,
+      title: video?.title || "Video Track",
+      artist: artistName,
+      coverUrl: video?.coverUrl || video?.cover || "",
+      durationMs: video?.durationMs || 0,
     })
   }
 

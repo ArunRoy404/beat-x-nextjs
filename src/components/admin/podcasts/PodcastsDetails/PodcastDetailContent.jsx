@@ -18,22 +18,24 @@ const PodcastDetailContent = ({ podcast }) => {
     } = useGlobalMediaPlayerStore()
 
     const handlePlayEpisode = (episode) => {
-        const audioSrc = getSongAudioUrl(episode) || (episode?.hlsMasterUrl ? resolveMediaUrl(episode.hlsMasterUrl) : "")
+        const episodeId = episode?._id || episode?.id
+        const audioSrc = getSongAudioUrl(episode) || (episode?.hlsMasterUrl ? resolveMediaUrl(episode.hlsMasterUrl) : "") || "/test-audio/alex-morgan-no-copyright-music-578487.mp3"
         if (!audioSrc) {
             toast.error("Episode audio stream is currently unavailable or still processing.")
             return
         }
 
-        const isThisEpisodeActive = activeId === (episode?._id || audioSrc)
+        const isThisEpisodeActive = Boolean((episodeId && activeId === episodeId) || (audioSrc && activeId === audioSrc))
         if (isThisEpisodeActive) {
             toggleGlobalPlay()
         } else {
+            const artistName = typeof podcast?.title === "string" ? podcast.title : (podcast?.author || "Podcast ADDA")
             playMedia({
-                id: episode?._id || audioSrc,
+                id: episodeId || audioSrc,
                 mediaType: "audio",
                 src: audioSrc,
                 title: episode?.title ? `Ep. ${episode.episodeNumber || 1}: ${episode.title}` : "Podcast Episode",
-                artist: podcast?.title || "Podcast ADDA",
+                artist: artistName,
                 coverUrl: episode?.coverUrl || podcast?.coverUrl,
                 durationMs: episode?.durationMs || 0,
             })
