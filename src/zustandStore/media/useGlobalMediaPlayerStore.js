@@ -20,6 +20,7 @@ export const useGlobalMediaPlayerStore = create((set, get) => ({
   coverUrl: "",
   currentTime: 0,
   duration: 0,
+  liked: false,
 
   // Queue & Navigation state
   queue: [],
@@ -43,6 +44,8 @@ export const useGlobalMediaPlayerStore = create((set, get) => ({
       artist = "",
       coverUrl = "",
       durationMs = 0,
+      liked = false,
+      isLiked = false,
     } = media || {};
 
     const currentState = get();
@@ -108,6 +111,7 @@ export const useGlobalMediaPlayerStore = create((set, get) => ({
       coverUrl,
       currentTime: 0,
       duration: durationMs ? durationMs / 1000 : 0,
+      liked: Boolean(liked || isLiked),
       queue: newQueue,
       currentIndex: newIndex,
     });
@@ -133,6 +137,8 @@ export const useGlobalMediaPlayerStore = create((set, get) => ({
   setCurrentTime: (currentTime) => set({ currentTime }),
   setDuration: (duration) => set({ duration }),
   seekTo: (time) => set({ currentTime: time }),
+  setLiked: (liked) => set({ liked: Boolean(liked) }),
+  toggleLiked: () => set((state) => ({ liked: !state.liked })),
 
   // Queue actions
   setQueue: (rawQueue, startIndex = 0) => {
@@ -192,6 +198,7 @@ export const useGlobalMediaPlayerStore = create((set, get) => ({
       coverUrl: nextItem.coverUrl || nextItem.artwork || "",
       currentTime: 0,
       duration: nextItem.durationMs ? nextItem.durationMs / 1000 : 0,
+      liked: Boolean(nextItem.liked || nextItem.isLiked),
       currentIndex: nextIdx,
       isPlaying: true,
     });
@@ -240,6 +247,7 @@ export const useGlobalMediaPlayerStore = create((set, get) => ({
       coverUrl: prevItem.coverUrl || prevItem.artwork || "",
       currentTime: 0,
       duration: prevItem.durationMs ? prevItem.durationMs / 1000 : 0,
+      liked: Boolean(prevItem.liked || prevItem.isLiked),
       currentIndex: prevIdx,
       isPlaying: true,
     });
@@ -267,6 +275,7 @@ export const useGlobalMediaPlayerStore = create((set, get) => ({
       isPlaying: false,
       src: null,
       id: null,
+      liked: false,
       currentTime: 0,
       queue: [],
       currentIndex: -1,

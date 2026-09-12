@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronDown,
   ChevronUp,
+  Heart,
   ListMusic,
   Maximize2,
   Mic2,
@@ -25,6 +26,10 @@ import CommonCoverImage from "@/components/shared/CommonCoverImage/CommonCoverIm
 import PlayerSlider from "@/components/shared/MediaPlayerControls/PlayerSlider";
 import { useGlobalMediaPlayerStore } from "@/zustandStore/media/useGlobalMediaPlayerStore";
 import { useVolumeStore } from "@/zustandStore/audio/useVolumeStore";
+import { useSongDetail } from "@/hooks/api/user/songs/useSongDetail";
+import { useToggleLikeSong } from "@/hooks/api/user/songs/useToggleLikeSong";
+import { useVideoDetail } from "@/hooks/api/user/videos/useVideoDetail";
+import { useToggleLikeVideo } from "@/hooks/api/user/videos/useToggleLikeVideo";
 import { resolveMediaUrl } from "@/lib/format/resolveMediaUrl";
 import { canPlayNext, canPlayPrev } from "@/lib/player/playerUtils";
 import { toast } from "sonner";
@@ -45,6 +50,10 @@ const GlobalFloatingMediaPlayer = () => {
     isOpen,
     isPlaying,
     mediaType,
+    id,
+    liked,
+    setLiked,
+    toggleLiked,
     src: rawSrc,
     title,
     artist,
@@ -73,6 +82,43 @@ const GlobalFloatingMediaPlayer = () => {
   const coverUrl = resolveMediaUrl(rawCoverUrl);
 
   const { volume, isMuted, setVolume, toggleMute } = useVolumeStore();
+
+  const activeSongId = isOpen && id && mediaType === "audio" ? id : null;
+  const activeVideoId = isOpen && id && mediaType === "video" ? id : null;
+
+  const { data: songDetail } = useSongDetail(activeSongId);
+  const { data: videoDetail } = useVideoDetail(activeVideoId);
+
+  const { toggleLike: toggleSongLike, isPending: isSongLikePending } = useToggleLikeSong();
+  const { toggleLikeVideo, isPending: isVideoLikePending } = useToggleLikeVideo();
+
+  const isLikePending = mediaType === "video" ? isVideoLikePending : isSongLikePending;
+
+  // Synchronize user-specific like status when detailed song data loads
+  useEffect(() => {
+    if (mediaType === "audio" && typeof songDetail?.isLiked === "boolean") {
+      setLiked(songDetail.isLiked);
+    }
+  }, [mediaType, songDetail?.isLiked, setLiked]);
+
+  // Synchronize user-specific like status when detailed video data loads
+  useEffect(() => {
+    if (mediaType === "video" && typeof videoDetail?.isLiked === "boolean") {
+      setLiked(videoDetail.isLiked);
+    }
+  }, [mediaType, videoDetail?.isLiked, setLiked]);
+
+  const handleToggleLike = useCallback(() => {
+    if (!id) {
+      toggleLiked();
+      return;
+    }
+    if (mediaType === "video") {
+      toggleLikeVideo(id);
+    } else {
+      toggleSongLike(id);
+    }
+  }, [id, mediaType, toggleLikeVideo, toggleSongLike, toggleLiked]);
 
   const mediaRef = useRef(null);
 
@@ -525,6 +571,21 @@ const GlobalFloatingMediaPlayer = () => {
                   <span className="truncate text-[10px] text-light-gray">{artist || "BeatX"}</span>
                 </div>
                 <div className="flex shrink-0 items-center gap-1">
+                  <button
+                    type="button"
+                    disabled={isLikePending}
+                    onClick={handleToggleLike}
+                    className="p-1 rounded-full text-light-gray hover:text-whitetext transition-colors cursor-pointer disabled:opacity-50"
+                    title={liked ? "Unlike video" : "Like video"}
+                    aria-label={liked ? "Unlike video" : "Like video"}
+                  >
+                    <Heart
+                      className={cn(
+                        "size-3.5 transition-colors",
+                        liked ? "fill-red-error text-red-error" : "text-light-gray hover:text-whitetext"
+                      )}
+                    />
+                  </button>
                   <GradientPlayButton size="sm" playing={isPlaying} onClick={togglePlay} />
                   <button
                     type="button"
@@ -571,12 +632,29 @@ const GlobalFloatingMediaPlayer = () => {
 
                 {/* Control Deck */}
                 <div className="px-4 py-3 flex items-center justify-between gap-2.5 bg-black/60 backdrop-blur-md">
-                  {/* Left: Metadata */}
-                  <div className="flex flex-col min-w-0 max-w-[130px] sm:max-w-[170px]">
-                    <span className="text-xs font-semibold text-whitetext truncate">{title || "Video Track"}</span>
-                    <span className="text-[11px] text-light-gray truncate">
-                      {artist || "BeatX"} &middot; <span className="font-mono">{formatTime(currentTime)} / {formatTime(duration)}</span>
-                    </span>
+                  {/* Left: Metadata & Like */}
+                  <div className="flex items-center gap-1.5 min-w-0 max-w-[150px] sm:max-w-[190px]">
+                    <div className="flex flex-col min-w-0 flex-1">
+                      <span className="text-xs font-semibold text-whitetext truncate">{title || "Video Track"}</span>
+                      <span className="text-[11px] text-light-gray truncate">
+                        {artist || "BeatX"} &middot; <span className="font-mono">{formatTime(currentTime)} / {formatTime(duration)}</span>
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      disabled={isLikePending}
+                      onClick={handleToggleLike}
+                      className="p-1 rounded-full text-light-gray hover:text-whitetext transition-colors cursor-pointer shrink-0 disabled:opacity-50"
+                      title={liked ? "Unlike video" : "Like video"}
+                      aria-label={liked ? "Unlike video" : "Like video"}
+                    >
+                      <Heart
+                        className={cn(
+                          "size-3.5 sm:size-4 transition-colors",
+                          liked ? "fill-red-error text-red-error" : "text-light-gray hover:text-whitetext"
+                        )}
+                      />
+                    </button>
                   </div>
 
                   {/* Center: Playback Buttons with Shuffle, Prev, Play, Next, Repeat */}
@@ -764,8 +842,8 @@ const GlobalFloatingMediaPlayer = () => {
               className="hidden"
             />
 
-            {/* Left: Thumbnail & Info */}
-            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 min-w-0 max-w-[110px] xs:max-w-[145px] sm:max-w-[220px]">
+            {/* Left: Thumbnail & Info + Like */}
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 min-w-0 max-w-[130px] xs:max-w-[170px] sm:max-w-[250px]">
               <div className="relative size-8 shrink-0 overflow-hidden rounded-full bg-dark-accent sm:size-10">
                 <CommonCoverImage
                   src={coverUrl}
@@ -785,6 +863,21 @@ const GlobalFloatingMediaPlayer = () => {
                   {artist || "BeatX"}
                 </span>
               </div>
+              <button
+                type="button"
+                disabled={isLikePending}
+                onClick={handleToggleLike}
+                className="shrink-0 p-1 rounded-full text-light-gray hover:text-whitetext transition-colors cursor-pointer disabled:opacity-50"
+                title={liked ? "Unlike audio" : "Like audio"}
+                aria-label={liked ? "Unlike audio" : "Like audio"}
+              >
+                <Heart
+                  className={cn(
+                    "size-3.5 sm:size-4 transition-colors",
+                    liked ? "fill-red-error text-red-error" : "text-light-gray hover:text-whitetext"
+                  )}
+                />
+              </button>
             </div>
 
             {/* Center: Playback Controls (Single Row on mobile) & Desktop Seekbar */}

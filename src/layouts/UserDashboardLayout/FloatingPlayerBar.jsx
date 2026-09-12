@@ -11,6 +11,7 @@ import { useUserPlayerStore } from "@/zustandStore/user/userStore/userPlayerStor
 import { useVolumeStore } from "@/zustandStore/audio/useVolumeStore"
 import { useGlobalMediaPlayerStore } from "@/zustandStore/media/useGlobalMediaPlayerStore"
 import { useToggleLikeSong } from "@/hooks/api/user/songs/useToggleLikeSong"
+import { useSongDetail } from "@/hooks/api/user/songs/useSongDetail"
 import { usePlaySong } from "@/hooks/api/user/songs/usePlaySong"
 import { saveSongProgressRequest } from "@/services/user/songsServices"
 import { resolveMediaUrl } from "@/lib/format/resolveMediaUrl"
@@ -40,7 +41,8 @@ const FloatingPlayerBar = () => {
         isPending: isTrackChanging,
     } = usePlaySong()
     const { volume, isMuted, setVolume, toggleMute } = useVolumeStore()
-    const { toggleLike } = useToggleLikeSong()
+    const { toggleLike, isPending: isLikePending } = useToggleLikeSong()
+    const { data: songDetail } = useSongDetail(songId || null)
     const audioRef = useRef(null)
 
     const isGlobalOpen = useGlobalMediaPlayerStore((state) => state.isOpen)
@@ -52,6 +54,13 @@ const FloatingPlayerBar = () => {
 
     const [mobileVolumeOpen, setMobileVolumeOpen] = useState(false)
     const mobileVolumeRef = useRef(null)
+
+    // Sync user-specific like status when detailed song data loads
+    useEffect(() => {
+        if (typeof songDetail?.isLiked === "boolean") {
+            useUserPlayerStore.getState().setLiked(songDetail.isLiked)
+        }
+    }, [songDetail?.isLiked])
 
     useEffect(() => {
         if (!mobileVolumeOpen) return
@@ -418,6 +427,7 @@ const FloatingPlayerBar = () => {
                         </span>
                         <button
                             type="button"
+                            disabled={isLikePending}
                             onClick={() => {
                                 if (songId) {
                                     toggleLike(songId)
@@ -425,7 +435,7 @@ const FloatingPlayerBar = () => {
                                     toggleLiked()
                                 }
                             }}
-                            className="shrink-0 p-0.5"
+                            className="shrink-0 p-0.5 disabled:opacity-50"
                             aria-label={liked ? "Unlike" : "Like"}
                         >
                             <Heart className={cn("size-3 sm:size-4 cursor-pointer transition-colors", liked ? "fill-red-error text-red-error" : "text-light-gray hover:text-whitetext")} />
