@@ -791,7 +791,7 @@ const GlobalFloatingMediaPlayer = () => {
               stiffness: 90,
               damping: 15,
             }}
-            className="fixed bottom-4 left-1/2 z-50 flex w-[calc(100%-16px)] max-w-4xl items-center justify-between gap-1.5 rounded-full border border-border bg-(--player-bar-bg) px-2.5 py-2 shadow-(--now-playing-glow) backdrop-blur-md sm:bottom-6 sm:w-[calc(100%-48px)] sm:gap-6 sm:px-6 sm:py-3.5 md:gap-12 relative overflow-hidden"
+            className="fixed bottom-4 left-1/2 z-50 flex w-[calc(100%-16px)] max-w-4xl items-center justify-between gap-1.5 rounded-full border border-border bg-(--player-bar-bg) px-2.5 py-2 shadow-(--now-playing-glow) backdrop-blur-md sm:bottom-6 sm:w-[calc(100%-48px)] sm:gap-6 sm:px-6 sm:py-3.5 md:gap-12 overflow-hidden"
           >
             {/* Mobile Top Edge Seek & Progress Bar (Runs seamlessly along the top border without taking row space) */}
             <div className="absolute top-0 inset-x-6 h-2 sm:hidden z-10 flex items-start cursor-pointer">

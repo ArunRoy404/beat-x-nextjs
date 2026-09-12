@@ -337,7 +337,7 @@ const FloatingPlayerBar = () => {
                 delay: 0.65 // Slides up shortly after other page items load
             }}
             className={cn(
-                "fixed bottom-4 left-1/2 z-50 flex w-[calc(100%-16px)] max-w-4xl items-center justify-between gap-1.5 rounded-full border border-border bg-(--player-bar-bg) px-2.5 py-2 shadow-(--now-playing-glow) backdrop-blur-md sm:bottom-6 sm:w-[calc(100%-48px)] sm:gap-6 sm:px-6 sm:py-3.5 md:gap-12 relative overflow-hidden",
+                "absolute bottom-4 left-1/2 z-50 flex w-[calc(100%-16px)] max-w-4xl items-center justify-between gap-1.5 rounded-full border border-border bg-(--player-bar-bg) px-2.5 py-2 shadow-(--now-playing-glow) backdrop-blur-md sm:bottom-6 sm:w-[calc(100%-48px)] sm:gap-6 sm:px-6 sm:py-3.5 md:gap-12 overflow-hidden",
                 isGlobalOpen && globalMediaType === "video" && "hidden sm:flex"
             )}
         >
