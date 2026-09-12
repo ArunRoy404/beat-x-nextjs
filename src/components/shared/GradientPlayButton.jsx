@@ -1,3 +1,4 @@
+import { Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const sizeClasses = {
@@ -5,12 +6,12 @@ const sizeClasses = {
     md: "size-12 p-1",
 }
 
-const GradientPlayButton = ({ size = "md", playing = false, className, iconClassName, onClick, type = "button", ...props }) => {
+const GradientPlayButton = ({ size = "md", playing = false, loading = false, className, iconClassName, onClick, type = "button", ...props }) => {
     return (
         <button
             type={type}
             onClick={onClick}
-            aria-label={playing ? "Pause" : "Play"}
+            aria-label={loading ? "Buffering" : playing ? "Pause" : "Play"}
             className={cn(
                 "shrink-0 rounded-full bg-(image:--button-bg) drop-shadow-(--play-button-glow) flex items-center justify-center cursor-pointer",
                 sizeClasses[size],
@@ -19,7 +20,9 @@ const GradientPlayButton = ({ size = "md", playing = false, className, iconClass
             {...props}
         >
             <span className="flex size-full items-center justify-center rounded-full bg-background">
-                {playing ? (
+                {loading ? (
+                    <Loader2 className={cn("size-4 text-button-text animate-spin", iconClassName)} />
+                ) : playing ? (
                     <svg
                         viewBox="0 0 14 18"
                         className={cn("w-3.5 h-4.5 text-button-text", iconClassName)}

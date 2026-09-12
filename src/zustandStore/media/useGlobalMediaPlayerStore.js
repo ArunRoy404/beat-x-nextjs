@@ -21,6 +21,8 @@ export const useGlobalMediaPlayerStore = create((set, get) => ({
   currentTime: 0,
   duration: 0,
   liked: false,
+  isBuffering: false,
+  pendingSeekTime: null,
 
   // Queue & Navigation state
   queue: [],
@@ -48,6 +50,15 @@ export const useGlobalMediaPlayerStore = create((set, get) => ({
       isLiked = false,
     } = media || {};
 
+    const sanitizedArtist =
+      typeof artist === "object" && artist !== null
+        ? artist?.name || artist?.title || "BeatX Media"
+        : (artist || "BeatX Media");
+    const sanitizedTitle =
+      typeof title === "object" && title !== null
+        ? title?.name || title?.title || "Media Track"
+        : (title || "Media Track");
+
     const currentState = get();
     const targetId = id || src;
 
@@ -61,6 +72,7 @@ export const useGlobalMediaPlayerStore = create((set, get) => ({
       set({
         isOpen: true,
         isPlaying: true,
+        isBuffering: false,
       });
       return;
     }
@@ -89,8 +101,8 @@ export const useGlobalMediaPlayerStore = create((set, get) => ({
           id: targetId,
           src,
           mediaType,
-          title,
-          artist,
+          title: sanitizedTitle,
+          artist: sanitizedArtist,
           coverUrl,
           durationMs,
         });
@@ -103,11 +115,13 @@ export const useGlobalMediaPlayerStore = create((set, get) => ({
       isOpen: true,
       isMinimized: false,
       isPlaying: true,
+      isBuffering: false,
+      pendingSeekTime: null,
       id: targetId,
       src,
       mediaType,
-      title,
-      artist,
+      title: sanitizedTitle,
+      artist: sanitizedArtist,
       coverUrl,
       currentTime: 0,
       duration: durationMs ? durationMs / 1000 : 0,
@@ -124,19 +138,21 @@ export const useGlobalMediaPlayerStore = create((set, get) => ({
         useUserPlayerStore.getState().setIsPlaying(false);
       } catch (e) {}
     }
-    set({ isPlaying: !state.isPlaying });
+    set({ isPlaying: !state.isPlaying, ...(state.isPlaying ? { isBuffering: false } : {}) });
   },
-  pauseMedia: () => set({ isPlaying: false }),
+  pauseMedia: () => set({ isPlaying: false, isBuffering: false }),
   resumeMedia: () => {
     try {
       useUserPlayerStore.getState().setIsPlaying(false);
     } catch (e) {}
-    set({ isPlaying: true });
+    set({ isPlaying: true, isBuffering: false });
   },
 
   setCurrentTime: (currentTime) => set({ currentTime }),
   setDuration: (duration) => set({ duration }),
-  seekTo: (time) => set({ currentTime: time }),
+  seekTo: (time) => set({ currentTime: time, pendingSeekTime: time }),
+  clearPendingSeek: () => set({ pendingSeekTime: null }),
+  setIsBuffering: (isBuffering) => set({ isBuffering: Boolean(isBuffering) }),
   setLiked: (liked) => set({ liked: Boolean(liked) }),
   toggleLiked: () => set((state) => ({ liked: !state.liked })),
 
@@ -273,6 +289,8 @@ export const useGlobalMediaPlayerStore = create((set, get) => ({
     set({
       isOpen: false,
       isPlaying: false,
+      isBuffering: false,
+      pendingSeekTime: null,
       src: null,
       id: null,
       liked: false,
