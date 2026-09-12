@@ -25,7 +25,10 @@ export const queryKeys = {
     trending: () => [...queryKeys.songs.all, "trending"],
     featured: () => [...queryKeys.songs.all, "featured"],
     list: (params) => [...queryKeys.songs.all, "list", params],
-    liked: () => [...queryKeys.songs.all, "liked"],
+    liked: (params) =>
+      params
+        ? [...queryKeys.songs.all, "liked", params]
+        : [...queryKeys.songs.all, "liked"],
     detail: (id) => [...queryKeys.songs.all, "detail", id],
     stream: (id) => [...queryKeys.songs.all, "stream", id],
     like: (id) => [...queryKeys.songs.all, "like", id],

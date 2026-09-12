@@ -33,8 +33,10 @@ export async function getFeaturedSongsRequest() {
   return res?.data?.data;
 }
 
-export async function getLikedSongsRequest() {
-  const res = await axiosPrivate.get("/songs/liked");
+export async function getLikedSongsRequest({ page = 1, limit = 20 } = {}) {
+  const res = await axiosPrivate.get("/songs/liked", {
+    params: { page, limit },
+  });
   return res?.data?.data ?? res?.data;
 }
 

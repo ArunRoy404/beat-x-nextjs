@@ -6,10 +6,11 @@ import { queryKeys } from "@/lib/reactQuery/queryKeys";
 
 /**
  * Hook to fetch the signed-in user's collection of liked songs.
+ * Supports optional pagination/query params.
  */
-export function useLikedSongs() {
+export function useLikedSongs(params) {
   return useQuery({
-    queryKey: queryKeys.songs.liked(),
-    queryFn: getLikedSongsRequest,
+    queryKey: queryKeys.songs.liked(params),
+    queryFn: () => getLikedSongsRequest(params),
   });
 }
