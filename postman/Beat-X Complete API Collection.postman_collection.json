@@ -8552,10 +8552,10 @@
           ]
         },
         {
-          "name": "Playlists",
+          "name": "✅ Playlists",
           "item": [
             {
-              "name": "Create Playlist",
+              "name": "✅ Create Playlist",
               "event": [
                 {
                   "listen": "test",
@@ -8658,7 +8658,7 @@
               ]
             },
             {
-              "name": "List My Playlists",
+              "name": "✅ List My Playlists",
               "request": {
                 "method": "GET",
                 "header": [
@@ -8738,7 +8738,7 @@
               ]
             },
             {
-              "name": "Get Playlist by Id",
+              "name": "✅ Get Playlist by Id",
               "request": {
                 "method": "GET",
                 "header": [
@@ -8800,7 +8800,7 @@
               ]
             },
             {
-              "name": "Update Playlist",
+              "name": "✅ Update Playlist",
               "request": {
                 "method": "PATCH",
                 "header": [
@@ -8890,7 +8890,7 @@
               ]
             },
             {
-              "name": "Add Song to Playlist",
+              "name": "✅ Add Song to Playlist",
               "request": {
                 "method": "POST",
                 "header": [
@@ -8982,7 +8982,7 @@
               ]
             },
             {
-              "name": "Remove Song from Playlist",
+              "name": "✅ Remove Song from Playlist",
               "request": {
                 "method": "DELETE",
                 "header": [
@@ -9048,7 +9048,7 @@
               ]
             },
             {
-              "name": "Delete Playlist",
+              "name": "✅ Delete Playlist",
               "request": {
                 "method": "DELETE",
                 "header": [
