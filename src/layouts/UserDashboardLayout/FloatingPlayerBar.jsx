@@ -2,14 +2,19 @@
 
 import { useEffect, useRef, useState, useCallback } from "react"
 import Image from "next/image"
-import { motion } from "framer-motion"
-import { Heart, ListMusic, Maximize2, Mic2, Music, Repeat, Shuffle, SkipBack, SkipForward, Volume2, VolumeX, X } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { Heart, ListMusic, Maximize2, Mic2, Music, Repeat, Repeat1, Shuffle, SkipBack, SkipForward, Volume2, VolumeX, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import GradientPlayButton from "@/components/shared/GradientPlayButton"
+import PlayerSlider from "@/components/shared/MediaPlayerControls/PlayerSlider"
 import { useUserPlayerStore } from "@/zustandStore/user/userStore/userPlayerStore"
 import { useVolumeStore } from "@/zustandStore/audio/useVolumeStore"
+import { useGlobalMediaPlayerStore } from "@/zustandStore/media/useGlobalMediaPlayerStore"
 import { useToggleLikeSong } from "@/hooks/api/user/songs/useToggleLikeSong"
+import { usePlaySong } from "@/hooks/api/user/songs/usePlaySong"
 import { saveSongProgressRequest } from "@/services/user/songsServices"
+import { resolveMediaUrl } from "@/lib/format/resolveMediaUrl"
+import { toast } from "sonner"
 
 const SEEK_SECONDS = 10
 
@@ -23,14 +28,41 @@ const formatTime = (seconds) => {
 
 const FloatingPlayerBar = () => {
     const { title, artist, artwork, src, liked, toggleLiked, songId, isPlaying: storeIsPlaying, setIsPlaying: setStoreIsPlaying, closeTrack } = useUserPlayerStore()
+    const {
+        playNext,
+        playPrev,
+        toggleShuffle,
+        toggleRepeatMode,
+        hasNext,
+        hasPrev,
+        isShuffle,
+        repeatMode,
+        isPending: isTrackChanging,
+    } = usePlaySong()
     const { volume, isMuted, setVolume, toggleMute } = useVolumeStore()
     const { toggleLike } = useToggleLikeSong()
     const audioRef = useRef(null)
 
+    const isGlobalOpen = useGlobalMediaPlayerStore((state) => state.isOpen)
+    const globalMediaType = useGlobalMediaPlayerStore((state) => state.mediaType)
+
     const [isPlaying, setIsPlaying] = useState(false)
     const [currentTime, setCurrentTime] = useState(0)
     const [duration, setDuration] = useState(0)
-    const [repeat, setRepeat] = useState(false)
+
+    const [mobileVolumeOpen, setMobileVolumeOpen] = useState(false)
+    const mobileVolumeRef = useRef(null)
+
+    useEffect(() => {
+        if (!mobileVolumeOpen) return
+        const onPointerDown = (event) => {
+            if (!mobileVolumeRef.current?.contains(event.target)) {
+                setMobileVolumeOpen(false)
+            }
+        }
+        document.addEventListener("pointerdown", onPointerDown)
+        return () => document.removeEventListener("pointerdown", onPointerDown)
+    }, [mobileVolumeOpen])
 
     // Complete player teardown
     const handleClose = useCallback(() => {
@@ -46,7 +78,7 @@ const FloatingPlayerBar = () => {
             try {
                 navigator.mediaSession.metadata = null
                 navigator.mediaSession.playbackState = "none"
-                const actions = ["play", "pause", "seekbackward", "seekforward", "seekto", "stop"]
+                const actions = ["play", "pause", "seekbackward", "seekforward", "seekto", "stop", "previoustrack", "nexttrack"]
                 actions.forEach((act) => {
                     try {
                         navigator.mediaSession.setActionHandler(act, null)
@@ -125,6 +157,28 @@ const FloatingPlayerBar = () => {
         } catch (e) {}
     }, [isPlaying, src])
 
+    // Sync position state with OS media controls
+    useEffect(() => {
+        if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return
+        if (!("setPositionState" in navigator.mediaSession)) return
+        if (!src || !Number.isFinite(duration) || duration <= 0) return
+
+        try {
+            navigator.mediaSession.setPositionState({
+                duration: Math.max(duration, 0),
+                playbackRate: 1,
+                position: Math.min(Math.max(currentTime, 0), duration),
+            })
+        } catch (e) {}
+    }, [currentTime, duration, src])
+
+    const seekBy = useCallback((delta) => {
+        const audio = audioRef.current
+        if (!audio) return
+        const max = Number.isFinite(audio.duration) ? audio.duration : Infinity
+        audio.currentTime = Math.min(Math.max(audio.currentTime + delta, 0), max)
+    }, [])
+
     // Register OS Media Session action handlers
     useEffect(() => {
         if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return
@@ -148,6 +202,12 @@ const FloatingPlayerBar = () => {
             }],
             ["seekbackward", () => seekBy(-SEEK_SECONDS)],
             ["seekforward", () => seekBy(SEEK_SECONDS)],
+            ["previoustrack", () => {
+                if (hasPrev && !isTrackChanging) playPrev()
+            }],
+            ["nexttrack", () => {
+                if (hasNext && !isTrackChanging) playNext()
+            }],
             ["stop", () => handleClose()],
         ]
 
@@ -164,7 +224,7 @@ const FloatingPlayerBar = () => {
                 } catch (e) {}
             })
         }
-    }, [src, handleClose, setStoreIsPlaying])
+    }, [src, handleClose, setStoreIsPlaying, hasPrev, hasNext, isTrackChanging, playPrev, playNext, seekBy])
 
     useEffect(() => {
         // The audio element can finish loading metadata before this component's
@@ -188,10 +248,6 @@ const FloatingPlayerBar = () => {
     useEffect(() => {
         applyVolume()
     }, [applyVolume, src])
-
-    useEffect(() => {
-        if (audioRef.current) audioRef.current.loop = repeat
-    }, [repeat])
 
     // Auto-play when a new track/src is selected
     useEffect(() => {
@@ -221,6 +277,8 @@ const FloatingPlayerBar = () => {
         }
     }, [storeIsPlaying, applyVolume])
 
+    const resolvedSrc = resolveMediaUrl(src)
+
     const togglePlay = () => {
         const audio = audioRef.current
         if (!audio) return
@@ -229,6 +287,9 @@ const FloatingPlayerBar = () => {
             setIsPlaying(false)
             setStoreIsPlaying?.(false)
         } else {
+            try {
+                useGlobalMediaPlayerStore.getState().pauseMedia()
+            } catch (e) {}
             applyVolume()
             audio.play().then(() => {
                 applyVolume()
@@ -236,13 +297,6 @@ const FloatingPlayerBar = () => {
                 setStoreIsPlaying?.(true)
             }).catch(() => {})
         }
-    }
-
-    const seekBy = (delta) => {
-        const audio = audioRef.current
-        if (!audio) return
-        const max = Number.isFinite(audio.duration) ? audio.duration : Infinity
-        audio.currentTime = Math.min(Math.max(audio.currentTime + delta, 0), max)
     }
 
     const handleSeekChange = (e) => {
@@ -259,7 +313,7 @@ const FloatingPlayerBar = () => {
         }
     }
 
-    const progress = duration ? currentTime / duration : 0
+    const progress = duration > 0 ? Math.min(1, Math.max(0, currentTime / duration)) : 0
 
     if (!src && !title) return null
 
@@ -273,13 +327,39 @@ const FloatingPlayerBar = () => {
                 damping: 15,
                 delay: 0.65 // Slides up shortly after other page items load
             }}
-            className="absolute bottom-6 left-1/2 z-20 flex w-[calc(100%-48px)] max-w-4xl items-center gap-6 rounded-full border border-border bg-(--player-bar-bg) px-6 py-3.5 shadow-(--now-playing-glow) backdrop-blur-md md:gap-12"
+            className={cn(
+                "fixed bottom-4 left-1/2 z-50 flex w-[calc(100%-16px)] max-w-4xl items-center justify-between gap-1.5 rounded-full border border-border bg-(--player-bar-bg) px-2.5 py-2 shadow-(--now-playing-glow) backdrop-blur-md sm:bottom-6 sm:w-[calc(100%-48px)] sm:gap-6 sm:px-6 sm:py-3.5 md:gap-12 relative overflow-hidden",
+                isGlobalOpen && globalMediaType === "video" && "hidden sm:flex"
+            )}
         >
+            {/* Mobile Top Edge Seek & Progress Bar (Runs seamlessly along the top border without taking row space) */}
+            <div className="absolute top-0 inset-x-6 h-2 sm:hidden z-10 flex items-start cursor-pointer">
+                <div className="relative w-full h-[2px] overflow-hidden rounded-t-full bg-white/10">
+                    <div
+                        className="h-full rounded-full bg-(image:--button-bg) transition-all duration-150"
+                        style={{ width: `${progress * 100}%` }}
+                    />
+                </div>
+                <input
+                    type="range"
+                    min={0}
+                    max={duration || 0}
+                    step={0.1}
+                    value={currentTime}
+                    onChange={handleSeekChange}
+                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                    aria-label="Seek track"
+                />
+            </div>
+
             <audio
                 ref={audioRef}
-                src={src}
+                src={resolvedSrc}
                 preload="metadata"
                 onPlay={() => {
+                    try {
+                        useGlobalMediaPlayerStore.getState().pauseMedia()
+                    } catch (e) {}
                     applyVolume()
                     setIsPlaying(true)
                     setStoreIsPlaying?.(true)
@@ -294,28 +374,48 @@ const FloatingPlayerBar = () => {
                     setStoreIsPlaying?.(false)
                 }}
                 onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
+                onError={() => {
+                    setIsPlaying(false)
+                    setStoreIsPlaying?.(false)
+                    toast.error("Audio stream source is unavailable or still processing.")
+                }}
                 onEnded={() => {
                     setIsPlaying(false)
                     setStoreIsPlaying?.(false)
                     if (songId) {
                         saveSongProgressRequest({ id: songId, positionMs: Math.floor(duration * 1000), completed: true }).catch(() => {})
                     }
+
+                    if (repeatMode === "one") {
+                        if (audioRef.current) {
+                            audioRef.current.currentTime = 0
+                            audioRef.current.play().then(() => {
+                                setIsPlaying(true)
+                                setStoreIsPlaying?.(true)
+                            }).catch(() => {})
+                        }
+                    } else if (hasNext || isShuffle) {
+                        playNext()
+                    }
                 }}
             />
 
-            <div className="flex shrink-0 items-center gap-2">
-                <div className="relative size-10 shrink-0 overflow-hidden rounded-full bg-dark-accent">
+            {/* Left: Artwork + Title/Artist + Like */}
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 min-w-0 max-w-[110px] xs:max-w-[145px] sm:max-w-[220px]">
+                <div className="relative size-8 shrink-0 overflow-hidden rounded-full bg-dark-accent sm:size-10">
                     {artwork ? (
                         <Image alt={title || "Track artwork"} src={artwork} fill sizes="40px" className="object-cover" />
                     ) : (
                         <div className="flex size-full items-center justify-center bg-white/10 text-light-gray">
-                            <Music className="size-5 text-secondary" />
+                            <Music className="size-4 sm:size-5 text-secondary" />
                         </div>
                     )}
                 </div>
-                <div className="hidden flex-col gap-1 sm:flex">
-                    <div className="flex items-center gap-2">
-                        <span className="whitespace-nowrap text-lg font-semibold text-whitetext">{title}</span>
+                <div className="flex min-w-0 flex-1 flex-col">
+                    <div className="flex items-center gap-1">
+                        <span className="truncate whitespace-nowrap text-xs font-semibold text-whitetext sm:text-base md:text-lg">
+                            {title}
+                        </span>
                         <button
                             type="button"
                             onClick={() => {
@@ -325,90 +425,198 @@ const FloatingPlayerBar = () => {
                                     toggleLiked()
                                 }
                             }}
+                            className="shrink-0 p-0.5"
                             aria-label={liked ? "Unlike" : "Like"}
                         >
-                            <Heart className={cn("size-4 cursor-pointer transition-colors", liked ? "fill-red-error text-red-error" : "text-light-gray hover:text-whitetext")} />
+                            <Heart className={cn("size-3 sm:size-4 cursor-pointer transition-colors", liked ? "fill-red-error text-red-error" : "text-light-gray hover:text-whitetext")} />
                         </button>
                     </div>
-                    <span className="text-xs text-light-gray">{artist}</span>
+                    <span className="truncate text-[10px] text-light-gray sm:text-xs leading-tight">
+                        {artist}
+                    </span>
                 </div>
             </div>
 
-            <div className="flex flex-1 flex-col items-center gap-2">
-                <div className="flex items-center gap-4">
-                    <button type="button" className="hidden text-light-gray sm:block" aria-label="Shuffle">
-                        <Shuffle className="size-5" />
-                    </button>
-                    <button type="button" onClick={() => seekBy(-SEEK_SECONDS)} className="text-whitetext" aria-label="Rewind 10 seconds">
-                        <SkipBack className="size-5" fill="currentColor" />
-                    </button>
-                    <GradientPlayButton size="md" playing={isPlaying} onClick={togglePlay} />
-                    <button type="button" onClick={() => seekBy(SEEK_SECONDS)} className="text-whitetext" aria-label="Forward 10 seconds">
-                        <SkipForward className="size-5" fill="currentColor" />
-                    </button>
+            {/* Center: Playback Controls (Single Row on mobile) & Desktop Seekbar */}
+            <div className="flex min-w-0 flex-1 items-center justify-center gap-1 xs:gap-1.5 sm:flex-col sm:gap-2">
+                <div className="flex shrink-0 items-center gap-1.5 xs:gap-2 sm:gap-4">
+                    {/* Shuffle toggle button - VISIBLE ON MOBILE */}
                     <button
                         type="button"
-                        onClick={() => setRepeat((prev) => !prev)}
-                        className={repeat ? "text-secondary" : "text-light-gray"}
-                        aria-label="Repeat"
-                        aria-pressed={repeat}
+                        onClick={toggleShuffle}
+                        className={cn(
+                            "cursor-pointer p-1 transition-colors",
+                            isShuffle ? "text-secondary" : "text-light-gray hover:text-whitetext"
+                        )}
+                        aria-label="Shuffle"
+                        aria-pressed={isShuffle}
+                        title={isShuffle ? "Shuffle On" : "Shuffle Off"}
                     >
-                        <Repeat className="size-5" />
+                        <Shuffle className="size-3.5 sm:size-5" />
+                    </button>
+
+                    {/* Previous Track button - VISIBLE ON MOBILE */}
+                    <button
+                        type="button"
+                        onClick={playPrev}
+                        disabled={!hasPrev || isTrackChanging}
+                        className={cn(
+                            "p-1 transition-opacity",
+                            !hasPrev || isTrackChanging
+                                ? "cursor-not-allowed opacity-30 text-light-gray pointer-events-none"
+                                : "cursor-pointer text-whitetext hover:text-secondary"
+                        )}
+                        aria-label="Previous track"
+                        title="Previous track"
+                    >
+                        <SkipBack className="size-4 sm:size-5" fill="currentColor" />
+                    </button>
+
+                    {/* Play / Pause button */}
+                    <GradientPlayButton size="sm" playing={isPlaying} onClick={togglePlay} className="sm:hidden" />
+                    <GradientPlayButton size="md" playing={isPlaying} onClick={togglePlay} className="hidden sm:inline-flex" />
+
+                    {/* Next Track button - VISIBLE ON MOBILE */}
+                    <button
+                        type="button"
+                        onClick={playNext}
+                        disabled={!hasNext || isTrackChanging}
+                        className={cn(
+                            "p-1 transition-opacity",
+                            !hasNext || isTrackChanging
+                                ? "cursor-not-allowed opacity-30 text-light-gray pointer-events-none"
+                                : "cursor-pointer text-whitetext hover:text-secondary"
+                        )}
+                        aria-label="Next track"
+                        title="Next track"
+                    >
+                        <SkipForward className="size-4 sm:size-5" fill="currentColor" />
+                    </button>
+
+                    {/* Repeat toggle button - VISIBLE ON MOBILE */}
+                    <button
+                        type="button"
+                        onClick={toggleRepeatMode}
+                        className={cn(
+                            "cursor-pointer p-1 transition-colors",
+                            repeatMode !== "off" ? "text-secondary" : "text-light-gray hover:text-whitetext"
+                        )}
+                        aria-label={`Repeat mode: ${repeatMode}`}
+                        aria-pressed={repeatMode !== "off"}
+                        title={
+                            repeatMode === "off"
+                                ? "Repeat Off"
+                                : repeatMode === "all"
+                                ? "Repeat All"
+                                : "Repeat One"
+                        }
+                    >
+                        {repeatMode === "one" ? (
+                            <Repeat1 className="size-3.5 sm:size-5" />
+                        ) : (
+                            <Repeat className="size-3.5 sm:size-5" />
+                        )}
                     </button>
                 </div>
+
+                {/* Desktop Seekbar with Timestamps (only takes 2nd line on desktop) */}
                 <div className="hidden w-full items-center gap-2 sm:flex">
-                    <span className="w-9 shrink-0 text-xs text-light-gray">{formatTime(currentTime)}</span>
-                    <div className="relative h-2 w-full flex-1">
-                        <div className="absolute inset-0 overflow-hidden rounded-full bg-dark-gray">
-                            <div className="h-full rounded-full bg-(image:--button-bg)" style={{ width: `${progress * 100}%` }} />
-                        </div>
-                        <input
-                            type="range"
-                            min={0}
-                            max={duration || 0}
-                            step={0.1}
-                            value={currentTime}
-                            onChange={handleSeekChange}
-                            className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                            aria-label="Seek"
-                        />
-                    </div>
-                    <span className="w-9 shrink-0 text-xs text-light-gray">{formatTime(duration)}</span>
+                    <span className="w-9 shrink-0 font-mono text-xs text-light-gray">{formatTime(currentTime)}</span>
+                    <PlayerSlider
+                        value={currentTime}
+                        max={duration || 0}
+                        step={0.1}
+                        onChange={handleSeekChange}
+                        ariaLabel="Seek"
+                    />
+                    <span className="w-9 shrink-0 text-right font-mono text-xs text-light-gray">{formatTime(duration)}</span>
                 </div>
             </div>
 
-            <div className="hidden shrink-0 items-center gap-4 lg:flex">
-                <button type="button" className="text-light-gray" aria-label="Lyrics">
-                    <Mic2 className="size-4" />
-                </button>
-                <button type="button" className="text-light-gray" aria-label="Queue">
-                    <ListMusic className="size-4" />
-                </button>
-                <div className="flex items-center gap-2">
-                    <button type="button" onClick={toggleMute} aria-label={isMuted ? "Unmute" : "Mute"}>
+            {/* Right: Tools & Close */}
+            <div className="flex shrink-0 items-center gap-1 sm:gap-3">
+                <div className="hidden shrink-0 items-center gap-4 lg:flex">
+                    <button type="button" className="text-light-gray hover:text-whitetext transition-colors cursor-pointer" aria-label="Lyrics">
+                        <Mic2 className="size-4" />
+                    </button>
+                    <button type="button" className="text-light-gray hover:text-whitetext transition-colors cursor-pointer" aria-label="Queue">
+                        <ListMusic className="size-4" />
+                    </button>
+                </div>
+
+                {/* Desktop Inline Volume */}
+                <div className="hidden items-center gap-2 sm:flex">
+                    <button type="button" onClick={toggleMute} aria-label={isMuted ? "Unmute" : "Mute"} className="cursor-pointer hover:text-whitetext transition-colors">
                         {isMuted || volume === 0 ? (
                             <VolumeX className="size-4 text-light-gray" />
                         ) : (
                             <Volume2 className="size-4 text-light-gray" />
                         )}
                     </button>
-                    <div className="relative h-1 w-20">
-                        <div className="absolute inset-0 overflow-hidden rounded-full bg-dark-gray">
-                            <div className="h-full rounded-full bg-light-gray" style={{ width: `${(isMuted ? 0 : volume) * 100}%` }} />
-                        </div>
-                        <input
-                            type="range"
-                            min={0}
+                    <div className="w-16 lg:w-20">
+                        <PlayerSlider
+                            variant="volume"
+                            value={isMuted ? 0 : volume}
                             max={1}
                             step={0.01}
-                            value={isMuted ? 0 : volume}
                             onChange={handleVolumeChange}
-                            className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                            aria-label="Volume"
+                            ariaLabel="Volume"
                         />
                     </div>
                 </div>
-                <button type="button" className="text-light-gray" aria-label="Fullscreen">
+
+                {/* Mobile Volume Popover */}
+                <div ref={mobileVolumeRef} className="relative sm:hidden">
+                    <AnimatePresence>
+                        {mobileVolumeOpen && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 8, scale: 0.94 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 8, scale: 0.94 }}
+                                transition={{ type: "spring", stiffness: 420, damping: 30 }}
+                                className="absolute bottom-full left-1/2 z-10 mb-3 flex -translate-x-1/2 flex-col items-center gap-2.5 rounded-2xl border border-border bg-(--player-bar-bg) px-2.5 py-3 shadow-(--now-playing-glow) backdrop-blur-xl"
+                            >
+                                <span className="font-mono text-[10px] tabular-nums text-light-gray">
+                                    {Math.round((isMuted ? 0 : volume) * 100)}
+                                </span>
+                                <PlayerSlider
+                                    variant="volume"
+                                    vertical
+                                    length="h-24"
+                                    value={isMuted ? 0 : volume}
+                                    max={1}
+                                    step={0.01}
+                                    onChange={handleVolumeChange}
+                                    ariaLabel="Volume"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={toggleMute}
+                                    aria-label={isMuted ? "Unmute" : "Mute"}
+                                    className="cursor-pointer text-light-gray transition-colors hover:text-whitetext"
+                                >
+                                    {isMuted || volume === 0 ? <VolumeX className="size-4" /> : <Volume2 className="size-4" />}
+                                </button>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    <button
+                        type="button"
+                        onClick={() => setMobileVolumeOpen((prev) => !prev)}
+                        aria-label="Volume"
+                        aria-expanded={mobileVolumeOpen}
+                        className={
+                            mobileVolumeOpen
+                                ? "flex cursor-pointer items-center rounded-full bg-white/10 p-1 text-secondary transition-colors"
+                                : "flex cursor-pointer items-center rounded-full p-1 text-light-gray transition-colors hover:text-whitetext"
+                        }
+                    >
+                        {isMuted || volume === 0 ? <VolumeX className="size-3.5" /> : <Volume2 className="size-3.5" />}
+                    </button>
+                </div>
+
+                <button type="button" className="hidden text-light-gray hover:text-whitetext transition-colors cursor-pointer lg:block" aria-label="Fullscreen">
                     <Maximize2 className="size-4" />
                 </button>
                 <button
@@ -418,7 +626,7 @@ const FloatingPlayerBar = () => {
                     aria-label="Close"
                     title="Close player"
                 >
-                    <X className="size-4" />
+                    <X className="size-3.5 sm:size-4" />
                 </button>
             </div>
         </motion.div>
