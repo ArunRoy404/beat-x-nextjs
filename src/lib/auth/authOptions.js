@@ -1,3 +1,4 @@
+import { decode as defaultDecode, encode as defaultEncode } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { loginRequest, verifyEmailRequest, refreshTokenRequest } from "@/services/auth/authServices";
 import { decodeJwt } from "./decodeJwt";
@@ -43,6 +44,20 @@ function toSessionUser({ accessToken, refreshToken, role }) {
 export const authOptions = {
   secret: env.nextAuthSecret,
   session: { strategy: "jwt" },
+  jwt: {
+    async decode(params) {
+      try {
+        return await defaultDecode(params);
+      } catch {
+        // Return null if token decryption fails (corrupted token, changed secret, invalid IV)
+        // so NextAuth treats it as unauthenticated instead of throwing a fatal JWT_SESSION_ERROR.
+        return null;
+      }
+    },
+    async encode(params) {
+      return await defaultEncode(params);
+    },
+  },
   pages: {
     signIn: "/admin/login",
   },
@@ -92,13 +107,14 @@ export const authOptions = {
   ],
   callbacks: {
     async redirect({ url, baseUrl }) {
-      if (url.startsWith("/")) return url;
+      // Always return an absolute URL: next-auth's client-side signIn() calls
+      // `new URL(data.url)` which throws "Failed to construct 'URL': Invalid URL" if relative.
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
       try {
         const parsed = new URL(url);
-        if (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") {
-          return `${parsed.pathname}${parsed.search}`;
+        if (parsed.origin === baseUrl || parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") {
+          return url;
         }
-        if (parsed.origin === baseUrl) return url;
       } catch {}
       return baseUrl;
     },

@@ -20,11 +20,16 @@ export function useLogin({ redirectTo } = {}) {
       const result = await signIn("credentials", {
         email,
         password,
+        callbackUrl: redirectTo || "/",
         redirect: false,
-      })
+      });
 
       if (result?.error) {
-        throw new Error(result.error)
+        const message =
+          result.error === "CredentialsSignin"
+            ? "Invalid email or password. Please check your credentials."
+            : result.error;
+        throw new Error(message);
       }
 
       let session = await getSession()
