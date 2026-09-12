@@ -2545,10 +2545,10 @@
           ]
         },
         {
-          "name": "Songs",
+          "name": "✅ Songs",
           "item": [
             {
-              "name": "Home",
+              "name": "✅ Home",
               "request": {
                 "method": "GET",
                 "header": [
@@ -2610,7 +2610,7 @@
               ]
             },
             {
-              "name": "Browse",
+              "name": "✅ Browse",
               "event": [
                 {
                   "listen": "test",
@@ -3232,7 +3232,7 @@
               ]
             },
             {
-              "name": "Liked",
+              "name": "✅ Liked",
               "request": {
                 "method": "GET",
                 "header": [
@@ -3634,7 +3634,7 @@
               ]
             },
             {
-              "name": "Get Song by Id",
+              "name": "✅ Get Song by Id",
               "request": {
                 "method": "GET",
                 "header": [
@@ -3696,7 +3696,7 @@
               ]
             },
             {
-              "name": "Like / Unlike Toggle",
+              "name": "✅ Like / Unlike Toggle",
               "request": {
                 "method": "POST",
                 "header": [
@@ -3760,7 +3760,7 @@
               ]
             },
             {
-              "name": "Get Stream URL",
+              "name": "✅ Get Stream URL",
               "request": {
                 "method": "GET",
                 "header": [
@@ -3824,7 +3824,7 @@
               ]
             },
             {
-              "name": "Save Playback Progress",
+              "name": "✅ Save Playback Progress",
               "request": {
                 "method": "POST",
                 "header": [
