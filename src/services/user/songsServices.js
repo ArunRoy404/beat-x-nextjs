@@ -47,7 +47,7 @@ export async function getSongStreamUrlRequest(id) {
 
 export async function getSongDetailRequest(id) {
   if (!id) return null;
-  const res = await axiosPublic.get(`/songs/${id}`);
+  const res = await axiosPrivate.get(`/songs/${id}`);
   return res?.data?.data;
 }
 

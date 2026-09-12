@@ -101,12 +101,6 @@ export function usePlaySong(options = {}) {
         useGlobalMediaPlayerStore.getState().pauseMedia();
       } catch (e) {}
 
-      if (error) {
-        toast.info("Playing audio preview (Sign in for full access)");
-      } else {
-        toast.success(`Now playing: ${song?.title || "Song"}`);
-      }
-
       queryClient.invalidateQueries({ queryKey: queryKeys.songs.home() });
 
       options?.onSuccess?.({ song, streamData }, variables);
