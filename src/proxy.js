@@ -29,8 +29,14 @@ function redirectNoStore(url) {
 
 export async function proxy(request) {
   const { pathname } = request.nextUrl;
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+  let token = null;
+  try {
+    token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+  } catch {
+    token = null;
+  }
   const isAdmin = token?.role === "admin";
+  const hasStaleSession = !token && request.cookies.has("next-auth.session-token");
 
   if (pathname.startsWith(ADMIN_DASHBOARD_PATH)) {
     if (!token) {
@@ -40,7 +46,11 @@ export async function proxy(request) {
           ? ADMIN_DASHBOARD_HOME_PATH
           : pathname;
       loginUrl.searchParams.set("callbackUrl", `${targetPath}${request.nextUrl.search}`);
-      return redirectNoStore(loginUrl);
+      const response = redirectNoStore(loginUrl);
+      if (hasStaleSession) {
+        response.cookies.delete("next-auth.session-token");
+      }
+      return response;
     }
 
     if (!isAdmin) {
@@ -52,7 +62,11 @@ export async function proxy(request) {
     if (token) {
       return redirectNoStore(new URL(getRoleHomePath(token.role), request.nextUrl));
     }
-    return NextResponse.next();
+    const response = NextResponse.next();
+    if (hasStaleSession) {
+      response.cookies.delete("next-auth.session-token");
+    }
+    return response;
   }
 
   // --- Listener ("user" role) area ------------------------------------------
@@ -61,14 +75,22 @@ export async function proxy(request) {
     if (token) {
       return redirectNoStore(new URL(getRoleHomePath(token.role), request.nextUrl));
     }
-    return NextResponse.next();
+    const response = NextResponse.next();
+    if (hasStaleSession) {
+      response.cookies.delete("next-auth.session-token");
+    }
+    return response;
   }
 
   if (isUserProtectedPath(pathname)) {
     if (!token) {
       const loginUrl = new URL(USER_SIGN_IN_PATH, request.nextUrl);
       loginUrl.searchParams.set("callbackUrl", `${pathname}${request.nextUrl.search}`);
-      return redirectNoStore(loginUrl);
+      const response = redirectNoStore(loginUrl);
+      if (hasStaleSession) {
+        response.cookies.delete("next-auth.session-token");
+      }
+      return response;
     }
 
     // Signed in, but not as a listener — hand them to their own area. The

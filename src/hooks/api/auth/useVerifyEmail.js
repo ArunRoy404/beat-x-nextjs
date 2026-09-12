@@ -21,11 +21,16 @@ export function useVerifyEmail({ redirectTo } = {}) {
       const result = await signIn("email-otp", {
         email,
         otp,
+        callbackUrl: redirectTo || "/",
         redirect: false,
-      })
+      });
 
       if (result?.error) {
-        throw new Error(result.error)
+        const message =
+          result.error === "CredentialsSignin"
+            ? "Invalid or expired verification code."
+            : result.error;
+        throw new Error(message);
       }
 
       let session = await getSession()
