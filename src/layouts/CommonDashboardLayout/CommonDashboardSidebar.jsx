@@ -30,7 +30,7 @@ const CommonDashboardSidebar = ({ data, title, footer, ...props }) => {
         <TooltipProvider delayDuration={0}>
             <Sidebar
                 collapsible="icon"
-                className="custom-dashboard-sidebar border-r border-border z-100"
+                className="custom-dashboard-sidebar border-r border-border z-30"
                 {...props}
             >
                 <div

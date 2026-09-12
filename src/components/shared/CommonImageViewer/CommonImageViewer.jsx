@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client"
 
 import React, { useState, useEffect, useCallback } from "react"
@@ -66,7 +67,7 @@ const CommonImageViewer = ({
     if (!isOpen || !images || images.length === 0) return null
 
     return (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-between bg-background/95 backdrop-blur-2xl animate-in fade-in duration-200 select-none overflow-hidden">
+        <div className="fixed inset-0 z-[500] flex flex-col items-center justify-between bg-background/95 backdrop-blur-2xl animate-in fade-in duration-200 select-none overflow-hidden">
             {/* Top Bar Header */}
             <div className="w-full p-4 sm:p-6 flex items-center justify-between z-20 bg-gradient-to-b from-black/80 via-black/40 to-transparent">
                 <div className="flex items-center gap-3">

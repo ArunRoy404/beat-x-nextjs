@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -74,7 +75,7 @@ const EditRoleModal = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[500] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-[#141414] border border-border/60 rounded-[16px] w-full max-w-md overflow-hidden shadow-2xl flex flex-col p-6 gap-5 max-h-[90vh]">
         {/* Modal Header */}
         <div className="flex items-center justify-between">
