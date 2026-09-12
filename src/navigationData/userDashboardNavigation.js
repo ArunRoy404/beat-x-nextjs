@@ -15,7 +15,7 @@ export const userDashboardNavigation = {
       items: [
         { title: "Library", url: "/library", iconName: "MusicLibraryIcon" },
         { title: "Albums", url: "/albums", iconName: "AlbumIcon" },
-        { title: "Create Playlist", url: "/create-playlist", iconName: "AddCircleIcon" },
+        { title: "Playlist", url: "/playlist", iconName: "MusicPlaylistIcon" },
         { title: "Like Songs", url: "/liked", iconName: "HeartIcon" },
         { title: "Download", url: "/downloads", iconName: "DownloadTrayIcon" },
       ],

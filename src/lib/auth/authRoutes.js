@@ -15,6 +15,7 @@ export const userProtectedPaths = [
   "/explore",
   "/library",
   "/notifications",
+  "/playlist",
   "/podcasts",
   "/profile",
   "/shop",

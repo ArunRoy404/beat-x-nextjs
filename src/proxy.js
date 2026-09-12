@@ -121,6 +121,7 @@ export const config = {
     "/explore/:path*",
     "/library/:path*",
     "/notifications/:path*",
+    "/playlist/:path*",
     "/podcasts/:path*",
     "/profile/:path*",
     "/shop/:path*",
