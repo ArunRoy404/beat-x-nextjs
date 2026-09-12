@@ -16,6 +16,7 @@ const PlaylistTracksList = ({ tracks = [], playlistId, onAddSongsClick }) => {
           key={track?._id || track?.id || idx}
           track={track}
           index={idx}
+          tracks={tracks}
           playlistId={playlistId}
         />
       ))}

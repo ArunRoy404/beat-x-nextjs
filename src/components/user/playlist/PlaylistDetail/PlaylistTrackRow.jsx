@@ -17,7 +17,7 @@ function formatSeconds(ms) {
   return `${m}:${s < 10 ? "0" : ""}${s}`;
 }
 
-const PlaylistTrackRow = ({ track, index, playlistId }) => {
+const PlaylistTrackRow = ({ track, index, tracks = [], playlistId }) => {
   const trackId = track?._id || track?.id;
   const { playSong, currentSongId, isPlaying } = usePlaySong();
   const { mutate: removeSong, isPending: isRemovePending } = useRemoveSongFromPlaylist();
@@ -35,7 +35,12 @@ const PlaylistTrackRow = ({ track, index, playlistId }) => {
           </span>
           <button
             type="button"
-            onClick={() => playSong(track)}
+            onClick={() =>
+              playSong(track, {
+                queue: tracks.length > 0 ? tracks : [track],
+                index,
+              })
+            }
             className={cn(
               "cursor-pointer text-secondary transition-transform active:scale-95",
               isCurrentPlaying ? "flex" : "hidden group-hover:flex"

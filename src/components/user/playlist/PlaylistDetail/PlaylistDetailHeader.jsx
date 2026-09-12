@@ -24,7 +24,7 @@ const PlaylistDetailHeader = ({ playlist, tracks = [] }) => {
 
   const handlePlayAll = () => {
     if (firstSong) {
-      playSong(firstSong);
+      playSong(firstSong, { queue: tracks, index: 0 });
     }
   };
 

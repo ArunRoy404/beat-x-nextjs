@@ -2,9 +2,22 @@
 
 import { Play, Plus } from "lucide-react"
 import { useUserWatchStore } from "@/zustandStore/user/userStore/userWatchStore"
+import { useGlobalMediaPlayerStore } from "@/zustandStore/media/useGlobalMediaPlayerStore"
 
 const WatchHeroBanner = () => {
     const watchHero = useUserWatchStore((state) => state.watchHero)
+    const { playMedia } = useGlobalMediaPlayerStore()
+
+    const handleWatchPremiere = () => {
+        playMedia({
+            id: watchHero?.id || "watch-premiere",
+            mediaType: "video",
+            src: "/test-audio/alex-morgan-no-copyright-music-578487.mp3",
+            title: watchHero?.title || "Premiere Video",
+            artist: "BeatX Premiere",
+            coverUrl: watchHero?.artwork || "",
+        })
+    }
 
     return (
         <div className="relative h-[480px] w-full shrink-0 overflow-hidden rounded-[16px] sm:h-[460px] lg:h-[622px]">
@@ -23,6 +36,7 @@ const WatchHeroBanner = () => {
                 <div className="flex flex-wrap items-center gap-3 sm:gap-4">
                     <button
                         type="button"
+                        onClick={handleWatchPremiere}
                         className="flex cursor-pointer items-center gap-2 rounded-[32px] bg-secondary px-5 py-3 text-sm font-semibold text-button-text transition-transform active:scale-95 sm:px-8 sm:py-4 sm:text-base"
                     >
                         <Play className="size-5" fill="currentColor" />

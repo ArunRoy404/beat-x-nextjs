@@ -63,7 +63,7 @@ const PlaylistAddSongsPicker = ({ playlistId, trackIds = new Set() }) => {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-12 text-center text-light-gray">
-          <p className="text-sm">No songs found matching "{query}"</p>
+          <p className="text-sm">No songs found matching &quot;{query}&quot;</p>
         </div>
       )}
     </div>

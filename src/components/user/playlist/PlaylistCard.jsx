@@ -26,7 +26,7 @@ const PlaylistCard = ({
   const handlePlayClick = (e) => {
     e.stopPropagation();
     if (firstSong) {
-      playSong(firstSong);
+      playSong(firstSong, { queue: songs, index: 0 });
     } else {
       onViewDetails?.(playlist);
     }

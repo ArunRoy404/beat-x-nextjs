@@ -85,7 +85,7 @@ const GlobalTop50Section = () => {
                             </div>
                             <button
                                 type="button"
-                                onClick={() => playlistOfTheWeek?.song ? playSong(playlistOfTheWeek.song) : null}
+                                onClick={() => playlistOfTheWeek?.song ? playSong(playlistOfTheWeek.song, { queue: liveSongs, index: 0 }) : null}
                                 className="flex cursor-pointer items-center justify-center gap-2 rounded-full bg-whitetext px-5 py-2.5 text-sm font-semibold text-button-text transition-transform active:scale-95 sm:px-8 sm:py-4 sm:text-base"
                             >
                                 {isTopPlaying ? (
@@ -100,13 +100,13 @@ const GlobalTop50Section = () => {
 
                     <div className="min-w-0 w-full flex-1">
                         <CarouselContent className="-ml-3 sm:-ml-4">
-                            {chart.map((item) => {
+                            {chart.map((item, idx) => {
                                 const isThisPlaying = currentSongId === (item?.song?._id || item?.song?.id) && isPlaying
                                 return (
                                     <CarouselItem key={item.id} className="basis-1/2 pl-3 sm:pl-4">
                                         <RankedChartCard
                                             item={item}
-                                            onPlay={(it) => it?.song ? playSong(it.song) : null}
+                                            onPlay={(it) => it?.song ? playSong(it.song, { queue: liveSongs, index: idx }) : null}
                                             isPlaying={isThisPlaying}
                                         />
                                     </CarouselItem>

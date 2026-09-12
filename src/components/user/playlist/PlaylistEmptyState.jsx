@@ -15,7 +15,7 @@ const PlaylistEmptyState = ({ isSearch = false, searchQuery = "", onAction }) =>
           No playlists matched your search
         </h3>
         <p className="mt-1 text-xs text-light-gray max-w-sm">
-          We couldn't find any playlists matching "{searchQuery}". Try a different search term.
+          We couldn&apos;t find any playlists matching &quot;{searchQuery}&quot;. Try a different search term.
         </p>
         <Button
           type="button"

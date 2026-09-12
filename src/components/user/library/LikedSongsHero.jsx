@@ -19,14 +19,14 @@ const LikedSongsHero = () => {
 
     const handlePlayAll = () => {
         if (firstSong) {
-            playSong(firstSong)
+            playSong(firstSong, { queue: likedList, index: 0 })
         }
     }
 
     const handleShuffle = () => {
         if (likedList.length > 0) {
-            const randomSong = likedList[Math.floor(Math.random() * likedList.length)]
-            playSong(randomSong)
+            const randomIndex = Math.floor(Math.random() * likedList.length)
+            playSong(likedList[randomIndex], { queue: likedList, index: randomIndex, shuffle: true })
         }
     }
 
