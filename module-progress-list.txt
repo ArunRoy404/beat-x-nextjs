@@ -1,0 +1,97 @@
+BeatX - Admin & User Module: UI Screens and Functional Feature List
+====================================================================
+
+Hello,
+
+This document lists every screen currently built for the Admin and User
+modules, and confirms exactly which features on each screen are live and
+working with real, connected data.
+
+
+PART 1 - UI SCREENS
+--------------------
+a. User Module 
+    - Home
+    - Explore
+    - Artist Profile
+    - Trending
+    - Library
+    - Albums
+    - Audiobooks
+    - Downloads
+    - Notifications
+    - Podcasts
+    - Profile
+    - Shop - Shop Page, Item Details Page, Checkout Page
+    - Subscription
+    - Tickets
+    - Watch - Videos Page, Video Player Page
+    - Login
+    - Register
+    - Forgot Password
+    - OTP Verification
+    - Reset Password - Reset Page, Success Page
+    - Verify Email
+
+b. Admin Module
+    - Dashboard Overview
+    - Analytics
+    - Music (Songs) - Upload New Song, Edit Song, Delete Song, Reject Song, Song Details (forms)
+    - Videos - Edit Video, Delete Video, Reject Video, Video Details (forms)
+    - Podcasts - Edit Podcast, Delete Podcast, Reject Podcast, Podcast Details with Reviews & Analytics (forms)
+    - Audiobooks - Upload Audiobook, Edit Audiobook, Delete Audiobook, Add / Edit / Delete Chapter (forms)
+    - Albums - Create Album, Edit Album, Delete Album, Album Details with Analytics (forms)
+    - Artists - Add Artist, Delete Artist, Artist Details with Verification Review (forms)
+    - Users - Invite User, Delete User, User Details (forms)
+    - Shop - Add Product, Edit Product, Delete Product, Product Details with Analytics (forms)
+    - Tours & Events - Create Event, Edit Event, Delete Event, Event Details with Analytics, Event Under Review Approval (forms)
+    - Genre - Add Genre, Edit Genre, Delete Genre (forms)
+    - Roles & Permissions - Invite Admin, Edit Role (forms)
+    - Subscriptions - Add / Edit Plan (form)
+    - Settings
+    - Profile
+    - Login
+    - Forgot Password
+    - OTP Verification
+    - Reset Password - Reset Page, Success Page
+
+
+PART 2 - FUNCTIONAL FEATURES (Live, Connected to Real Data)
+-------------------------------------------------------------
+a. User Module
+    - Home - Featured/trending songs carousel with playback, quick-play for "Your Mix" and New Releases, recommended artists and daily picks, song details view with play and like/unlike
+    - Explore - Browse music by genre filter, featured songs carousel with playback, approved artists directory
+    - Trending - Trending songs carousel with playback, Hot Albums carousel, Trending Videos carousel, Global Top 50 chart with playback
+    - Library - Liked Songs with live count / Play All / Shuffle, personal playlists list, top artists list, recently released albums
+    - Albums - Full album catalog, featured spotlight, new releases, and user favorites (browsing only; playback/like buttons on this screen are not active yet)
+    - Profile - View account overview, edit profile (name, phone, photo), update preferences, view favorites, change password, delete account
+    - Login - Secure sign-in with role-based redirect
+    - Register - Create a new account
+    - Forgot Password - Send a password-reset code to the registered email
+    - OTP Verification - Resend verification code (confirmed together with the password reset step)
+    - Reset Password - Set a new password and confirm
+    - Verify Email - Confirm the account using the verification code
+    - Background Music Player (all pages) - Continuous playback using live streaming songs, listening progress saved automatically, like/unlike directly from the player
+
+b. Admin Module
+    - Dashboard Overview - Live platform statistics, revenue tracking, growth chart, genre mix, revenue streams, recent uploads, recent activity feed
+    - Analytics - Time-range filtering (7 Days, 30 Days, 3 Months, 6 Months, 1 Year) driving the growth chart, peak listening hours, and genre-distribution charts
+    - Music (Songs) - Browse/filter/search/paginate songs, upload/edit/delete songs, approve or reject submissions with a reason, activate or archive songs
+    - Videos - Browse/filter/search/paginate videos, edit/delete videos, approve or reject submissions with a reason (uploading new videos and individual video analytics are not available yet)
+    - Podcasts - Browse/filter/search/paginate podcasts, edit/delete podcasts, reject submissions with a reason, moderate listener reviews (uploading new podcasts is not available yet)
+    - Audiobooks - Browse/filter/search/paginate audiobooks, upload/edit/delete audiobooks, add/edit/delete chapters
+    - Albums - Browse/filter/search/paginate albums, create/edit/delete albums (individual album analytics not available yet)
+    - Artists - Browse/filter/search/paginate artist applications, approve verification, reject with a reason, request additional documents, suspend/reactivate, delete an artist, view full artist details (manually adding a new artist is not available yet)
+    - Users - Browse/search/filter/paginate the registered users list (inviting, editing, suspending, and deleting a user are not available yet)
+    - Shop - Live shop statistics, browse/filter/search/paginate products, edit/delete products, view product sales analytics (adding a new product is not available yet)
+    - Tours & Events - Live event statistics, browse/filter/search/paginate events, create/edit/delete events, view ticket-sales analytics (approving/rejecting an event under review is not available yet)
+    - Genre - Browse/search/paginate genres, add/edit/delete genres
+    - Profile - View account details and login history
+    - Login - Secure sign-in with role-based access
+    - Forgot Password - Send a password-reset code to the registered email
+    - OTP Verification - Resend verification code (confirmed together with the password reset step)
+    - Reset Password - Set a new password and confirm
+
+
+Please let us know if you have any questions.
+Best regards,
