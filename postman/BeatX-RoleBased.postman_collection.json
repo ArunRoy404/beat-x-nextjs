@@ -49872,7 +49872,7 @@
               ]
             },
             {
-              "name": "⚠️ Approve Song (artist submission) (never triggers — status alias map has 'pending' but backend sends 'pending_review')",
+              "name": "✅ Approve Song (artist submission)",
               "request": {
                 "method": "PATCH",
                 "header": [
@@ -50079,7 +50079,7 @@
               ]
             },
             {
-              "name": "⚠️ Reject Song (artist submission) (same status alias-map gap as approve)",
+              "name": "✅ Reject Song (artist submission)",
               "request": {
                 "method": "PATCH",
                 "header": [

@@ -91,18 +91,26 @@ All 12 endpoints verified correct: URL, body shape, and enums (reject `reasonCod
 
 ---
 
-## 8. Songs / Music — ⚠️ Needs adjustment (not yet fixed)
+## 8. Songs / Music — ✅ Done
 
-- `GET /admin/songs ✅`
-- `POST /admin/songs ✅`
+**What I did:** ran a full endpoint-by-endpoint check against live Postman request/response examples (not just the earlier summary), confirmed the rest of the module was already built correctly, and fixed the one real defect — the `pending` vs `pending_review` status mismatch — plus the missing filter tabs. Renamed the sidebar entry from "Music's & Songs" to "Music".
+
+- `GET /admin/songs ✅` — verified real response nests the list under `data.song` (singular) plus a `data.stats` object (`total`, `totalStreams`, `published`, `awaitingApproval`, `rejected`, `draft`, `scheduled`); `SongsContainer.jsx` and `AdminDashboardMusicPage.jsx` already unwrapped this correctly — no bug here, unlike the Users module's `data.admins` surprise
+- `POST /admin/songs ✅` — formdata fields match contract exactly; response is `{ trackingId }`, handled correctly as async (list invalidates immediately, `transcodeStatus` updates via refetch)
 - `GET /admin/songs/{id} ✅`
-- `PATCH /admin/songs/{id} ✅`
-- `PATCH /admin/songs/{id}/approve ⚠️ (never triggers — status alias map has "pending" but backend sends "pending_review", so isSongAwaitingReview() never fires)`
-- `PATCH /admin/songs/{id}/reject ⚠️ (same alias-map gap as approve)`
+- `PATCH /admin/songs/{id} ✅` — all fields match contract (title/artist/album/genre/explicit/status/scheduledAt/isFeatured/isTrending); take-down/restore via `status` confirmed working
+- `PATCH /admin/songs/{id}/approve ✅` — fixed: `pending_review` is now aliased to the canonical `PENDING` bucket in `songStatus.js`, so `isSongAwaitingReview()` correctly detects real artist submissions
+- `PATCH /admin/songs/{id}/reject ✅` — same fix; reject dialog already sent `{ reason }` correctly, it just never used to render
 - `DELETE /admin/songs/{id} ✅`
-- `POST /admin/songs/upload-url 🆕 (contract itself says this route is effectively unused — Create Song is a direct multipart upload)`
+- `POST /admin/songs/upload-url 🆕 (unused by design per contract note — Create Song uploads directly via multipart)`
 
-**Also:** filter tabs omit `scheduled` and `rejected`.
+**Root cause & fix:** `songStatus.js`'s alias map had `pending` but the backend's real enum value (confirmed from the live Postman collection, not assumed) is `pending_review`. Added `pending_review` as an input alias, and added `toApiSongStatus()` to convert the canonical `pending` bucket back to the wire value `pending_review` when building the outgoing list-filter param (`songsParams.js`) — every other status bucket's wire spelling already matches its canonical value 1:1, only this one bucket is asymmetric. Also added the missing `Scheduled` and `Rejected` tabs to `SongsContainer.jsx`'s `STATUS_TABS`.
+
+**Verified correct, no changes needed:** create/edit forms (`buildSongFormData.js`, `EditSongForm.jsx`, `AdminSongFormFields.jsx`) — visibility→status mapping is correct (`"schedule"` → `SONG_STATUS.SCHEDULED` = `"scheduled"`, no typo bug like Events had); all 5 mutation hooks handle toast/invalidate internally per project convention; SSR prefetch in `page.jsx` correctly parallel-fetches songs + genres; stats cards already read the real `stats.*` fields precisely.
+
+**Known minor gap, left as-is (not an API issue):** `SongDetailFooter.jsx` only has Delete/Close — no Approve/Reject/Take-down/Restore buttons in the detail dialog, unlike Podcasts' detail footer which has full action parity. Those actions all work correctly from the table row and mobile card, just not from inside the detail view. Cosmetic/UX inconsistency, not a broken endpoint — left out of this pass to keep it scoped to actual bugs.
+
+**Full UI field sweep (every remaining file, every displayed value):** checked `SongsCard.jsx`, `SongDetailContent.jsx`, `SongDetailHeader.jsx`, `SongDetailsDialog.jsx`, `EditSongDialog.jsx`, `DeleteSongForm.jsx`, `UploadNewSongDialog.jsx`, and `adminSongSchema.js` field-by-field against the real `GET /admin/songs/{id}` response. Every value shown (title, artist, album, genre, durationMs, publishedAt, scheduledAt, playCount, playCountWeek, likeCount, explicit, isTrending, trendDirection, isFeatured, ownerId, submittedStatus, submittedAt, reviewedBy, reviewedAt, rejectionReason, transcodeStatus, coverUrl, hlsMasterUrl) maps to a real API field — nothing fabricated, no `|| "hardcoded fallback"` patterns, Mongo refs (`album`/`ownerId`/`reviewedBy`) correctly handled as either populated objects or bare ids. `SongDetailsDialog` correctly re-fetches `GET /admin/songs/{id}` on open rather than trusting stale list-row data. One cosmetic-only item with no API to verify against: the Upload dialog's helper text ("MP3/WAV/FLAC · Max 100MB · Cover art min 1000×1000px") is static UI copy — the Postman collection doesn't document file-size/dimension limits, so this couldn't be cross-checked either way.
 
 ---
 
@@ -277,9 +285,9 @@ Confirmed via full-collection search: zero subscription endpoints exist anywhere
 
 | Status | Modules |
 |---|---|
-| ✅ Fully done | User Management, Artist Verification, Genres, Albums, Dashboard, Analytics, Admin Profile — **7 / 23** |
-| ⚠️ Needs adjustment | Songs, Videos, Podcasts+Reviews, Audiobooks+Reviews, Events/Tours, Shop, Activity Log — **7 / 23** |
+| ✅ Fully done | User Management, Artist Verification, Genres, Albums, Dashboard, Analytics, Admin Profile, Songs/Music — **8 / 23** |
+| ⚠️ Needs adjustment | Videos, Podcasts+Reviews, Audiobooks+Reviews, Events/Tours, Shop, Activity Log — **6 / 23** |
 | 🆕 Backend ready, not wired | Platform Settings, Categories — **2 / 23** |
 | ❌ Not built / no backend | Payouts, Scheduler, Uploads, Support Tickets, Admins/Staff, Roles & RBAC, Subscriptions — **7 / 23** |
 
-Next recommended target: the shared `pending` vs `pending_review` status-enum bug across Songs/Videos/Podcasts — one root-cause fix that unblocks real moderation on three modules at once.
+Next recommended target: the same `pending` vs `pending_review` status-enum bug in Videos and Podcasts (same root cause just fixed in Songs, applied one module at a time per current workflow).

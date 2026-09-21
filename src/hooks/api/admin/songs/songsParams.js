@@ -3,7 +3,7 @@
 // it out of useSongs.js (which is "use client") matters: any export from a
 // "use client" file becomes client-only, and a Server Component can't call
 // it directly.
-import { normalizeSongStatus } from "@/lib/constants/songStatus"
+import { normalizeSongStatus, toApiSongStatus } from "@/lib/constants/songStatus"
 
 export const SONGS_PAGE_SIZE = 20
 // GET /admin/songs caps `limit` at 50 — anything larger is a 400.
@@ -27,7 +27,7 @@ const firstString = (value) => {
 export function buildSongsParams(raw = {}) {
   const rawStatus = firstString(raw?.status)
   const status =
-    rawStatus && rawStatus !== "all" ? normalizeSongStatus(rawStatus) : undefined
+    rawStatus && rawStatus !== "all" ? toApiSongStatus(normalizeSongStatus(rawStatus)) : undefined
 
   const genre = firstString(raw?.genre)
   const album = firstString(raw?.album)

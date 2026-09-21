@@ -23,6 +23,10 @@ export const SONG_STATUS = {
 }
 
 // Only spellings the API actually uses are listed — nothing invented.
+// Confirmed against the Postman collection's documented enum for
+// GET/PATCH /admin/songs: draft | pending_review | scheduled | active |
+// archived | rejected — "pending_review" is the real wire value for the
+// PENDING bucket, not "pending".
 const SONG_STATUS_ALIASES = {
   active: SONG_STATUS.ACTIVE,
   published: SONG_STATUS.ACTIVE,
@@ -30,6 +34,7 @@ const SONG_STATUS_ALIASES = {
   scheduled: SONG_STATUS.SCHEDULED,
   archived: SONG_STATUS.ARCHIVED,
   pending: SONG_STATUS.PENDING,
+  pending_review: SONG_STATUS.PENDING,
   awaitingapproval: SONG_STATUS.PENDING,
   rejected: SONG_STATUS.REJECTED,
 }
@@ -52,6 +57,16 @@ export function normalizeSongStatus(status) {
   if (!status || typeof status !== "string") return ""
   const key = status.trim().toLowerCase()
   return SONG_STATUS_ALIASES[key] ?? key
+}
+
+/**
+ * Reverses normalizeSongStatus for values being sent back to the API (e.g.
+ * the list filter's `status` query param). Every bucket's wire spelling
+ * matches its canonical value except PENDING, whose wire value is
+ * "pending_review" — use this instead of sending a canonical status as-is.
+ */
+export function toApiSongStatus(canonicalStatus) {
+  return canonicalStatus === SONG_STATUS.PENDING ? "pending_review" : canonicalStatus
 }
 
 /**
