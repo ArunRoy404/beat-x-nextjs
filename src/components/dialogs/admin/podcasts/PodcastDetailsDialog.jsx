@@ -16,7 +16,11 @@ import PodcastDetailFooter from "@/components/admin/podcasts/PodcastsDetails/Pod
 const PodcastDetailsDialog = ({ podcast: summary, children }) => {
     const [open, setOpen] = useState(false)
     const { data: detail, isLoading } = usePodcastDetail(open ? summary?._id : undefined)
-    const podcast = detail ? { ...detail.podcast, episodes: detail.episodes } : summary
+    // GET /admin/podcasts/{id} nests the episode list under
+    // `episodes.data` (a paginated object), not a bare array — passing the
+    // object straight through used to crash PodcastDetailContent's
+    // `episodes.map` the moment a real detail response landed.
+    const podcast = detail ? { ...detail.podcast, episodes: detail.episodes?.data ?? [] } : summary
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>

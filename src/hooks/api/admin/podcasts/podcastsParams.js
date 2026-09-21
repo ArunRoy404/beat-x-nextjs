@@ -3,6 +3,8 @@
 // it out of usePodcasts.js (which is "use client") matters: any export from
 // a "use client" file becomes client-only, and a Server Component can't
 // call it directly.
+import { normalizePodcastStatus, toApiPodcastStatus } from "@/lib/constants/podcastStatus"
+
 export const PODCASTS_PAGE_SIZE = 10
 
 export function buildPodcastsParams(raw = {}) {
@@ -14,7 +16,7 @@ export function buildPodcastsParams(raw = {}) {
   return {
     page,
     limit: PODCASTS_PAGE_SIZE,
-    ...(status && status !== "all" && { status }),
+    ...(status && status !== "all" && { status: toApiPodcastStatus(normalizePodcastStatus(status)) }),
     ...(category && category !== "all" && { category }),
     ...(q && { q }),
   }

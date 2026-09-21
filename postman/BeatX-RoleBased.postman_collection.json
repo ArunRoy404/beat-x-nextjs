@@ -52183,7 +52183,7 @@
           "name": "Podcasts",
           "item": [
             {
-              "name": "⚠️ Create Podcast (form exists but is a non-functional stub — never actually calls this endpoint)",
+              "name": "✅ Create Podcast",
               "request": {
                 "method": "POST",
                 "header": [
@@ -53496,7 +53496,7 @@
               ]
             },
             {
-              "name": "⚠️ Approve Podcast (artist submission) (same pending vs pending_review + draft-gating bug as Videos)",
+              "name": "✅ Approve Podcast (artist submission)",
               "request": {
                 "method": "PATCH",
                 "header": [
@@ -53703,7 +53703,7 @@
               ]
             },
             {
-              "name": "⚠️ Reject Podcast (artist submission) (same gating bug as approve)",
+              "name": "✅ Reject Podcast (artist submission)",
               "request": {
                 "method": "PATCH",
                 "header": [

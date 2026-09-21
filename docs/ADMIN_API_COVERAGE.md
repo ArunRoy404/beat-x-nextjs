@@ -140,20 +140,34 @@ All 12 endpoints verified correct: URL, body shape, and enums (reject `reasonCod
 
 ---
 
-## 10. Podcasts + Reviews — ⚠️ Needs adjustment (not yet fixed)
+## 10. Podcasts + Reviews — ✅ Done
 
-- `POST /creator/podcasts ⚠️ (form exists but is a non-functional stub — shows a toast and never actually calls this endpoint)`
-- `GET /admin/podcasts ✅`
-- `GET /admin/podcasts/{id} ✅`
-- `PATCH /admin/podcasts/{id} ✅`
-- `PATCH /admin/podcasts/{id}/approve ⚠️ (same "pending" vs "pending_review" + draft-gating bug as Videos)`
-- `PATCH /admin/podcasts/{id}/reject ⚠️ (same gating bug as approve)`
+**What I did:** checked every endpoint one by one against live Postman request/response examples. This module had four separate "list renders empty / crashes" bugs from the same root cause (response-shape assumptions never checked against the real payload), the same `pending_review` gating bug as Songs/Videos, and a completely non-functional create flow. All fixed. Also built out real category support (`GET /category`) since podcasts are categorized by Category, not Genre — the module was wrongly wired to the Genre endpoint.
+
+- `GET /admin/podcasts ✅` — **critical bug fixed**: real response nests the list under `data.podcasts`, but `PodcastsContainer.jsx` read `data?.data` (always empty). The admin Podcasts table/cards have been showing "No podcasts" regardless of real data.
+- `GET /admin/podcasts/{id} ✅` — **critical bug fixed**: real response nests episodes under `data.episodes.data` (a paginated object), but `PodcastDetailsDialog.jsx` passed the whole `episodes` object straight through as `podcast.episodes`. Opening any podcast's detail view and switching to its episode list would throw `episodes.map is not a function` the moment a real response landed (same bug class as the `genres.map` crash reported earlier on this route — see below).
+- `PATCH /admin/podcasts/{id} ✅` — take-down/restore via `status` confirmed working
+- `PATCH /admin/podcasts/{id}/approve ✅` — fixed: gating previously checked literal `"pending"`/`"draft"` (backend sends `"pending_review"`, and an admin's own draft isn't a review-queue item). Centralized into new `src/lib/constants/podcastStatus.js` (mirrors `videoStatus.js`), replacing two separately-duplicated incomplete gating checks in `PodcastDetailFooter.jsx` and `PodcastsTableActions.jsx`.
+- `PATCH /admin/podcasts/{id}/reject ✅` — same fix
 - `DELETE /admin/podcasts/{id} ✅`
-- `GET /admin/podcasts/reviews ✅`
+- `GET /admin/podcasts/reviews ✅` — **critical bug fixed**: real response nests the list under `data.reviews`, but `PodcastDetailReviews.jsx`'s unwrap only checked `data.data`/`data.items`/a bare array — never `data.reviews`. The reviews tab (previously reported as "the best-built review UI in the app — fully correct") was actually always showing the empty state; that earlier finding was wrong, caught only by this detailed re-check.
 - `PATCH /admin/podcasts/reviews/{id}/moderate ✅`
 - `DELETE /admin/podcasts/reviews/{id} ✅`
+- `POST /creator/podcasts ✅ (admin shares the artist create route, same pattern as Events)` — was a dead stub (`toast.info(...)`, never called the endpoint, and the form's fields — Episode Title/Series Name/Season/Episode # — were for creating an *episode*, not the podcast show this endpoint actually creates). Rebuilt from scratch: new `podcastCreateSchema` + `buildPodcastFormData.js` (title/description/language/category/status/cover, matches the real multipart contract), new `useCreatePodcast.js` hook, and the "Create Podcast" banner button now opens a real dialog instead of showing an "unavailable" toast.
 
-**Note:** the reviews sub-module (list/moderate/delete) is the best-built review UI in the app — fully correct. Only the create-podcast flow and the approve/reject gating bug need work. Podcast category select also hardcodes a fake list instead of fetching real `/category` data (see module 22).
+**Root cause common to three of the four critical bugs:** the codebase consistently assumed unwrapped/flat response shapes without checking the live payload — `data.podcasts` read as `data.data`, `episodes.data` read as a bare array, `data.reviews` read as `data.data`. Same bug class as the Users `data.admins` bug and the Videos `data.videos` bug found earlier this session.
+
+**Podcasts use Category, not Genre — a second, pre-existing bug:** the module was calling `useGenres()` (music genres) for its filter dropdown, while the real podcast object only has a `category` field (a bare Category ObjectId, e.g. `"66fd1c2e2f1b9a0012a3000c"`, never populated to `{name}` by the backend). `useGenres()`'s response resolves to `{ data: [...], total, ... }` (an object), and the old code did `const { data: genres = [] } = useGenres()` then unconditionally called `genres.map(...)` to build filter options — since `genres` was a truthy object, not an array, this threw `genres.map is not a function`. **This is the exact crash you reported earlier on `/admin/dashboard/podcasts`.** At the time I left it alone since it wasn't the day's target; fixed now as part of this module's full pass, the same way Songs/Videos' analogous genre-fetch crash risk was already fixed (aligning to the `genresList = genresData?.genre ?? genresData?.genres ?? genresData?.data ?? []` defensive pattern) — except here the fix is to stop calling the wrong endpoint entirely. Added a small read-only `categoryServices.js` / `useCategories.js` (mirrors `genreServices.js`) hitting the real `GET /category` endpoint, and used it to resolve every category id shown in the table, cards, and detail view to a real name — full admin Category CRUD (Create/Update/Delete) still has no UI and remains tracked separately (module 21).
+
+**Other real issues found and fixed in the same pass:**
+- **Fabricated data:** `PodcastDetailContent.jsx` hardcoded `artist: podcast?.title || "Podcast ADDA"` as the now-playing label fallback — a made-up brand name with no basis in the API. Changed to a generic `"Podcast"`.
+- **React purity bug:** `PodcastDetailReviews.jsx` used `key={review?._id || Math.random()}` — calling `Math.random()` during render is impure and was flagged by the React Compiler as a real correctness issue (unstable keys break reconciliation). Changed to `review?._id || index`.
+- **Thin detail view:** `PodcastDetailContent.jsx` was missing the entire moderation trail (`submittedStatus`, `submittedAt`, `reviewedBy`, `reviewedAt`, `rejectionReason`) that Songs/Videos already show — added, following the same `refToText()` Mongo-ref-safe pattern. Also added the missing `Scheduled For` field.
+- **SSR gap:** the category filter/lookup wasn't prefetched server-side — added the same parallel `prefetchQuery` (plus the unfiltered-stats prefetch Videos already has) to `page.jsx`.
+- **Missing filter tabs:** `STATUS_TABS` only had `All/Draft/Active/Archived` — added `Pending`, `Scheduled`, `Rejected` to match Songs/Videos.
+- **Optional chaining:** added throughout `PodcastDetailContent.jsx`'s episode list rendering (`episode?.title`, `episode?.durationMs`, etc. — was direct property access without `?.`).
+
+**Documented, not expanded (deliberate, out of scope for this pass):** `EditPodcastForm.jsx` only edits description/status/scheduledAt/isFeatured/isTrending/trendDirection — `PATCH /admin/podcasts/{id}` also accepts title/language/category/ownerId, so those could be added to the edit form later. The old comment in `adminPodcastSchema.js` incorrectly claimed those fields "belong to the Creator route" (they don't — the admin update endpoint accepts them directly); corrected the comment to say this is simply unbuilt, not that it's out of the admin endpoint's contract.
 
 ---
 
@@ -297,9 +311,9 @@ Confirmed via full-collection search: zero subscription endpoints exist anywhere
 
 | Status | Modules |
 |---|---|
-| ✅ Fully done | User Management, Artist Verification, Genres, Albums, Dashboard, Analytics, Admin Profile, Songs/Music, Videos — **9 / 23** |
-| ⚠️ Needs adjustment | Podcasts+Reviews, Audiobooks+Reviews, Events/Tours, Shop, Activity Log — **5 / 23** |
-| 🆕 Backend ready, not wired | Platform Settings, Categories — **2 / 23** |
+| ✅ Fully done | User Management, Artist Verification, Genres, Albums, Dashboard, Analytics, Admin Profile, Songs/Music, Videos, Podcasts+Reviews — **10 / 23** |
+| ⚠️ Needs adjustment | Audiobooks+Reviews, Events/Tours, Shop, Activity Log — **4 / 23** |
+| 🆕 Backend ready, not wired | Platform Settings, Categories (now partially — read-only `GET /category` is wired for the Podcasts module; admin Create/Update/Delete Category still has no UI) — **2 / 23** |
 | ❌ Not built / no backend | Payouts, Scheduler, Uploads, Support Tickets, Admins/Staff, Roles & RBAC, Subscriptions — **7 / 23** |
 
-Next recommended target: Podcasts — same `pending`/`pending_review` root cause, plus the create-podcast form needs real wiring (currently a dead stub).
+Next recommended target: Audiobooks + Reviews — same missing-reviews-sub-module gap as Podcasts had, plus a take-down/restore control missing from the edit form and an unsubscribed upload-progress endpoint.

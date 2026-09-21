@@ -30,8 +30,8 @@ const PodcastsCard = ({ podcast }) => {
                 </div>
 
                 <div className="flex flex-col gap-1">
-                    <span className="text-light-whitetext text-[12px] font-normal uppercase tracking-wider">Genre</span>
-                    <CommonTableTag>{podcast?.genre?.name || "-"}</CommonTableTag>
+                    <span className="text-light-whitetext text-[12px] font-normal uppercase tracking-wider">Category</span>
+                    <CommonTableTag>{podcast?.categoryName || "-"}</CommonTableTag>
                 </div>
 
                 <div className="flex flex-col gap-1">

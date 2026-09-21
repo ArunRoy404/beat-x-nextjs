@@ -41,6 +41,10 @@ export const queryKeys = {
     list: (params) => [...queryKeys.genre.all, "list", params],
     search: (name) => [...queryKeys.genre.all, "search", name],
   },
+  categories: {
+    all: ["categories"],
+    list: (params) => [...queryKeys.categories.all, "list", params],
+  },
   audiobooks: {
     all: ["audiobooks"],
     list: (params) => [...queryKeys.audiobooks.all, "list", params],
