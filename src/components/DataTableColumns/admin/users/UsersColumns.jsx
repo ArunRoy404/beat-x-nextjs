@@ -1,9 +1,10 @@
 import React from "react"
-import { Eye, Trash2 } from "lucide-react"
+import { Eye, Trash2, BadgeCheck } from "lucide-react"
 import { format } from "date-fns"
 import CommonTableHeader from "@/components/shared/CommonTable/CommonTableHeader"
 import CommonTableCell from "@/components/shared/CommonTable/CommonTableCell"
 import CommonAvatar from "@/components/shared/CommonAvatar"
+import UserStatusBadge from "@/components/shared/UserStatusBadge/UserStatusBadge"
 import { Button } from "@/components/ui/button"
 import UserDetailsDialog from "@/components/dialogs/admin/users/UserDetailsDialog"
 import DeleteUserDialog from "@/components/dialogs/admin/users/DeleteUserDialog"
@@ -22,7 +23,12 @@ export const getUsersColumns = () => [
             className="w-10 h-10 rounded-full border border-white/5 shrink-0"
           />
           <div className="flex flex-col min-w-0">
-            <span className="text-whitetext font-semibold text-sm truncate">{user?.name || "-"}</span>
+            <span className="flex items-center gap-1 text-whitetext font-semibold text-sm truncate">
+              {user?.name || "-"}
+              {user?.isVerified && (
+                <BadgeCheck className="w-3.5 h-3.5 text-secondary shrink-0" aria-label="Verified" />
+              )}
+            </span>
             <span className="text-light-gray/60 text-xs truncate">{user?.email || "-"}</span>
           </div>
         </div>
@@ -45,21 +51,13 @@ export const getUsersColumns = () => [
     }
   },
   {
-    accessorKey: "isVerified",
+    accessorKey: "status",
     header: () => <CommonTableHeader>Status</CommonTableHeader>,
-    cell: ({ getValue }) => {
-      const isVerified = getValue()
-      const colorClass = isVerified
-        ? "text-[#34C759] border-[#34C759]/20 bg-[#34C759]/10"
-        : "text-[#FFCC00] border-[#FFCC00]/20 bg-[#FFCC00]/10"
-      return (
-        <div className="flex">
-          <span className={`inline-block px-2.5 py-0.5 rounded-full border text-[12px] font-normal select-none ${colorClass}`}>
-            {isVerified ? "Verified" : "Unverified"}
-          </span>
-        </div>
-      )
-    }
+    cell: ({ getValue }) => (
+      <div className="flex">
+        <UserStatusBadge status={getValue()} />
+      </div>
+    )
   },
   {
     accessorKey: "coinBalance",

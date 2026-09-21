@@ -1,35 +1,19 @@
 "use client"
 
-import React from "react"
-// import {
-//     Dialog,
-//     DialogContent,
-//     DialogHeader,
-//     DialogTitle,
-//     DialogTrigger,
-// } from "@/components/ui/dialog"
-// import { Trash2 } from "lucide-react"
-// import DeleteUserForm from "@/components/forms/users/DeleteUserForm"
-import { toast } from "sonner"
+import React, { useState } from "react"
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import { Trash2 } from "lucide-react"
+import DeleteUserForm from "@/components/forms/users/DeleteUserForm"
 
-const DeleteUserDialog = ({ user, children }) => {
-    // Preserving dialog and form code for future backend integration
-    // const [open, setOpen] = useState(false)
+const DeleteUserDialog = ({ user, children, onDeleted }) => {
+    const [open, setOpen] = useState(false)
 
-    const handleClick = (e) => {
-        e?.stopPropagation?.()
-        toast.info("This action will be enabled once backend user management endpoints are released.")
-    }
-
-    if (children && React.isValidElement(children)) {
-        return React.cloneElement(children, {
-            onClick: handleClick,
-        })
-    }
-
-    return null
-
-    /*
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
@@ -48,14 +32,15 @@ const DeleteUserDialog = ({ user, children }) => {
 
                 <DeleteUserForm
                     user={user}
-                    onSuccess={() => setOpen(false)}
+                    onSuccess={() => {
+                        setOpen(false)
+                        onDeleted?.()
+                    }}
                     onCancel={() => setOpen(false)}
                 />
             </DialogContent>
         </Dialog>
     )
-    */
 }
 
 export default DeleteUserDialog
-

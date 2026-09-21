@@ -1,12 +1,22 @@
 /**
- * Sanitize and build URL search parameters for admin users endpoint.
- * This is a pure helper function (no React hooks) suitable for both Server and Client Components.
+ * Sanitize and build URL search parameters for the admin users endpoint
+ * (GET /admin/users). This is a pure helper function (no React hooks)
+ * suitable for both Server and Client Components.
  */
+const VALID_STATUSES = ["active", "suspended", "banned"];
+const VALID_ROLES = ["user", "artist", "developer"];
+
 export function buildUsersParams(raw = {}) {
   const params = {};
 
-  if (raw.status && typeof raw.status === "string" && raw.status.toLowerCase() !== "all") {
-    params.status = raw.status.toLowerCase();
+  const status = String(raw.status || "").toLowerCase();
+  if (VALID_STATUSES.includes(status)) {
+    params.status = status;
+  }
+
+  const role = String(raw.role || "").toLowerCase();
+  if (VALID_ROLES.includes(role)) {
+    params.role = role;
   }
 
   if (raw.q && typeof raw.q === "string" && raw.q.trim()) {

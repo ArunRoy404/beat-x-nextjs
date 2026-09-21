@@ -1,66 +1,81 @@
 "use client"
 
 import React from "react"
-import { useForm } from "react-hook-form"
+import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
-import { toast } from "sonner"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
+import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSelect"
+import { useInviteUser } from "@/hooks/api/admin/users/useInviteUser"
+
+const ROLE_OPTIONS = [
+    { value: "admin", label: "Admin" },
+    { value: "developer", label: "Developer" },
+]
 
 const inviteSchema = z.object({
-    name: z.string().min(1, "Name is required"),
     email: z.string().email("Invalid email address").min(1, "Email is required"),
+    role: z.enum(["admin", "developer"], { required_error: "Role is required" }),
 })
 
-const InviteUserForm = ({ onCancel }) => {
+const InviteUserForm = ({ onSuccess, onCancel }) => {
+    const { mutate: inviteUser, isPending } = useInviteUser()
+
     const {
         register,
         handleSubmit,
+        control,
         reset,
         formState: { errors },
     } = useForm({
         resolver: zodResolver(inviteSchema),
         defaultValues: {
-            name: "",
             email: "",
+            role: "admin",
         },
     })
 
-    // No invite/create endpoint exists yet — wire this to a real mutation once one does.
-    const onSubmit = () => {
-        toast.warning("Inviting users isn't connected to an API yet.")
-        reset()
+    const onSubmit = (data) => {
+        inviteUser(data, {
+            onSuccess: () => {
+                reset()
+                onSuccess?.()
+            },
+        })
     }
 
     return (
         <CommonFormContainer onSubmit={handleSubmit(onSubmit)}>
-            {/* Name */}
-            <div className="flex flex-col gap-2 shrink-0">
-                <label className="text-[#A175FF] text-[14px] font-medium font-sans">
-                    Name
-                </label>
-                <CommonInput
-                    placeholder="Full name"
-                    className="rounded-full bg-white/[0.03] border-white/10"
-                    {...register("name")}
-                    error={errors.name?.message}
-                />
-            </div>
-
             {/* Email Address */}
             <div className="flex flex-col gap-2 shrink-0">
                 <label className="text-[#A175FF] text-[14px] font-medium font-sans">
                     Email
                 </label>
                 <CommonInput
-                    placeholder="artist@example.com"
+                    placeholder="staff@example.com"
                     className="rounded-full bg-white/[0.03] border-white/10"
                     {...register("email")}
                     error={errors.email?.message}
                 />
             </div>
+
+            {/* Role */}
+            <Controller
+                name="role"
+                control={control}
+                render={({ field }) => (
+                    <CommonSelect
+                        label="Role"
+                        placeholder="Select role"
+                        value={field.value}
+                        onChange={field.onChange}
+                        options={ROLE_OPTIONS}
+                        error={errors.role?.message}
+                    />
+                )}
+            />
 
             {/* Footer Buttons */}
             <div className="flex items-center gap-4 mt-6 shrink-0">
@@ -78,8 +93,9 @@ const InviteUserForm = ({ onCancel }) => {
                     variant="gradient"
                     className="flex-1 h-[52px]! rounded-full font-semibold"
                     size="lg"
+                    isLoading={isPending}
                 >
-                    Invite User
+                    Send Invite
                 </Button>
             </div>
         </CommonFormContainer>

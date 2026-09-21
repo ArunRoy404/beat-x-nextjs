@@ -14,10 +14,10 @@ const AddNewUser = () => {
         </div>
         <div className="flex flex-col gap-1 min-w-0">
           <h2 className="text-whitetext text-[20px] not-italic font-medium leading-none truncate">
-            Register New User
+            Invite Staff
           </h2>
           <p className="text-white/40 text-[12px] not-italic font-normal truncate mt-0.5">
-            Add new users · Set up account roles · Manage permissions and profiles
+            Onboard a new admin or developer account by email
           </p>
         </div>
       </div>

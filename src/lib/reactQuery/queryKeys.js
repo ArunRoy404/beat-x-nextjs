@@ -34,6 +34,7 @@ export const queryKeys = {
     all: ["users"],
     profile: () => [...queryKeys.users.all, "profile"],
     list: (params) => [...queryKeys.users.all, "list", params],
+    detail: (id) => [...queryKeys.users.all, "detail", id],
   },
   genre: {
     all: ["genre"],
