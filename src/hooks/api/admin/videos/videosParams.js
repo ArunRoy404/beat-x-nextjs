@@ -1,3 +1,5 @@
+import { normalizeVideoStatus, toApiVideoStatus } from "@/lib/constants/videoStatus";
+
 /**
  * Pure helper function to parse raw URL search params into sanitized API params
  * for GET /admin/videos.
@@ -7,7 +9,7 @@ export function buildVideosParams(rawParams = {}) {
   const statusParam = typeof rawParams.status === "string" ? rawParams.status.trim() : "";
   let status;
   if (statusParam && statusParam.toLowerCase() !== "all") {
-    status = statusParam.toLowerCase();
+    status = toApiVideoStatus(normalizeVideoStatus(statusParam));
   }
 
   const genreParam = typeof rawParams.genre === "string" ? rawParams.genre.trim() : "";

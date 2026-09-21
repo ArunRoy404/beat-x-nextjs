@@ -51433,7 +51433,7 @@
               ]
             },
             {
-              "name": "⚠️ Approve Video (artist submission) (gating checks literal 'pending' instead of 'pending_review', and wrongly gates 'draft' too)",
+              "name": "✅ Approve Video (artist submission)",
               "request": {
                 "method": "PATCH",
                 "header": [
@@ -51640,7 +51640,7 @@
               ]
             },
             {
-              "name": "⚠️ Reject Video (artist submission) (same gating bug as approve)",
+              "name": "✅ Reject Video (artist submission)",
               "request": {
                 "method": "PATCH",
                 "header": [

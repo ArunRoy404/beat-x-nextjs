@@ -114,17 +114,29 @@ All 12 endpoints verified correct: URL, body shape, and enums (reject `reasonCod
 
 ---
 
-## 9. Videos — ⚠️ Needs adjustment (not yet fixed)
+## 9. Videos — ✅ Done
 
-- `GET /admin/videos ✅`
+**What I did:** checked every endpoint one by one against live Postman request/response examples (not assumptions). Found and fixed one bug worse than the planned `pending_review` gating issue — the video grid was silently broken (always empty) — plus several smaller correctness/UI-honesty issues along the way.
+
+- `GET /admin/videos ✅` — **critical bug fixed**: the real response nests the list under `data.videos`, but `VideosContainer.jsx` was reading `data?.data` (always `undefined` → always fell back to `[]`). The admin Videos grid has been showing "No videos found" regardless of real data. Now reads `data?.videos` correctly.
 - `GET /admin/videos/{id} ✅`
-- `PATCH /admin/videos/{id} ✅`
-- `PATCH /admin/videos/{id}/approve ⚠️ (gating checks literal "pending" instead of "pending_review", and wrongly treats "draft" as needing approval)`
-- `PATCH /admin/videos/{id}/reject ⚠️ (same gating bug as approve)`
+- `PATCH /admin/videos/{id} ✅` — take-down/restore via `status` confirmed working; contract confirms this route is JSON-only and cannot replace the cover file (see Edit-dialog fix below)
+- `PATCH /admin/videos/{id}/approve ✅` — fixed: gating previously checked literal `"pending"` (backend sends `"pending_review"`) and incorrectly treated `"draft"` as needing approval (admin's own drafts don't go through review). Centralized the fix into a new `src/lib/constants/videoStatus.js` (mirrors `songStatus.js`) instead of patching the inline logic in place, since the same incomplete status handling was duplicated across `VideoCard.jsx`, `VideoDetailHeader.jsx`, and `VideoDetailFooter.jsx` with three different incomplete color maps
+- `PATCH /admin/videos/{id}/reject ✅` — same fix; also corrected a nonsensical canned rejection-reason option ("Identity Music unclear or unreadable" → "Video content unclear or unreadable", looked like copy-pasted leftover text)
 - `DELETE /admin/videos/{id} ✅`
-- `POST /creator/videos ❌ (admin video creation intentionally not built — correctly disabled in UI with an explanatory note, matches contract's lack of an /admin/videos create route)`
+- `POST /creator/videos ❌ (correctly not built — admin video creation intentionally absent, disabled in UI with an honest "unavailable" toast, matches contract's lack of an /admin/videos create route)`
 
-**Also:** `UploadVideoDialog.jsx` is a dead/broken file (no valid component definition) that should be deleted; filter tabs omit `pending_review`, `scheduled`, `rejected`.
+**Other real issues found and fixed in the same pass:**
+- **Deceptive UI (silent data loss):** `EditVideoDialog.jsx` let an admin pick a new thumbnail image, showed a live preview, and on save displayed "Video changes saved successfully!" — but the selected file was never sent anywhere. The contract confirms `PATCH /admin/videos/{id}` is JSON-only and cannot replace the cover file, so there was never a way for this to actually work. Fixed: the thumbnail box is now an honest read-only preview — clicking it explains cover replacement isn't supported by the API yet, instead of silently accepting and discarding a file.
+- **Fabricated UI element:** `VideoDetailHeader.jsx` rendered a "verified" checkmark badge on every single video unconditionally — there is no such field anywhere in the video object or the contract. Removed; it was misleading, implying a verification status that doesn't exist.
+- **Fabricated fallback data:** both `VideoDetailHeader.jsx` and `VideoDetailContent.jsx` showed `video?.transcodeStatus || "ready"` — guessing "ready" whenever the real value was missing/falsy, which could hide a genuinely different transcode state. Changed to show `"-"` when absent, per the "no fabricated data" project rule.
+- **Thin detail view:** `VideoDetailContent.jsx` was missing the entire moderation trail (`submittedStatus`, `submittedAt`, `reviewedBy`, `reviewedAt`, `rejectionReason`) that Songs' equivalent already shows — directly relevant since we were fixing the approve/reject flow and an admin couldn't previously see *why* a video was rejected anywhere. Added, following the same `refToText()` Mongo-ref-safe pattern as `SongDetailContent.jsx`.
+- **Pre-existing rules-of-hooks violation:** `VideoCard.jsx` called `useGlobalMediaPlayerStore()` *after* an early `if (!video) return null` — a real (if latent) React bug predating this session, caught by lint while editing the file. Moved the hook call above the guard.
+- **Pre-existing effect anti-pattern:** `EditVideoDialog.jsx` synced fetched video data into form fields via `useEffect` + multiple `setState` calls, flagged by `react-hooks/set-state-in-effect`. Refactored into a `VideoEditFormFields` subcomponent keyed by `video?._id`/open-state so field values initialize directly from props on mount — no effect needed, matches the pattern React recommends for "resetting state when a prop changes."
+- **SSR gap:** the genre filter dropdown wasn't prefetched server-side (unlike Songs, which prefetches genres alongside its list) — caused an empty-then-populated flash on first paint. Added the same parallel `prefetchQuery` to `page.jsx`, and aligned `VideosContainer.jsx`'s `useGenres()` call to use the shared `TAXONOMY_OPTIONS_PARAMS` so the client cache key matches what's prefetched.
+- **Optional chaining:** `VideoCard.jsx` had several direct `video.x` property accesses without `?.` (technically safe today only because of a local guard, but inconsistent with the rest of the codebase and the project's mandatory-optional-chaining rule) — added throughout.
+
+**Also:** filter tabs were missing `Pending`, `Scheduled`, `Rejected` — added, matching Songs' tab set. Deleted two dead files: `UploadVideoDialog.jsx` (broken — no valid component definition, would throw if ever rendered) and `RejectVideoDialog.jsx` (unused duplicate — `VideoDetailFooter.jsx` already has its own working inline reject flow). Removed the stale comment in `AdminDashboardVideosPage.jsx` referencing the now-deleted `UploadVideoDialog`.
 
 ---
 
@@ -285,9 +297,9 @@ Confirmed via full-collection search: zero subscription endpoints exist anywhere
 
 | Status | Modules |
 |---|---|
-| ✅ Fully done | User Management, Artist Verification, Genres, Albums, Dashboard, Analytics, Admin Profile, Songs/Music — **8 / 23** |
-| ⚠️ Needs adjustment | Videos, Podcasts+Reviews, Audiobooks+Reviews, Events/Tours, Shop, Activity Log — **6 / 23** |
+| ✅ Fully done | User Management, Artist Verification, Genres, Albums, Dashboard, Analytics, Admin Profile, Songs/Music, Videos — **9 / 23** |
+| ⚠️ Needs adjustment | Podcasts+Reviews, Audiobooks+Reviews, Events/Tours, Shop, Activity Log — **5 / 23** |
 | 🆕 Backend ready, not wired | Platform Settings, Categories — **2 / 23** |
 | ❌ Not built / no backend | Payouts, Scheduler, Uploads, Support Tickets, Admins/Staff, Roles & RBAC, Subscriptions — **7 / 23** |
 
-Next recommended target: the same `pending` vs `pending_review` status-enum bug in Videos and Podcasts (same root cause just fixed in Songs, applied one module at a time per current workflow).
+Next recommended target: Podcasts — same `pending`/`pending_review` root cause, plus the create-podcast form needs real wiring (currently a dead stub).
