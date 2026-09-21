@@ -5,6 +5,7 @@ Generated from a full pass over the codebase (`src/app/admin`, `src/templates/ad
 Rules applied:
 - ✅ = the full round trip is wired: UI action → hook → service → a real endpoint documented in Postman with a success example, with matching payload fields both ways.
 - ❌ = any part is broken or missing — API doesn't exist in Postman, UI doesn't call any API (dummy/local state), a required field is missing on either side, an enum/dropdown doesn't match the backend's accepted values, or only a small piece of a feature is incomplete. A feature is **never** marked ✅ if any part of it is incomplete.
+- ℹ️ = informational, not a gap — something that's absent on both the API side and the UI side consistently (so there's nothing broken to fix), or a capability that's correctly and intentionally left unused/unimplemented.
 
 ---
 
@@ -52,6 +53,7 @@ Rules applied:
  - ❌ List Admins (GET /admin/admins) — zero code, no dedicated staff-only list page exists
  - ❌ Invite Admin duplicate (POST /admin/admins/invite) — confirmed unused; `/admin/users/invite` is the only wired invite route
  - ❌ Stats cards (Total/Verified/Suspended-Banned/New This Month) — computed client-side from only the current page of the users array, not true platform-wide totals (no dedicated stats endpoint is called)
+ - ℹ️ Edit User profile (name/email) — no such endpoint exists anywhere in Postman's User Management folder (only list/get/invite/suspend/ban/reactivate/delete are documented); correctly has no UI for it either, so this is not a gap
 
 ## 4. Admin Artists (Verification Queue)
  - ❌ Status tabs mismatch — UI tabs are All/Pending/Approved/Suspended/Rejected and send `tab=approved` / `tab=rejected` directly to the API, but the documented enum is only `all | verified | pending | suspended` — "Approved" should map to `verified`, and "Rejected" has no backing tab value at all
@@ -82,6 +84,7 @@ Rules applied:
  - ✅ List Songs table — GET /admin/songs, response shape matches
  - ✅ Status filter tabs (Draft/Pending/Scheduled/Active/Archived/Rejected) — "Pending" correctly maps to wire value `pending_review`, matches enum
  - ✅ Genre filter — sent as `genre` param, no client-side filtering
+ - ❌ Album filter — `album` is supported end-to-end in `songsParams.js`/`songsServices.js` (param is built and sent to the API), but no dropdown/control exists anywhere in `SongsContainer.jsx` to actually set it — capability unreachable
  - ✅ Search — debounced, sent as `q` param, no client-side filtering
  - ✅ Pagination — page/limit sent as params
  - ❌ Dashboard stat cards ("Total Songs", "Total Streams", "Published", "Drafts") read a `stats` object that does not appear anywhere in the documented GET /admin/songs response
@@ -90,7 +93,7 @@ Rules applied:
  - ❌ Upload New Song "Album" field — appended to the Create request's payload, but `album` is not part of the documented Create Song formdata keys (only documented on Update)
  - ❌ Upload New Song "Explicit Content" toggle — same issue: `explicit` is sent on create but is not in the documented Create Song formdata keys
  - ❌ Upload New Song "Schedule" visibility + scheduledAt date picker — `scheduledAt` is documented only on the Update DTO; the Create endpoint's documented body has no `scheduledAt` field, so scheduling a brand-new song sends an undocumented field the create endpoint doesn't accept
- - ✅ Edit Song (title/artist/genre/album/explicit/status/scheduledAt) — PATCH /admin/songs/{id}, field names match the Update DTO exactly
+ - ✅ Edit Song (title/artist/genre/album/explicit/status/scheduledAt) — PATCH /admin/songs/{id}, field names match the Update DTO's documented "Fields" list exactly (note: the Postman collection's own saved example body for this request is internally inconsistent — it shows a `title, cover[file], audio[file]` formdata example even though the endpoint's own description says "JSON-only, cannot replace cover/audio files"; the Fields list is the authoritative contract and the app's JSON PATCH implementation matches it)
  - ✅ Edit Song "Featured" toggle — matches documented `isFeatured`, correctly omitted from Create
  - ✅ Edit Song "Trending" toggle — matches documented `isTrending`, correctly omitted from Create
  - ❌ `trendDirection` (enum up/down/stable) — documented as an accepted/editable Update field and even displayed read-only in the detail view, but there is no UI control to actually set it — an admin can never change it
@@ -98,6 +101,8 @@ Rules applied:
  - ✅ Approve Song (artist submission) — PATCH .../approve, no body, gated correctly to pending submissions only
  - ✅ Reject Song (artist submission) — PATCH .../reject `{reason}`, matches, client validates non-empty reason
  - ✅ Delete Song — DELETE /admin/songs/{id}, handles 204 response correctly
+ - ℹ️ Get Upload URL (presigned) — confirmed unused anywhere in the Songs module code, correctly so: Postman marks it unused-by-design since Create/Update upload directly via multipart instead — not a gap
+ - ❌ Upload progress tracking — POST /admin/songs returns a `trackingId` (the upload is processed async server-side), and a documented `GET /uploads/{trackingId}/progress` (SSE) endpoint exists to watch it, but zero code anywhere calls it — after uploading a new song the admin gets no live progress, only the next periodic refetch
  - ✅ Song Analytics tab — correctly left as a commented-out placeholder with an empty-state message since the API has no analytics fields for songs (not faked)
  - ✅ URL-driven filter/search/pagination state, SSR/ISR registration, and query-key sharing all correctly wired
  - ✅ No dummy data / zustand store leftover for admin Songs
@@ -151,6 +156,7 @@ Rules applied:
  - ✅ "Total Podcasts" stat card — real unfiltered total, not dummy
  - ✅ View Details dialog header/basic fields — GET /admin/podcasts/{id}, matches
  - ❌ Episodes list inside podcast details — the UI assumes the detail response nests episodes as `episodes.data` and renders episode fields (episodeNumber, seasonNumber, durationMs, playCount, status, etc.), but the Postman example response for Get Podcast by Id never actually documents an `episodes` key or episode schema — this shape is unverified against the collection
+ - ❌ Episode/season management (create/edit/delete episode, delete season) — Postman confirms these only exist as ARTIST-role routes (`/creator/podcasts/{id}/episodes`, `/seasons`), explicitly documented as shared by "artists/admins via ARTIST > Podcasts"; the Admin Podcasts module has no create/edit/delete-episode UI at all — episodes are view-only from the admin side
  - ❌ Create Podcast — posts to the correct shared `/creator/podcasts` route with title/description/language/category/status/scheduledAt/cover, BUT the documented formdata also includes `ownerId` and the UI has **no artist/owner picker field at all**, so `ownerId` is never sent
  - ❌ Edit Podcast — form only submits description/status/scheduledAt/isFeatured/isTrending/trendDirection to PATCH /admin/podcasts/{id}; the endpoint also documents `title`, `language`, `category`, `ownerId` as editable, none of which are exposed in the form (the form's own code comments admit this is unfinished)
  - ❌ Cover image update after creation — the API documents a separate PATCH /admin/podcasts/{id}/cover (multipart) endpoint for replacing the cover, but no service/hook/UI anywhere calls it or exposes a re-upload control — the cover can only be set once, at creation
@@ -183,11 +189,13 @@ Rules applied:
  - ❌ Update Chapter (replace audio) — same file-type mismatch on the inline "Replace Audio" control
  - ✅ Update Chapter (title-only) — PATCH .../chapters/{id}, matches
  - ✅ Delete Chapter — DELETE .../chapters/{id}, matches
+ - ℹ️ Reorder Chapters — no endpoint exists anywhere in Postman for this, and no drag/reorder UI exists in `ChapterRow.jsx`/`AudioBookDetailChapters.jsx` either — consistently absent on both sides, not a gap
  - ❌ Chapter upload progress — the API documents an SSE progress endpoint (`GET /uploads/{trackingId}/progress`) for tracking long transcodes after the initial 201, but the UI has zero progress indicator and relies purely on toast + periodic refetch, so large uploads (up to 2GB per the UI's own copy) give no feedback until the next auto-refresh
  - ❌ Presigned chapter-upload-URL flow — the service function for it exists in code but has zero callers anywhere (dead code); non-blocking since Postman marks this endpoint optional-by-design, but per strict audit it's unwired
  - ✅ Reviews list — GET /admin/audiobooks/reviews?audiobookId, matches
  - ✅ Review hide/unhide (moderate) — PATCH .../moderate `{hidden, reason}`, matches
  - ✅ Review delete — DELETE .../reviews/{id}, matches
+ - ❌ Audiobook Analytics — unlike Songs/Videos/Albums/Podcasts (which at least keep a commented-out analytics placeholder for future backend support), the Admin Audiobooks detail view has no Analytics tab component at all; the API also has no analytics fields for audiobooks, so both sides are missing it
  - ✅ No dummy data / zustand store leftover for admin Audiobooks
 
 ## 10. Admin Genre
