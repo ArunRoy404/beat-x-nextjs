@@ -50,6 +50,10 @@ export const queryKeys = {
     list: (params) => [...queryKeys.audiobooks.all, "list", params],
     detail: (id) => [...queryKeys.audiobooks.all, "detail", id],
   },
+  audiobookReviews: {
+    all: ["audiobookReviews"],
+    list: (params) => [...queryKeys.audiobookReviews.all, "list", params],
+  },
   music: {
     all: ["music"],
     list: (params) => [...queryKeys.music.all, "list", params],

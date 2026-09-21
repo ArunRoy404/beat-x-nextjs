@@ -117,7 +117,7 @@ const AudioBookDetailHeader = ({ book, chapters = [] }) => {
                             <span className="text-[10px] font-medium text-dark-gray uppercase tracking-wider">Duration</span>
                         </div>
                         <div className="flex flex-col gap-[2px]">
-                            <span className="text-[14px] sm:text-[15px] font-semibold text-whitetext truncate">{book?.totalChapters ?? chapters.length}</span>
+                            <span className="text-[14px] sm:text-[15px] font-semibold text-whitetext truncate">{book?.totalChapters ?? chapters?.length ?? 0}</span>
                             <span className="text-[10px] font-medium text-dark-gray uppercase tracking-wider">Chapters</span>
                         </div>
                         <div className="flex flex-col gap-[2px]">

@@ -17,9 +17,16 @@ const AudioBookDetailsDialog = ({ book: summary, children }) => {
     const [open, setOpen] = useState(false)
     // GET /audiobooks/:id returns { book, chapters, userProgress } — not the
     // book flattened with chapters inline, so pull each piece out here.
+    // `chapters` itself is a paginated object ({ data, total, page, limit }),
+    // not a bare array — the Postman example showed a bare array, but the
+    // real server doesn't match it (confirmed via live response), so reading
+    // `detail?.chapters || []` used to pass the whole object through and
+    // crash every downstream `[...chapters]`/`chapters.map(...)` call.
     const { data: detail, isLoading } = useAudioBookDetail(open ? summary?._id : undefined)
     const book = detail?.book || summary
-    const chapters = detail?.chapters || []
+    const chapters = Array.isArray(detail?.chapters)
+        ? detail.chapters
+        : (detail?.chapters?.data ?? [])
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>

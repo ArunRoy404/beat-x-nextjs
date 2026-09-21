@@ -13,6 +13,7 @@ import { useUrlListParams } from "@/hooks/useUrlListParams"
 import { useAudioBooks } from "@/hooks/api/admin/audiobooks/useAudioBooks"
 import { AUDIOBOOKS_PAGE_SIZE, buildAudioBooksParams } from "@/hooks/api/admin/audiobooks/audioBooksParams"
 import { useGenres } from "@/hooks/api/admin/genre/useGenres"
+import { TAXONOMY_OPTIONS_PARAMS } from "@/lib/constants/taxonomyOptions"
 
 const STATUS_TABS = ["All", "Draft", "Active", "Archived"]
 const SEARCH_DEBOUNCE_MS = 300
@@ -37,10 +38,22 @@ const AudioBooksContainer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchInput])
 
-  const { data: genres = [] } = useGenres()
+  // `useGenres()` resolves to a paginated object ({ data, total, ... }),
+  // never a bare array — `const { data: genres = [] } = useGenres()` only
+  // guards against `undefined`, so `genres.map(...)` below used to throw
+  // "genres.map is not a function" the moment real data landed (same root
+  // cause as the crash already fixed on the Podcasts route).
+  const genresQuery = useGenres(TAXONOMY_OPTIONS_PARAMS)
+  const genresData = genresQuery?.data
+  const genresList =
+    genresData?.genre ??
+    genresData?.genres ??
+    genresData?.data ??
+    (Array.isArray(genresData) ? genresData : [])
+
   const genreOptions = [
     { value: "all", label: "All Genres" },
-    ...genres.map((genre) => ({ value: genre._id, label: genre.name })),
+    ...genresList.map((genre) => ({ value: genre?._id, label: genre?.name || "Unnamed Genre" })),
   ]
 
   const params = buildAudioBooksParams({
@@ -51,7 +64,12 @@ const AudioBooksContainer = () => {
   })
 
   const { data, isLoading, isError, error, refetch } = useAudioBooks(params)
-  const books = data?.data ?? []
+  // The Postman collection's saved example showed the list nested under
+  // `data.data`, but the real live server nests it under `data.audio` —
+  // the example was stale. Same bug class as the Users `data.admins` and
+  // Videos `data.videos` mismatches found earlier; `data?.data` is kept as
+  // a fallback only in case an older/different server build is in play.
+  const books = data?.audio ?? data?.data ?? []
   const total = data?.total ?? 0
   const totalPages = Math.ceil(total / AUDIOBOOKS_PAGE_SIZE) || 1
 
@@ -99,7 +117,7 @@ const AudioBooksContainer = () => {
           {/* Cards Responsive Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10 w-full">
             {books.map((book) => (
-              <div key={book._id}>
+              <div key={book?._id}>
                 <AudioBookCard book={book} />
               </div>
             ))}

@@ -6,6 +6,7 @@ const CommonAudioInput = ({
     value,
     onChange,
     accept = "audio/*",
+    subtitle = "MP3, WAV, FLAC · Max 200MB",
     error,
     className,
 }) => {
@@ -56,7 +57,7 @@ const CommonAudioInput = ({
                             Drop your audio file here
                         </p>
                         <p className="text-light-whitetext text-[11px] mt-0.5 font-sans">
-                            MP3, WAV, FLAC · Max 200MB
+                            {subtitle}
                         </p>
                     </div>
                 )}

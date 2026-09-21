@@ -5,10 +5,13 @@ import { PlusCircle } from "lucide-react"
 import ChapterRow from "./ChapterRow"
 import AddChapterForm from "./AddChapterForm"
 
-const AudioBookDetailChapters = ({ book, chapters: chaptersProp = [] }) => {
+const AudioBookDetailChapters = ({ book, chapters: chaptersProp }) => {
     const [showAddForm, setShowAddForm] = useState(false)
-    const chapters = [...chaptersProp].sort(
-        (a, b) => (a.chapterNumber ?? 0) - (b.chapterNumber ?? 0)
+    // Defensive: only ever spread a real array, regardless of what the
+    // caller passes through (a non-array here previously crashed the whole
+    // detail dialog with "chaptersProp is not iterable").
+    const chapters = (Array.isArray(chaptersProp) ? chaptersProp : []).slice().sort(
+        (a, b) => (a?.chapterNumber ?? 0) - (b?.chapterNumber ?? 0)
     )
 
     return (
@@ -42,7 +45,7 @@ const AudioBookDetailChapters = ({ book, chapters: chaptersProp = [] }) => {
 
             <div className="flex flex-col gap-3">
                 {chapters.map((chapter, index) => (
-                    <ChapterRow key={chapter._id} audiobookId={book?._id} book={book} chapter={chapter} index={index} />
+                    <ChapterRow key={chapter?._id} audiobookId={book?._id} book={book} chapter={chapter} index={index} />
                 ))}
                 {chapters.length === 0 && !showAddForm && (
                     <div className="py-10 text-center text-muted-foreground bg-white/[0.02] border border-white/5 rounded-[16px] text-sm">

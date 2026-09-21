@@ -15,7 +15,7 @@ import EditAudioBookForm from "@/components/forms/audiobooks/EditAudioBookForm"
 const EditAudioBookDialog = ({ book: summary, children }) => {
   const [open, setOpen] = useState(false)
   const { data: detail, isLoading } = useAudioBookDetail(open ? summary?._id : undefined)
-  const book = detail?.audiobook || detail?.book || summary
+  const book = detail?.book || summary
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

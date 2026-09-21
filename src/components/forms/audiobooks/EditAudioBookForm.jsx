@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
@@ -32,7 +32,6 @@ const EditAudioBookForm = ({ book, onSuccess, onCancel }) => {
     handleSubmit,
     control,
     watch,
-    reset,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(audioBookSchema),
@@ -52,29 +51,6 @@ const EditAudioBookForm = ({ book, onSuccess, onCancel }) => {
       publishedAt: book?.publishedAt ? new Date(book.publishedAt) : new Date(),
     },
   })
-
-  useEffect(() => {
-    if (book) {
-      reset({
-        title: book?.title || "",
-        author: book?.author || "",
-        narrator: book?.narrator || "",
-        synopsis: book?.synopsis || "",
-        language: book?.language || "",
-        genre: getGenreId(book?.genre),
-        status: book?.status || "active",
-        isBestseller: Boolean(book?.isBestseller),
-        isTrending: Boolean(book?.isTrending),
-        isFeatured: Boolean(book?.isFeatured),
-        bestsellerRank: book?.bestsellerRank ? String(book.bestsellerRank) : "",
-        trendDirection: book?.trendDirection || "up",
-        publishedAt: book?.publishedAt ? new Date(book.publishedAt) : new Date(),
-      })
-      if (book?.coverUrl) {
-        setCover(book.coverUrl)
-      }
-    }
-  }, [book, reset])
 
   const handleCoverChange = (file) => {
     setNewCoverFile(file)
@@ -128,6 +104,7 @@ const EditAudioBookForm = ({ book, onSuccess, onCancel }) => {
         onCoverChange={handleCoverChange}
         coverError={coverError}
         watch={watch}
+        showAdminFlags
       />
 
       <div className="flex items-center gap-4 mt-2 shrink-0">

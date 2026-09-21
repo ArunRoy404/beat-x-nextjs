@@ -2,7 +2,9 @@ import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 import { getQueryClient } from "@/lib/reactQuery/getQueryClient";
 import { queryKeys } from "@/lib/reactQuery/queryKeys";
 import { getAudioBooksRequest } from "@/services/admin/audioBooksServices";
+import { getGenresRequest } from "@/services/admin/genreServices";
 import { buildAudioBooksParams } from "@/hooks/api/admin/audiobooks/audioBooksParams";
+import { TAXONOMY_OPTIONS_PARAMS } from "@/lib/constants/taxonomyOptions";
 import AdminDashboardAudioBooksPage from "@/templates/admin/dashboard/AdminDashboardAudioBooksPage";
 
 // No `export const revalidate` here on purpose: getAudioBooksRequest reads
@@ -14,13 +16,26 @@ import AdminDashboardAudioBooksPage from "@/templates/admin/dashboard/AdminDashb
 const page = async ({ searchParams }) => {
   const rawParams = await searchParams;
   const params = buildAudioBooksParams(rawParams);
+  const defaultParams = buildAudioBooksParams();
 
   const queryClient = getQueryClient();
 
-  await queryClient.prefetchQuery({
-    queryKey: queryKeys.audiobooks.list(params),
-    queryFn: () => getAudioBooksRequest(params),
-  });
+  await Promise.all([
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.audiobooks.list(params),
+      queryFn: () => getAudioBooksRequest(params),
+    }),
+    JSON.stringify(params) !== JSON.stringify(defaultParams)
+      ? queryClient.prefetchQuery({
+          queryKey: queryKeys.audiobooks.list(defaultParams),
+          queryFn: () => getAudioBooksRequest(defaultParams),
+        })
+      : Promise.resolve(),
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.genre.list(TAXONOMY_OPTIONS_PARAMS),
+      queryFn: () => getGenresRequest(TAXONOMY_OPTIONS_PARAMS),
+    }),
+  ]);
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

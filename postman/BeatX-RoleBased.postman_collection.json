@@ -55113,7 +55113,7 @@
           "name": "Audiobooks (admin-only, no artist create route)",
           "item": [
             {
-              "name": "✅ Get Chapter Upload URL (presigned, optional flow)",
+              "name": "🆕 Get Chapter Upload URL (presigned, optional flow — unused by design, batch chapter-create endpoint this key feeds isn't used, single Create Chapter is multipart instead)",
               "request": {
                 "method": "POST",
                 "header": [
@@ -55538,7 +55538,7 @@
                     }
                   ],
                   "cookie": [],
-                  "body": "{\n  \"status\": true,\n  \"message\": \"Success\",\n  \"data\": {\n    \"data\": [\n      {\n        \"_id\": \"66fd1c2e2f1b9a0012a30032\",\n        \"title\": \"The Sound of Silence\",\n        \"author\": \"Jane Doe\",\n        \"narrator\": \"John Smith\",\n        \"coverUrl\": \"https://cdn.beatx.app/audiobook-covers/abc123.jpg\",\n        \"coverKey\": \"audiobook-covers/abc123.jpg\",\n        \"synopsis\": \"A gripping tale of music and memory.\",\n        \"language\": \"en\",\n        \"totalChapters\": 18,\n        \"totalDurationMs\": 41400000,\n        \"genre\": {\n          \"_id\": \"66fd1c2e2f1b9a0012a3000a\",\n          \"name\": \"Hip-Hop\"\n        },\n        \"ratingAverage\": 4.4,\n        \"ratingCount\": 56,\n        \"playCount\": 2410,\n        \"likeCount\": 76,\n        \"playCountWeek\": 130,\n        \"isBestseller\": true,\n        \"isTrending\": false,\n        \"isFeatured\": true,\n        \"status\": \"active\",\n        \"universe\": [],\n        \"publishedAt\": \"2026-08-01T00:00:00.000Z\",\n        \"bestsellerRank\": 3,\n        \"trendDirection\": \"stable\",\n        \"createdAt\": \"2026-08-01T00:00:00.000Z\",\n        \"updatedAt\": \"2026-09-19T10:00:00.000Z\"\n      }\n    ],\n    \"total\": 42,\n    \"page\": 1,\n    \"limit\": 20\n  },\n  \"timestamp\": \"2026-09-19T10:00:00.000Z\",\n  \"path\": \"/admin/audiobooks\",\n  \"metadata\": {\n    \"duration\": \"18ms\"\n  }\n}"
+                  "body": "{\n  \"status\": true,\n  \"message\": \"Success\",\n  \"data\": {\n    \"total\": 42,\n    \"page\": 1,\n    \"limit\": 20,\n    \"audio\": [\n      {\n        \"_id\": \"66fd1c2e2f1b9a0012a30032\",\n        \"title\": \"The Sound of Silence\",\n        \"author\": \"Jane Doe\",\n        \"narrator\": \"John Smith\",\n        \"coverUrl\": \"https://cdn.beatx.app/audiobook-covers/abc123.jpg\",\n        \"coverKey\": \"audiobook-covers/abc123.jpg\",\n        \"synopsis\": \"A gripping tale of music and memory.\",\n        \"language\": \"en\",\n        \"totalChapters\": 18,\n        \"totalDurationMs\": 41400000,\n        \"genre\": {\n          \"_id\": \"66fd1c2e2f1b9a0012a3000a\",\n          \"name\": \"Hip-Hop\"\n        },\n        \"ratingAverage\": 4.4,\n        \"ratingCount\": 56,\n        \"playCount\": 2410,\n        \"likeCount\": 76,\n        \"playCountWeek\": 130,\n        \"isBestseller\": true,\n        \"isTrending\": false,\n        \"isFeatured\": true,\n        \"status\": \"active\",\n        \"universe\": [],\n        \"publishedAt\": \"2026-08-01T00:00:00.000Z\",\n        \"bestsellerRank\": 3,\n        \"trendDirection\": \"stable\",\n        \"createdAt\": \"2026-08-01T00:00:00.000Z\",\n        \"updatedAt\": \"2026-09-19T10:00:00.000Z\"\n      }\n    ]\n  },\n  \"timestamp\": \"2026-09-19T10:00:00.000Z\",\n  \"path\": \"/admin/audiobooks\",\n  \"metadata\": {\n    \"duration\": \"18ms\"\n  }\n}"
                 },
                 {
                   "name": "Unauthorized - Missing/Invalid Token",
@@ -56226,7 +56226,7 @@
                     }
                   ],
                   "cookie": [],
-                  "body": "{\n  \"status\": true,\n  \"message\": \"Success\",\n  \"data\": {\n    \"book\": {\n      \"_id\": \"66fd1c2e2f1b9a0012a30032\",\n      \"title\": \"The Sound of Silence\",\n      \"author\": \"Jane Doe\",\n      \"narrator\": \"John Smith\",\n      \"coverUrl\": \"https://cdn.beatx.app/audiobook-covers/abc123.jpg\",\n      \"coverKey\": \"audiobook-covers/abc123.jpg\",\n      \"synopsis\": \"A gripping tale of music and memory.\",\n      \"language\": \"en\",\n      \"totalChapters\": 18,\n      \"totalDurationMs\": 41400000,\n      \"genre\": {\n        \"_id\": \"66fd1c2e2f1b9a0012a3000a\",\n        \"name\": \"Hip-Hop\"\n      },\n      \"ratingAverage\": 4.4,\n      \"ratingCount\": 56,\n      \"playCount\": 2410,\n      \"likeCount\": 76,\n      \"playCountWeek\": 130,\n      \"isBestseller\": true,\n      \"isTrending\": false,\n      \"isFeatured\": true,\n      \"status\": \"active\",\n      \"universe\": [],\n      \"publishedAt\": \"2026-08-01T00:00:00.000Z\",\n      \"bestsellerRank\": 3,\n      \"trendDirection\": \"stable\",\n      \"createdAt\": \"2026-08-01T00:00:00.000Z\",\n      \"updatedAt\": \"2026-09-19T10:00:00.000Z\"\n    },\n    \"chapters\": [\n      {\n        \"_id\": \"66fd1c2e2f1b9a0012a30033\",\n        \"audiobookId\": \"66fd1c2e2f1b9a0012a30032\",\n        \"chapterNumber\": 3,\n        \"title\": \"Chapter 3: The Awakening\",\n        \"audioKey\": \"media/audiobooks/audio/abc123.mp3\",\n        \"durationMs\": 2300000,\n        \"hlsMasterUrl\": \"https://cdn.beatx.app/media/abc123/hls/master.m3u8\",\n        \"transcodeStatus\": \"ready\",\n        \"createdAt\": \"2026-08-01T00:00:00.000Z\",\n        \"updatedAt\": \"2026-09-19T10:00:00.000Z\"\n      }\n    ]\n  },\n  \"timestamp\": \"2026-09-19T10:00:00.000Z\",\n  \"path\": \"/admin/audiobooks/{{audiobookId}}\",\n  \"metadata\": {\n    \"duration\": \"18ms\"\n  }\n}"
+                  "body": "{\n  \"status\": true,\n  \"message\": \"Success\",\n  \"data\": {\n    \"book\": {\n      \"_id\": \"66fd1c2e2f1b9a0012a30032\",\n      \"title\": \"The Sound of Silence\",\n      \"author\": \"Jane Doe\",\n      \"narrator\": \"John Smith\",\n      \"coverUrl\": \"https://cdn.beatx.app/audiobook-covers/abc123.jpg\",\n      \"coverKey\": \"audiobook-covers/abc123.jpg\",\n      \"synopsis\": \"A gripping tale of music and memory.\",\n      \"language\": \"en\",\n      \"totalChapters\": 18,\n      \"totalDurationMs\": 41400000,\n      \"genre\": {\n        \"_id\": \"66fd1c2e2f1b9a0012a3000a\",\n        \"name\": \"Hip-Hop\"\n      },\n      \"ratingAverage\": 4.4,\n      \"ratingCount\": 56,\n      \"playCount\": 2410,\n      \"likeCount\": 76,\n      \"playCountWeek\": 130,\n      \"isBestseller\": true,\n      \"isTrending\": false,\n      \"isFeatured\": true,\n      \"status\": \"active\",\n      \"universe\": [],\n      \"publishedAt\": \"2026-08-01T00:00:00.000Z\",\n      \"bestsellerRank\": 3,\n      \"trendDirection\": \"stable\",\n      \"createdAt\": \"2026-08-01T00:00:00.000Z\",\n      \"updatedAt\": \"2026-09-19T10:00:00.000Z\"\n    },\n    \"chapters\": {\n      \"data\": [\n        {\n          \"_id\": \"66fd1c2e2f1b9a0012a30033\",\n          \"audiobookId\": \"66fd1c2e2f1b9a0012a30032\",\n          \"chapterNumber\": 3,\n          \"title\": \"Chapter 3: The Awakening\",\n          \"audioKey\": \"media/audiobooks/audio/abc123.mp3\",\n          \"durationMs\": 2300000,\n          \"hlsMasterUrl\": \"https://cdn.beatx.app/media/abc123/hls/master.m3u8\",\n          \"transcodeStatus\": \"ready\",\n          \"createdAt\": \"2026-08-01T00:00:00.000Z\",\n          \"updatedAt\": \"2026-09-19T10:00:00.000Z\"\n        }\n      ],\n      \"total\": 1,\n      \"page\": 1,\n      \"limit\": 20\n    }\n  },\n  \"timestamp\": \"2026-09-19T10:00:00.000Z\",\n  \"path\": \"/admin/audiobooks/{{audiobookId}}\",\n  \"metadata\": {\n    \"duration\": \"18ms\"\n  }\n}"
                 },
                 {
                   "name": "Unauthorized - Missing/Invalid Token",
@@ -56372,7 +56372,7 @@
               ]
             },
             {
-              "name": "⚠️ Update Audiobook (status field is carried through the form but has no UI control — no take-down/restore)",
+              "name": "✅ Update Audiobook (also take-down/restore)",
               "request": {
                 "method": "PATCH",
                 "header": [
@@ -57033,7 +57033,7 @@
               ]
             },
             {
-              "name": "⚠️ Create Chapter (trackingId returned and discarded — no SSE progress subscription)",
+              "name": "⚠️ Create Chapter (backend TODO: only mp3/mp4/aac/ogg accepted — confirmed 400 \"Unsupported file type\" for audio/x-flac; wav/flac need backend support added)",
               "request": {
                 "method": "POST",
                 "header": [
@@ -58130,7 +58130,7 @@
               ]
             },
             {
-              "name": "❌ List Reviews (zero code — no review moderation UI for audiobooks)",
+              "name": "✅ List Reviews",
               "request": {
                 "method": "GET",
                 "header": [
@@ -58437,7 +58437,7 @@
               ]
             },
             {
-              "name": "❌ Moderate Review (hide/unhide) (zero code — no review moderation UI for audiobooks)",
+              "name": "✅ Moderate Review (hide/unhide)",
               "request": {
                 "method": "PATCH",
                 "header": [
@@ -58785,7 +58785,7 @@
               ]
             },
             {
-              "name": "❌ Delete Review (zero code — no review moderation UI for audiobooks)",
+              "name": "✅ Delete Review",
               "request": {
                 "method": "DELETE",
                 "header": [

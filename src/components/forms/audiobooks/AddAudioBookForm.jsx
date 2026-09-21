@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
 import { useCreateAudioBook } from "@/hooks/api/admin/audiobooks/useCreateAudioBook"
-import { audioBookSchema } from "./audioBookSchema"
+import { audioBookCreateSchema } from "./audioBookSchema"
 import { buildAudioBookFormData } from "./buildAudioBookFormData"
 import AudioBookFormFields from "./AudioBookFormFields"
 
@@ -24,7 +24,7 @@ const AddAudioBookForm = ({ onSuccess, onCancel }) => {
         reset,
         formState: { errors },
     } = useForm({
-        resolver: zodResolver(audioBookSchema),
+        resolver: zodResolver(audioBookCreateSchema),
         defaultValues: {
             title: "",
             author: "",
@@ -33,12 +33,6 @@ const AddAudioBookForm = ({ onSuccess, onCancel }) => {
             language: "",
             genre: "",
             status: "draft",
-            isBestseller: false,
-            isTrending: false,
-            isFeatured: false,
-            bestsellerRank: "",
-            trendDirection: "",
-            publishedAt: undefined,
         },
     })
 

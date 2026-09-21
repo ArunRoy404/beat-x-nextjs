@@ -61,7 +61,18 @@ const AddChapterForm = ({ audiobookId, onDone, onCancel }) => {
                 disabled={isPending}
             />
 
-            <CommonAudioInput value={audio} onChange={setAudio} error={audioError} />
+            {/* mp3/mp4/aac/ogg are confirmed working today; wav/flac are
+                intended to be supported too but currently fail on the
+                backend (confirmed via a direct 400 "Unsupported file type"
+                for audio/x-flac) — left open here pending that backend fix
+                rather than blocking the formats we intend to support. */}
+            <CommonAudioInput
+                value={audio}
+                onChange={setAudio}
+                error={audioError}
+                accept="audio/mpeg,audio/mp4,audio/aac,audio/ogg,audio/wav,audio/flac,audio/x-flac"
+                subtitle="MP3, MP4, AAC, OGG, WAV, FLAC · Max 2GB"
+            />
 
             <div className="flex items-center gap-3 mt-1">
                 <Button type="button" variant="outline" size="sm" onClick={onCancel} disabled={isPending}>
