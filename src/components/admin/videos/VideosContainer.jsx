@@ -13,8 +13,10 @@ import { useUrlListParams } from "@/hooks/useUrlListParams"
 import { useVideos } from "@/hooks/api/admin/videos/useVideos"
 import { buildVideosParams } from "@/hooks/api/admin/videos/videosParams"
 import { useGenres } from "@/hooks/api/admin/genre/useGenres"
+import { TAXONOMY_OPTIONS_PARAMS } from "@/lib/constants/taxonomyOptions"
+import { normalizeVideoStatus } from "@/lib/constants/videoStatus"
 
-const STATUS_TABS = ["All", "Active", "Draft", "Archived"]
+const STATUS_TABS = ["All", "Draft", "Pending", "Scheduled", "Active", "Archived", "Rejected"]
 const SEARCH_DEBOUNCE_MS = 300
 const VIDEOS_PAGE_SIZE = 20
 
@@ -38,7 +40,7 @@ const VideosContainer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchInput])
 
-  const genresQuery = useGenres()
+  const genresQuery = useGenres(TAXONOMY_OPTIONS_PARAMS)
   const genresData = genresQuery?.data
   const genresList =
     genresData?.genre ??
@@ -63,10 +65,14 @@ const VideosContainer = () => {
   })
 
   const { data, isLoading, isError, error, refetch } = useVideos(params)
-  const videos = data?.data ?? []
+  const videos = data?.videos ?? []
   const total = data?.total ?? 0
   const limit = data?.limit ?? VIDEOS_PAGE_SIZE
   const totalPages = Math.ceil(total / limit) || 1
+
+  const normalizedStatus = normalizeVideoStatus(selectedStatus)
+  const activeTab =
+    STATUS_TABS.find((tab) => normalizeVideoStatus(tab) === normalizedStatus) || "All"
 
   return (
     <CommonTableContainer
@@ -75,7 +81,7 @@ const VideosContainer = () => {
           {/* Tab pills */}
           <CommonFilter
             tabs={STATUS_TABS}
-            activeTab={STATUS_TABS.find((tab) => tab.toLowerCase() === selectedStatus) || "All"}
+            activeTab={activeTab}
             onChange={(tab) => setParams({ status: tab.toLowerCase() === "all" ? undefined : tab.toLowerCase() })}
           />
 
@@ -112,7 +118,7 @@ const VideosContainer = () => {
           {/* Cards Responsive Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10 w-full">
             {videos.map((video) => (
-              <div key={video._id} className="flex h-full">
+              <div key={video?._id} className="flex h-full">
                 <VideoCard video={video} />
               </div>
             ))}

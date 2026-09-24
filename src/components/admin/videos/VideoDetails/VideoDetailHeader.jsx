@@ -1,25 +1,18 @@
 "use client"
 
-import React, { useState, useRef, useEffect, useCallback } from "react"
-import { ShieldCheck, Play, Pause } from "lucide-react"
+import React from "react"
+import { Play, Pause } from "lucide-react"
 import { format } from "date-fns"
 import { useGlobalMediaPlayerStore } from "@/zustandStore/media/useGlobalMediaPlayerStore"
-import { useVolumeStore } from "@/zustandStore/audio/useVolumeStore"
 import { resolveMediaUrl } from "@/lib/format/resolveMediaUrl"
 import { formatDurationMs } from "@/lib/format/formatDuration"
 import { toast } from "sonner"
-
-const STATUS_COLORS = {
-    active: "bg-green-success/15 text-green-success border-green-success/20",
-    published: "bg-green-success/15 text-green-success border-green-success/20",
-    draft: "bg-yellow-warning/15 text-yellow-warning border-yellow-warning/20",
-    archived: "bg-white/10 text-light-gray border-white/10",
-}
+import { VIDEO_STATUS, VIDEO_STATUS_LABELS, VIDEO_STATUS_COLORS, normalizeVideoStatus } from "@/lib/constants/videoStatus"
 
 const VideoDetailHeader = ({ video }) => {
-    const statusKey = (video?.status || "draft").toLowerCase()
-    const statusClass = STATUS_COLORS[statusKey] || STATUS_COLORS.draft
-    const isActive = statusKey === "active" || statusKey === "published"
+    const statusKey = normalizeVideoStatus(video?.status)
+    const statusClass = VIDEO_STATUS_COLORS[statusKey] || VIDEO_STATUS_COLORS[VIDEO_STATUS.DRAFT]
+    const isActive = statusKey === VIDEO_STATUS.ACTIVE
 
     const {
         id: activeId,
@@ -110,14 +103,10 @@ const VideoDetailHeader = ({ video }) => {
                         <h2 className="text-[18px] font-medium text-whitetext not-italic leading-none truncate max-w-[200px] sm:max-w-xs">
                             {video?.title}
                         </h2>
-                        {/* Verification Checkmark */}
-                        <div className="w-4 h-4 rounded-full bg-yellow-warning flex items-center justify-center text-black shrink-0">
-                            <ShieldCheck className="w-2.5 h-2.5 stroke-[3px]" />
-                        </div>
                         {/* Status Pill */}
-                        <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2.5 py-0.5 rounded-full border capitalize ${statusClass}`}>
+                        <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2.5 py-0.5 rounded-full border ${statusClass}`}>
                             <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isActive ? "bg-green-success" : "bg-yellow-warning"}`} />
-                            {video?.status || "draft"}
+                            {VIDEO_STATUS_LABELS[statusKey] || video?.status || "-"}
                         </span>
                         {/* Genre Pill */}
                         <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2.5 py-0.5 rounded-full border bg-secondary/15 text-secondary border-secondary/20 select-none">
@@ -146,7 +135,7 @@ const VideoDetailHeader = ({ video }) => {
                         <span className="text-[10px] font-medium text-dark-gray uppercase tracking-wider">Likes</span>
                     </div>
                     <div className="flex flex-col gap-[2px]">
-                        <span className="text-[14px] sm:text-[15px] font-semibold text-whitetext truncate">{video?.transcodeStatus || "ready"}</span>
+                        <span className="text-[14px] sm:text-[15px] font-semibold text-whitetext truncate">{video?.transcodeStatus || "-"}</span>
                         <span className="text-[10px] font-medium text-dark-gray uppercase tracking-wider">Status</span>
                     </div>
                 </div>

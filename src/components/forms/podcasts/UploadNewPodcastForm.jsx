@@ -1,25 +1,22 @@
 "use client"
 
-import React from "react"
+import React, { useState } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { uploadPodcastSchema, uploadPodcastDefaultValues } from "@/zodSchema/UploadNewPodcastZodSchema"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { DialogClose } from "@/components/ui/dialog"
 import { CheckCircle2, Clock, FileText } from "lucide-react"
-import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { DialogClose } from "@/components/ui/dialog"
 import CommonFormContainer from "@/components/shared/CommonInputs/CommonFormContainer/CommonFormContainer"
-import CommonAudioInput from "@/components/shared/CommonInputs/CommonAudioInput/CommonAudioInput"
 import CommonImageUpload from "@/components/shared/CommonInputs/CommonImageUpload/CommonImageUpload"
 import CommonInput from "@/components/shared/CommonInputs/CommonInput/CommonInput"
 import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSelect"
 import CommonCalender from "@/components/shared/CommonInputs/CommonInput/CommonCalender"
 import CommonSelectCards from "@/components/shared/CommonInputs/CommonInput/CommonSelectCards"
-import CommonInputContainer from "@/components/shared/CommonInputs/CommonInput/CommonInputContainer"
-
-const HOSTS = ["Arif Hossain", "Tahsin Ahmed", "Jishan", "Fahim", "Nabila"]
-const CATEGORIES = ["Technology", "Business", "Health", "History", "Entertainment", "POP"]
+import { useCreatePodcast } from "@/hooks/api/admin/podcasts/useCreatePodcast"
+import { useCategories } from "@/hooks/api/admin/categories/useCategories"
+import { TAXONOMY_OPTIONS_PARAMS } from "@/lib/constants/taxonomyOptions"
+import { podcastCreateSchema } from "./adminPodcastSchema"
+import { buildPodcastFormData } from "./buildPodcastFormData"
 
 const VISIBILITY_OPTIONS = [
     { value: "publish", label: "Publish Now", icon: CheckCircle2 },
@@ -28,154 +25,102 @@ const VISIBILITY_OPTIONS = [
 ]
 
 const UploadNewPodcastForm = ({ onSuccess, onCancel }) => {
+    const [cover, setCover] = useState(null)
+    const [coverError, setCoverError] = useState("")
+
+    const { mutate: createPodcast, isPending } = useCreatePodcast()
+
+    const categoriesQuery = useCategories(TAXONOMY_OPTIONS_PARAMS)
+    const categoriesList = categoriesQuery?.data?.data ?? []
+    const categoryOptions = categoriesList.map((category) => ({
+        value: category?._id,
+        label: category?.name || "Unnamed Category",
+    }))
+
     const {
         register,
         handleSubmit,
         control,
-        setValue,
+        watch,
         reset,
         formState: { errors },
     } = useForm({
-        resolver: zodResolver(uploadPodcastSchema),
-        defaultValues: uploadPodcastDefaultValues,
+        resolver: zodResolver(podcastCreateSchema),
+        defaultValues: {
+            title: "",
+            description: "",
+            language: "English",
+            category: "",
+            visibility: "publish",
+            scheduledAt: undefined,
+        },
     })
 
-    const onSubmit = (data) => {
-        toast.info("Podcast creation is currently unavailable.")
-        reset()
-        onSuccess?.()
-    }
+    const visibility = watch("visibility")
 
-    const onInvalid = (validationErrors) => {
-        const errorKeys = Object.keys(validationErrors)
-        if (errorKeys.length > 0) {
-            toast.error(validationErrors[errorKeys[0]].message)
+    const onSubmit = (data) => {
+        if (!(cover instanceof File)) {
+            setCoverError("Cover image is required")
+            return
         }
+        setCoverError("")
+
+        const formData = buildPodcastFormData({ ...data, cover })
+
+        createPodcast(formData, {
+            onSuccess: () => {
+                reset()
+                setCover(null)
+                onSuccess?.()
+            },
+        })
     }
 
     return (
-        <CommonFormContainer onSubmit={handleSubmit(onSubmit, onInvalid)}>
-            {/* Audio File Upload */}
-            <Controller
-                name="audioFile"
-                control={control}
-                render={({ field }) => (
-                    <CommonAudioInput
-                        value={field.value}
-                        onChange={(file) => setValue("audioFile", file, { shouldValidate: true })}
-                        error={errors.audioFile?.message}
-                        title="Drop your audio file here"
-                        subtitle="MP3, WAV · Max 500MB"
-                    />
-                )}
+        <CommonFormContainer onSubmit={handleSubmit(onSubmit)}>
+            <CommonImageUpload
+                value={cover}
+                onChange={setCover}
+                error={coverError}
             />
 
-            {/* Cover Art Upload */}
-            <Controller
-                name="coverImage"
-                control={control}
-                render={({ field }) => (
-                    <CommonImageUpload
-                        value={field.value}
-                        onChange={(file) => setValue("coverImage", file, { shouldValidate: true })}
-                        error={errors.coverImage?.message}
-                        title="Upload cover art"
-                        subtitle="Upload cover art · min 1400×1400px"
-                    />
-                )}
-            />
-
-            {/* Episode Title */}
             <CommonInput
-                label="Episode Title"
-                placeholder="Enter episode title..."
-                {...register("episodeTitle")}
-                error={errors.episodeTitle?.message}
+                label="Podcast Title"
+                placeholder="Enter podcast title..."
+                {...register("title")}
+                error={errors.title?.message}
             />
 
-            {/* Artist / Host Select */}
-            <Controller
-                name="artist"
-                control={control}
-                render={({ field }) => (
-                    <CommonSelect
-                        label="Artist/Host"
-                        placeholder="Choose Host"
-                        value={field.value}
-                        onChange={field.onChange}
-                        options={HOSTS}
-                        error={errors.artist?.message}
-                    />
-                )}
-            />
-
-            {/* Series Name & Category */}
-            <CommonInputContainer>
-                <CommonInput
-                    label="Series Name"
-                    placeholder="e.g. Tech Weekly BD"
-                    {...register("seriesName")}
-                    error={errors.seriesName?.message}
-                />
-
-                <Controller
-                    name="category"
-                    control={control}
-                    render={({ field }) => (
-                        <CommonSelect
-                            label="Category"
-                            placeholder="Select category"
-                            value={field.value}
-                            onChange={field.onChange}
-                            options={CATEGORIES}
-                            error={errors.category?.message}
-                        />
-                    )}
-                />
-            </CommonInputContainer>
-
-            {/* Season & Episode # */}
-            <CommonInputContainer>
-                <CommonInput
-                    label="Season"
-                    placeholder="e.g. 1"
-                    {...register("season")}
-                    error={errors.season?.message}
-                />
-
-                <CommonInput
-                    label="Episode #"
-                    placeholder="e.g. 14"
-                    {...register("episodeNumber")}
-                    error={errors.episodeNumber?.message}
-                />
-            </CommonInputContainer>
-
-            {/* Release Date */}
-            <Controller
-                name="releaseDate"
-                control={control}
-                render={({ field }) => (
-                    <CommonCalender
-                        label="Release Date"
-                        placeholder="Choose Date"
-                        value={field.value}
-                        onChange={field.onChange}
-                        error={errors.releaseDate?.message}
-                    />
-                )}
-            />
-
-            {/* Description */}
             <CommonInput
                 label="Description"
                 type="textarea"
-                placeholder="Episode description / show notes..."
+                placeholder="Podcast description..."
                 {...register("description")}
                 error={errors.description?.message}
             />
 
-            {/* Visibility Options */}
+            <CommonInput
+                label="Language"
+                placeholder="e.g. English"
+                {...register("language")}
+                error={errors.language?.message}
+            />
+
+            <Controller
+                name="category"
+                control={control}
+                render={({ field }) => (
+                    <CommonSelect
+                        label="Category"
+                        placeholder="Select category"
+                        value={field.value}
+                        onChange={field.onChange}
+                        options={categoryOptions}
+                        error={errors.category?.message}
+                    />
+                )}
+            />
+
             <Controller
                 name="visibility"
                 control={control}
@@ -190,23 +135,21 @@ const UploadNewPodcastForm = ({ onSuccess, onCancel }) => {
                 )}
             />
 
-            {/* Explicit Content Toggle */}
-            <Controller
-                name="isExplicit"
-                control={control}
-                render={({ field }) => (
-                    <div className="flex items-center justify-between py-2 border-t border-b border-whitetext/5 shrink-0">
-                        <span className="text-light-gray text-[16px] not-italic font-medium font-sans">
-                            Explicit Content
-                        </span>
-                        <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            className="data-checked:bg-secondary data-unchecked:bg-light-gray/20"
+            {visibility === "schedule" && (
+                <Controller
+                    name="scheduledAt"
+                    control={control}
+                    render={({ field }) => (
+                        <CommonCalender
+                            label="Scheduled Date"
+                            placeholder="Choose Date"
+                            value={field.value}
+                            onChange={field.onChange}
+                            error={errors.scheduledAt?.message}
                         />
-                    </div>
-                )}
-            />
+                    )}
+                />
+            )}
 
             {/* Footer Actions */}
             <div className="flex items-center gap-4 mt-2 shrink-0">
@@ -226,8 +169,9 @@ const UploadNewPodcastForm = ({ onSuccess, onCancel }) => {
                     variant="gradient"
                     className="flex-1"
                     size="lg"
+                    isLoading={isPending}
                 >
-                    Upload Now
+                    Create Podcast
                 </Button>
             </div>
         </CommonFormContainer>

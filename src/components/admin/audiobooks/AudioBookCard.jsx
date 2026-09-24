@@ -14,7 +14,7 @@ const STATUS_COLORS = {
 const AudioBookCard = ({ book }) => {
   if (!book) return null
 
-  const statusClass = STATUS_COLORS[book.status] || STATUS_COLORS.draft
+  const statusClass = STATUS_COLORS[book?.status] || STATUS_COLORS.draft
 
   return (
     <div className="relative overflow-hidden rounded-[24px] border border-border bg-white/[0.03] backdrop-blur-md flex flex-col w-full h-full">
@@ -23,23 +23,23 @@ const AudioBookCard = ({ book }) => {
       <div
         className="relative flex h-[186px] p-4 items-center justify-between align-stretch shrink-0 bg-cover bg-center bg-no-repeat rounded-t-[24px]"
         style={{
-          backgroundImage: `linear-gradient(0deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.45) 100%), url('${book.coverUrl || ""}')`,
+          backgroundImage: `linear-gradient(0deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.45) 100%), url('${book?.coverUrl || ""}')`,
           backgroundColor: "lightgray"
         }}
       >
         {/* Status Pill (Top-Left) */}
         <span className={`absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[12px] font-semibold tracking-wide select-none capitalize ${statusClass}`}>
           <span className="w-1.5 h-1.5 rounded-full bg-current" />
-          {book.status || "-"}
+          {book?.status || "-"}
         </span>
 
         {/* Genre Badge (Top-Right) */}
         <span className="absolute top-4 right-4 px-3 py-1 rounded-full border border-white/10 bg-white/[0.08] text-white text-[12px] font-medium tracking-wide select-none backdrop-blur-sm">
-          {book.genre?.name || "-"}
+          {book?.genre?.name || "-"}
         </span>
 
         {/* Bestseller badge */}
-        {book.isBestseller && (
+        {book?.isBestseller && (
           <span className="absolute bottom-3 right-4 inline-flex items-center gap-1 px-2 py-0.5 rounded-md border border-[#CC97FF]/20 bg-[#CC97FF]/10 text-[#CC97FF] text-[10px] font-semibold uppercase tracking-wider select-none">
             <Star className="w-2.5 h-2.5 shrink-0" /> Bestseller
           </span>
@@ -51,13 +51,13 @@ const AudioBookCard = ({ book }) => {
         {/* Text descriptions */}
         <div className="flex flex-col items-start text-left gap-1 w-full min-w-0">
           <h3 className="text-white text-[16px] font-semibold leading-normal truncate w-full">
-            {book.title}
+            {book?.title}
           </h3>
           <span className="text-[#ADAAAA] text-[12px] font-semibold leading-normal truncate w-full">
-            {book.author}
+            {book?.author}
           </span>
           <span className="text-[#ADAAAA] text-[12px] font-normal leading-normal truncate w-full">
-            Narrated by {book.narrator}
+            Narrated by {book?.narrator}
           </span>
         </div>
 
@@ -65,12 +65,12 @@ const AudioBookCard = ({ book }) => {
         <div className="flex items-center justify-start gap-4 text-[#ADAAAA] text-[12px] font-normal py-1 border-t border-b border-white/5 w-full">
           <div className="flex items-center gap-1.5">
             <Clock className="w-3.5 h-3.5 shrink-0 text-[#ADAAAA]" />
-            <span>{formatDurationMs(book.totalDurationMs)}</span>
+            <span>{formatDurationMs(book?.totalDurationMs)}</span>
           </div>
           <div className="w-[1px] h-3 bg-white/10" />
           <div className="flex items-center gap-1.5">
             <Star className="w-3.5 h-3.5 shrink-0 text-[#ADAAAA]" />
-            <span>{(book.ratingAverage || 0).toFixed(1)} ({book.ratingCount || 0})</span>
+            <span>{(book?.ratingAverage ?? 0).toFixed(1)} ({book?.ratingCount ?? 0})</span>
           </div>
         </div>
 

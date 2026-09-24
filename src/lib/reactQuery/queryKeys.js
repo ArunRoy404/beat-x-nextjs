@@ -37,16 +37,25 @@ export const queryKeys = {
     all: ["users"],
     profile: () => [...queryKeys.users.all, "profile"],
     list: (params) => [...queryKeys.users.all, "list", params],
+    detail: (id) => [...queryKeys.users.all, "detail", id],
   },
   genre: {
     all: ["genre"],
     list: (params) => [...queryKeys.genre.all, "list", params],
     search: (name) => [...queryKeys.genre.all, "search", name],
   },
+  categories: {
+    all: ["categories"],
+    list: (params) => [...queryKeys.categories.all, "list", params],
+  },
   audiobooks: {
     all: ["audiobooks"],
     list: (params) => [...queryKeys.audiobooks.all, "list", params],
     detail: (id) => [...queryKeys.audiobooks.all, "detail", id],
+  },
+  audiobookReviews: {
+    all: ["audiobookReviews"],
+    list: (params) => [...queryKeys.audiobookReviews.all, "list", params],
   },
   music: {
     all: ["music"],

@@ -8,6 +8,7 @@ import CommonSelect from "@/components/shared/CommonInputs/CommonInput/CommonSel
 import CommonCalender from "@/components/shared/CommonInputs/CommonInput/CommonCalender"
 import CommonImageUpload from "@/components/shared/CommonInputs/CommonImageUpload/CommonImageUpload"
 import { useGenres } from "@/hooks/api/admin/genre/useGenres"
+import { TAXONOMY_OPTIONS_PARAMS } from "@/lib/constants/taxonomyOptions"
 
 const STATUS_OPTIONS = [
   { value: "draft", label: "Draft" },
@@ -18,10 +19,11 @@ const STATUS_OPTIONS = [
 const TREND_DIRECTION_OPTIONS = [
   { value: "up", label: "Up" },
   { value: "down", label: "Down" },
+  { value: "stable", label: "Stable" },
 ]
 
-const AudioBookFormFields = ({ register, control, errors, cover, onCoverChange, coverError, watch }) => {
-  const genresQuery = useGenres()
+const AudioBookFormFields = ({ register, control, errors, cover, onCoverChange, coverError, watch, showAdminFlags = false }) => {
+  const genresQuery = useGenres(TAXONOMY_OPTIONS_PARAMS)
   const genresData = genresQuery?.data
   const genresList =
     genresData?.genre ??
@@ -90,80 +92,84 @@ const AudioBookFormFields = ({ register, control, errors, cover, onCoverChange, 
         />
       </div>
 
-      <Controller
-        name="publishedAt"
-        control={control}
-        render={({ field }) => (
-          <CommonCalender
-            label="Published Date"
-            value={field.value}
-            onChange={field.onChange}
-            error={errors.publishedAt?.message}
+      {showAdminFlags && (
+        <>
+          <Controller
+            name="publishedAt"
+            control={control}
+            render={({ field }) => (
+              <CommonCalender
+                label="Published Date"
+                value={field.value}
+                onChange={field.onChange}
+                error={errors.publishedAt?.message}
+              />
+            )}
           />
-        )}
-      />
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border border-white/10 rounded-[16px] p-4">
-        <Controller
-          name="isBestseller"
-          control={control}
-          render={({ field }) => (
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-whitetext text-[13px] font-medium">Bestseller</span>
-              <Switch checked={field.value} onCheckedChange={field.onChange} />
-            </div>
-          )}
-        />
-        <Controller
-          name="isTrending"
-          control={control}
-          render={({ field }) => (
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-whitetext text-[13px] font-medium">Trending</span>
-              <Switch checked={field.value} onCheckedChange={field.onChange} />
-            </div>
-          )}
-        />
-        <Controller
-          name="isFeatured"
-          control={control}
-          render={({ field }) => (
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-whitetext text-[13px] font-medium">Featured</span>
-              <Switch checked={field.value} onCheckedChange={field.onChange} />
-            </div>
-          )}
-        />
-      </div>
-
-      {(isBestseller || isTrending) && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {isBestseller && (
-            <CommonInput
-              label="Bestseller Rank"
-              type="number"
-              placeholder="e.g. 1"
-              {...register("bestsellerRank")}
-              error={errors.bestsellerRank?.message}
-            />
-          )}
-          {isTrending && (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border border-white/10 rounded-[16px] p-4">
             <Controller
-              name="trendDirection"
+              name="isBestseller"
               control={control}
               render={({ field }) => (
-                <CommonSelect
-                  label="Trend Direction"
-                  value={field.value}
-                  onChange={field.onChange}
-                  placeholder="Select direction"
-                  options={TREND_DIRECTION_OPTIONS}
-                  error={errors.trendDirection?.message}
-                />
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-whitetext text-[13px] font-medium">Bestseller</span>
+                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                </div>
               )}
             />
+            <Controller
+              name="isTrending"
+              control={control}
+              render={({ field }) => (
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-whitetext text-[13px] font-medium">Trending</span>
+                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                </div>
+              )}
+            />
+            <Controller
+              name="isFeatured"
+              control={control}
+              render={({ field }) => (
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-whitetext text-[13px] font-medium">Featured</span>
+                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                </div>
+              )}
+            />
+          </div>
+
+          {(isBestseller || isTrending) && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {isBestseller && (
+                <CommonInput
+                  label="Bestseller Rank"
+                  type="number"
+                  placeholder="e.g. 1"
+                  {...register("bestsellerRank")}
+                  error={errors.bestsellerRank?.message}
+                />
+              )}
+              {isTrending && (
+                <Controller
+                  name="trendDirection"
+                  control={control}
+                  render={({ field }) => (
+                    <CommonSelect
+                      label="Trend Direction"
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Select direction"
+                      options={TREND_DIRECTION_OPTIONS}
+                      error={errors.trendDirection?.message}
+                    />
+                  )}
+                />
+              )}
+            </div>
           )}
-        </div>
+        </>
       )}
     </>
   )

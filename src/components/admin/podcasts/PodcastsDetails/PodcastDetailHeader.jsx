@@ -1,16 +1,23 @@
 import React from "react"
 import Image from "next/image"
 import { formatDurationMs } from "@/lib/format/formatDuration"
-
-const STATUS_COLORS = {
-    active: "bg-green-success/15 text-green-success border-green-success/20",
-    draft: "bg-white/[0.05] text-light-gray border-white/10",
-    archived: "bg-yellow-warning/15 text-yellow-warning border-yellow-warning/20",
-    scheduled: "bg-[#CC97FF]/15 text-[#CC97FF] border-[#CC97FF]/20",
-}
+import { useCategories } from "@/hooks/api/admin/categories/useCategories"
+import { TAXONOMY_OPTIONS_PARAMS } from "@/lib/constants/taxonomyOptions"
+import { PODCAST_STATUS_LABELS, PODCAST_STATUS_COLORS, normalizePodcastStatus } from "@/lib/constants/podcastStatus"
 
 const PodcastDetailHeader = ({ podcast }) => {
-    const statusClass = STATUS_COLORS[podcast?.status] || STATUS_COLORS.draft
+    const statusKey = normalizePodcastStatus(podcast?.status)
+    const statusClass = PODCAST_STATUS_COLORS[statusKey] || PODCAST_STATUS_COLORS.draft
+
+    // `category` on the podcast object is a bare id, never populated —
+    // resolve it against the real category list instead of guessing at a
+    // `podcast?.category?.name` shape that the API never actually sends.
+    const categoriesQuery = useCategories(TAXONOMY_OPTIONS_PARAMS)
+    const categoriesList = categoriesQuery?.data?.data ?? []
+    const categoryName =
+        (typeof podcast?.category === "object" ? podcast?.category?.name : "") ||
+        categoriesList.find((category) => category?._id === podcast?.category)?.name ||
+        "-"
 
     return (
         <div
@@ -39,12 +46,12 @@ const PodcastDetailHeader = ({ podcast }) => {
                             <h2 className="text-[18px] font-medium text-whitetext not-italic leading-none">
                                 {podcast?.title}
                             </h2>
-                            <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2.5 py-0.5 rounded-full border capitalize ${statusClass}`}>
+                            <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2.5 py-0.5 rounded-full border ${statusClass}`}>
                                 <span className="w-1.5 h-1.5 rounded-full bg-current shrink-0" />
-                                {podcast?.status || "-"}
+                                {PODCAST_STATUS_LABELS[statusKey] || podcast?.status || "-"}
                             </span>
                             <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2.5 py-0.5 rounded-full border bg-[#CC97FF]/15 text-[#CC97FF] border-[#CC97FF]/20 select-none">
-                                {podcast?.genre?.name || "-"}
+                                {categoryName}
                             </span>
                         </div>
 

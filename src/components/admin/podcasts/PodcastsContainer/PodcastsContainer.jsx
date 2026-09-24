@@ -14,9 +14,11 @@ import { Spinner } from "@/components/ui/spinner"
 import { useUrlListParams } from "@/hooks/useUrlListParams"
 import { usePodcasts } from "@/hooks/api/admin/podcasts/usePodcasts"
 import { PODCASTS_PAGE_SIZE, buildPodcastsParams } from "@/hooks/api/admin/podcasts/podcastsParams"
-import { useGenres } from "@/hooks/api/admin/genre/useGenres"
+import { useCategories } from "@/hooks/api/admin/categories/useCategories"
+import { TAXONOMY_OPTIONS_PARAMS } from "@/lib/constants/taxonomyOptions"
+import { normalizePodcastStatus } from "@/lib/constants/podcastStatus"
 
-const STATUS_TABS = ["All", "Draft", "Active", "Archived"]
+const STATUS_TABS = ["All", "Draft", "Pending", "Scheduled", "Active", "Archived", "Rejected"]
 const SEARCH_DEBOUNCE_MS = 300
 
 const PodcastsContainer = () => {
@@ -39,11 +41,20 @@ const PodcastsContainer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchInput])
 
-  const { data: genres = [] } = useGenres()
-  const genreOptions = [
-    { value: "all", label: "All Genres" },
-    ...genres.map((genre) => ({ value: genre._id, label: genre.name })),
-  ]
+  // Podcasts are categorized by Category (not Genre) per the real API
+  // contract — `useCategories` also doubles as the category-id → name
+  // lookup for the table/card "Category" column below, since the list
+  // endpoint only returns a bare category id, never a populated object.
+  const categoriesQuery = useCategories(TAXONOMY_OPTIONS_PARAMS)
+  const categoriesData = categoriesQuery?.data
+  const categoriesList =
+    categoriesData?.data ??
+    (Array.isArray(categoriesData) ? categoriesData : [])
+
+  const categoriesById = categoriesList.reduce((map, category) => {
+    if (category?._id) map[category._id] = category?.name
+    return map
+  }, {})
 
   const params = buildPodcastsParams({
     status: selectedStatus,
@@ -53,9 +64,16 @@ const PodcastsContainer = () => {
   })
 
   const { data, isLoading, isError, error, refetch } = usePodcasts(params)
-  const podcasts = data?.data ?? []
+  const podcasts = (data?.podcasts ?? []).map((podcast) => ({
+    ...podcast,
+    categoryName: categoriesById[podcast?.category] || (typeof podcast?.category === "object" ? podcast?.category?.name : "") || "-",
+  }))
   const total = data?.total ?? 0
   const totalPages = Math.ceil(total / PODCASTS_PAGE_SIZE) || 1
+
+  const normalizedStatus = normalizePodcastStatus(selectedStatus)
+  const activeTab =
+    STATUS_TABS.find((tab) => normalizePodcastStatus(tab) === normalizedStatus) || "All"
 
   const columns = getPodcastsColumns()
 
@@ -66,7 +84,7 @@ const PodcastsContainer = () => {
           {/* Tab pills */}
           <CommonFilter
             tabs={STATUS_TABS}
-            activeTab={STATUS_TABS.find((tab) => tab.toLowerCase() === selectedStatus) || "All"}
+            activeTab={activeTab}
             onChange={(tab) => setParams({ status: tab.toLowerCase() === "all" ? undefined : tab.toLowerCase() })}
           />
 

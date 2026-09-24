@@ -2,6 +2,7 @@
 
 import React from "react"
 import Image from "next/image"
+import { format } from "date-fns"
 import InfoBox from "./InfoBox"
 import { formatDurationMs } from "@/lib/format/formatDuration"
 
@@ -33,9 +34,13 @@ const AudioBookDetailContent = ({ book, chapters = [] }) => {
                 <InfoBox label="Genre" value={book?.genre?.name} />
                 <InfoBox label="Language" value={book?.language} />
                 <InfoBox label="Total Duration" value={formatDurationMs(book?.totalDurationMs)} />
-                <InfoBox label="Total Chapters" value={book?.totalChapters ?? chapters.length} />
+                <InfoBox label="Total Chapters" value={book?.totalChapters ?? chapters?.length ?? 0} />
                 <InfoBox label="Status" value={book?.status} />
                 <InfoBox label="Rating" value={`${(book?.ratingAverage ?? 0).toFixed(1)} (${book?.ratingCount ?? 0})`} />
+                <InfoBox label="Bestseller" value={book?.isBestseller ? (book?.bestsellerRank ? `Yes (#${book.bestsellerRank})` : "Yes") : "No"} />
+                <InfoBox label="Trending" value={book?.isTrending ? (book?.trendDirection ? `Yes (${book.trendDirection})` : "Yes") : "No"} />
+                <InfoBox label="Featured" value={book?.isFeatured ? "Yes" : "No"} />
+                <InfoBox label="Published" value={book?.publishedAt ? format(new Date(book.publishedAt), "MMM d, yyyy") : "-"} />
 
                 {/* Synopsis (Full Width) */}
                 <div className="col-span-2 border border-white/10 bg-white/5 rounded-[16px] p-3 px-4 flex flex-col gap-1.5 w-full">

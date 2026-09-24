@@ -9,16 +9,40 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Mail, Calendar, Coins, Music, Mic2, Video, Pencil, Trash2 } from "lucide-react"
+import { Mail, Calendar, Coins, Music, Mic2, Video, ShieldAlert, ShieldX, ShieldCheck, Trash2 } from "lucide-react"
 import { format } from "date-fns"
 import CommonAvatar from "@/components/shared/CommonAvatar"
 import CommonCard from "@/components/shared/CommonCard/CommonCard"
-import { toast } from "sonner"
+import UserStatusBadge from "@/components/shared/UserStatusBadge/UserStatusBadge"
+import DeleteUserDialog from "@/components/dialogs/admin/users/DeleteUserDialog"
+import { useSuspendUser } from "@/hooks/api/admin/users/useSuspendUser"
+import { useBanUser } from "@/hooks/api/admin/users/useBanUser"
+import { useReactivateUser } from "@/hooks/api/admin/users/useReactivateUser"
 
 const UserDetailsDialog = ({ user, children }) => {
     const [open, setOpen] = useState(false)
 
+    const suspendMutation = useSuspendUser()
+    const banMutation = useBanUser()
+    const reactivateMutation = useReactivateUser()
+
     if (!user) return null
+
+    const userId = user._id || user.id
+    const isActive = user.status === "active"
+    const isPending = suspendMutation.isPending || banMutation.isPending || reactivateMutation.isPending
+
+    const handleSuspend = () => {
+        suspendMutation.mutate({ id: userId, reason: "Policy violation or administrative action." })
+    }
+
+    const handleBan = () => {
+        banMutation.mutate({ id: userId, reason: "Repeated policy violations." })
+    }
+
+    const handleReactivate = () => {
+        reactivateMutation.mutate({ id: userId })
+    }
 
     const verifiedClass = user.isVerified
         ? "text-[#34C759] border-[#34C759]/25 bg-[#34C759]/10"
@@ -80,6 +104,7 @@ const UserDetailsDialog = ({ user, children }) => {
                                     <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${verifiedClass}`}>
                                         {user?.isVerified ? "Verified" : "Unverified"}
                                     </span>
+                                    <UserStatusBadge status={user?.status} className="text-[11px]" />
                                 </div>
 
                                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-light-gray/40 text-[12px] font-medium">
@@ -97,30 +122,50 @@ const UserDetailsDialog = ({ user, children }) => {
 
                         {/* Right action buttons */}
                         <div className="flex items-center gap-2 mt-2 md:mt-0 shrink-0">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => toast.info("This action will be enabled once backend user management endpoints are released.")}
-                                className="rounded-lg h-9 border-white/10 bg-white/5 text-whitetext hover:bg-white/10 gap-1.5 px-3 font-semibold text-xs cursor-pointer"
-                            >
-                                <Pencil className="w-3.5 h-3.5" /> Edit
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => toast.info("This action will be enabled once backend user management endpoints are released.")}
-                                className="rounded-lg h-9 border-red-error/20 bg-[#FF453A]/10 text-[#FF453A] hover:bg-[#FF453A]/20 gap-1.5 px-3 font-semibold text-xs cursor-pointer border-0"
-                            >
-                                Suspend User
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => toast.info("This action will be enabled once backend user management endpoints are released.")}
-                                className="rounded-lg h-9 border-red-error/20 bg-[#FF453A]/10 text-[#FF453A] hover:bg-[#FF453A]/20 gap-1.5 px-3 font-semibold text-xs cursor-pointer border-0"
-                            >
-                                <Trash2 className="w-3.5 h-3.5" /> Delete
-                            </Button>
+                            {isActive ? (
+                                <>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        disabled={isPending}
+                                        onClick={handleSuspend}
+                                        className="rounded-lg h-9 border-yellow-warning/20 bg-yellow-warning/10 text-yellow-warning hover:bg-yellow-warning/20 gap-1.5 px-3 font-semibold text-xs cursor-pointer border-0 disabled:opacity-50"
+                                    >
+                                        <ShieldAlert className="w-3.5 h-3.5" />
+                                        {suspendMutation.isPending ? "Suspending..." : "Suspend"}
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        disabled={isPending}
+                                        onClick={handleBan}
+                                        className="rounded-lg h-9 border-red-error/20 bg-[#FF453A]/10 text-[#FF453A] hover:bg-[#FF453A]/20 gap-1.5 px-3 font-semibold text-xs cursor-pointer border-0 disabled:opacity-50"
+                                    >
+                                        <ShieldX className="w-3.5 h-3.5" />
+                                        {banMutation.isPending ? "Banning..." : "Ban"}
+                                    </Button>
+                                </>
+                            ) : (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    disabled={isPending}
+                                    onClick={handleReactivate}
+                                    className="rounded-lg h-9 border-green-success/20 bg-green-success/10 text-green-success hover:bg-green-success/20 gap-1.5 px-3 font-semibold text-xs cursor-pointer border-0 disabled:opacity-50"
+                                >
+                                    <ShieldCheck className="w-3.5 h-3.5" />
+                                    {reactivateMutation.isPending ? "Reactivating..." : "Reactivate"}
+                                </Button>
+                            )}
+                            <DeleteUserDialog user={user} onDeleted={() => setOpen(false)}>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="rounded-lg h-9 border-red-error/20 bg-[#FF453A]/10 text-[#FF453A] hover:bg-[#FF453A]/20 gap-1.5 px-3 font-semibold text-xs cursor-pointer border-0"
+                                >
+                                    <Trash2 className="w-3.5 h-3.5" /> Delete
+                                </Button>
+                            </DeleteUserDialog>
                         </div>
                     </div>
 

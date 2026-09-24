@@ -6,13 +6,14 @@ import DeletePodcastDialog from "@/components/dialogs/admin/podcasts/DeletePodca
 import RejectPodcastDialog from "@/components/dialogs/admin/podcasts/RejectPodcastDialog"
 import { useApprovePodcast } from "@/hooks/api/admin/podcasts/useApprovePodcast"
 import { useUpdatePodcastStatus } from "@/hooks/api/admin/podcasts/useUpdatePodcastStatus"
+import { PODCAST_STATUS, isPodcastAwaitingReview, normalizePodcastStatus } from "@/lib/constants/podcastStatus"
 
 const PodcastDetailFooter = ({ podcast }) => {
     const { mutate: approvePodcast, isPending: isApprovePending } = useApprovePodcast()
     const { mutate: updatePodcastStatus, isPending: isStatusPending } = useUpdatePodcastStatus()
 
-    const status = podcast?.status
-    const isPendingOrDraft = status === "draft" || status === "pending" || podcast?.submittedStatus === "pending"
+    const status = normalizePodcastStatus(podcast?.status)
+    const isAwaitingReview = isPodcastAwaitingReview(podcast)
 
     const handleApprove = () => {
         approvePodcast({ id: podcast?._id })
@@ -26,8 +27,8 @@ const PodcastDetailFooter = ({ podcast }) => {
         <div className="p-4 border-t border-white/5 mt-auto shrink-0 bg-card">
             <div className="flex items-center justify-between w-full flex-wrap gap-2">
                 <div className="flex items-center gap-2">
-                    {/* Approve / Reject buttons for Draft or Pending status only */}
-                    {isPendingOrDraft && (
+                    {/* Approve / Reject only for a real artist submission awaiting review */}
+                    {isAwaitingReview && (
                         <>
                             <Button
                                 onClick={handleApprove}
@@ -51,9 +52,9 @@ const PodcastDetailFooter = ({ podcast }) => {
                         </>
                     )}
 
-                    {!isPendingOrDraft && status === "active" && (
+                    {!isAwaitingReview && status === PODCAST_STATUS.ACTIVE && (
                         <Button
-                            onClick={() => handleStatusChange("archived")}
+                            onClick={() => handleStatusChange(PODCAST_STATUS.ARCHIVED)}
                             disabled={isStatusPending}
                             variant="outline"
                             className="text-yellow-warning border border-yellow-warning/20 bg-yellow-warning/10 hover:bg-yellow-warning/20 font-medium rounded-[10px] px-4 h-10"
@@ -62,9 +63,9 @@ const PodcastDetailFooter = ({ podcast }) => {
                         </Button>
                     )}
 
-                    {!isPendingOrDraft && status === "archived" && (
+                    {!isAwaitingReview && status === PODCAST_STATUS.ARCHIVED && (
                         <Button
-                            onClick={() => handleStatusChange("active")}
+                            onClick={() => handleStatusChange(PODCAST_STATUS.ACTIVE)}
                             disabled={isStatusPending}
                             variant="outline"
                             className="text-green-success border border-green-success/20 bg-green-success/10 hover:bg-green-success/20 font-medium rounded-[10px] px-4 h-10"

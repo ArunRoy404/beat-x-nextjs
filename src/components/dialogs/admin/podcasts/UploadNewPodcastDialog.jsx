@@ -19,7 +19,7 @@ const UploadNewPodcastDialog = () => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="gradient">
-          <PlusCircle className="mr-2 h-4 w-4" /> Upload Podcasts
+          <PlusCircle className="mr-2 h-4 w-4" /> Create Podcast
         </Button>
       </DialogTrigger>
 
@@ -27,7 +27,7 @@ const UploadNewPodcastDialog = () => {
         {/* Custom Header */}
         <DialogHeader>
           <DialogTitle>
-            Upload New Podcast
+            Create New Podcast
           </DialogTitle>
         </DialogHeader>
 

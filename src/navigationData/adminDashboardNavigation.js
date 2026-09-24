@@ -23,8 +23,8 @@ export const adminDashboardNavigation = {
     {
       category: "Content",
       items: [
-        { 
-          title: "Music's & Songs", 
+        {
+          title: "Music",
           navbarTitle: "Music & Songs",
           url: "/admin/dashboard/music", 
           iconName: "MusicNote01Icon",

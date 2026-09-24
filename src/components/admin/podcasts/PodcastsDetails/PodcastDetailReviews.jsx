@@ -19,8 +19,12 @@ const PodcastDetailReviews = ({ podcast }) => {
   const { mutate: moderateReview, isPending: isModeratePending } = useModerateReview()
   const { mutate: deleteReview, isPending: isDeletePending } = useDeleteReview()
 
-  // Support both wrapped paginated response and direct array
-  const reviews = Array.isArray(data?.data)
+  // Real GET /admin/podcasts/reviews response nests the list under
+  // `data.reviews` — this used to check `data.data`/`data.items`/a bare
+  // array only, so it never matched and reviews always rendered as empty.
+  const reviews = Array.isArray(data?.reviews)
+    ? data.reviews
+    : Array.isArray(data?.data)
     ? data.data
     : Array.isArray(data?.items)
     ? data.items
@@ -66,13 +70,13 @@ const PodcastDetailReviews = ({ podcast }) => {
         </div>
       ) : (
         <div className="flex flex-col gap-3">
-          {reviews.map((review) => {
+          {reviews.map((review, index) => {
             const rating = Number(review?.rating) || 0
             const isHidden = Boolean(review?.hidden)
 
             return (
               <div
-                key={review?._id || Math.random()}
+                key={review?._id || index}
                 className={cn(
                   "border border-white/10 bg-white/5 rounded-[16px] p-4 flex flex-col gap-3 transition-opacity",
                   isHidden && "opacity-60 bg-white/[0.02]"

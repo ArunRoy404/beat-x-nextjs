@@ -18,7 +18,7 @@ import { useGenres } from "@/hooks/api/admin/genre/useGenres"
 import { TAXONOMY_OPTIONS_PARAMS } from "@/lib/constants/taxonomyOptions"
 import { normalizeSongStatus } from "@/lib/constants/songStatus"
 
-const STATUS_TABS = ["All", "Draft", "Pending", "Active", "Archived"]
+const STATUS_TABS = ["All", "Draft", "Pending", "Scheduled", "Active", "Archived", "Rejected"]
 const SEARCH_DEBOUNCE_MS = 300
 
 const SongsContainer = () => {

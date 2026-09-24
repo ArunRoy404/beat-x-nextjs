@@ -13,7 +13,7 @@ import { getSongAudioUrl, resolveMediaUrl } from "@/lib/format/resolveMediaUrl"
 const ChapterRow = ({ audiobookId, book, chapter, index }) => {
     const [isEditing, setIsEditing] = useState(false)
     const [confirmingDelete, setConfirmingDelete] = useState(false)
-    const [title, setTitle] = useState(chapter.title || "")
+    const [title, setTitle] = useState(chapter?.title || "")
     const [newAudioFile, setNewAudioFile] = useState(null)
 
     const { mutate: updateChapter, isPending: isUpdating } = useUpdateChapter()
@@ -92,7 +92,7 @@ const ChapterRow = ({ audiobookId, book, chapter, index }) => {
                     <label className="text-[12px] text-light-gray font-medium">Replace Audio (Optional)</label>
                     <input
                         type="file"
-                        accept="audio/mp3,audio/mp4,audio/aac,audio/ogg,audio/wav,audio/*"
+                        accept="audio/mpeg,audio/mp4,audio/aac,audio/ogg,audio/wav,audio/flac,audio/x-flac"
                         onChange={(e) => setNewAudioFile(e.target.files?.[0] || null)}
                         className="text-xs text-light-gray file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-medium file:bg-secondary/10 file:text-secondary hover:file:bg-secondary/20 cursor-pointer"
                     />
@@ -107,7 +107,7 @@ const ChapterRow = ({ audiobookId, book, chapter, index }) => {
                         onClick={() => {
                             setIsEditing(false)
                             setNewAudioFile(null)
-                            setTitle(chapter.title || "")
+                            setTitle(chapter?.title || "")
                         }}
                         className="text-light-gray text-xs px-3.5 py-1.5 rounded-full border border-white/10 hover:bg-white/5 cursor-pointer transition-colors"
                     >
@@ -144,18 +144,18 @@ const ChapterRow = ({ audiobookId, book, chapter, index }) => {
 
             <div className="flex flex-col min-w-0 flex-1">
                 <span className="text-[#ADAAAA] text-[12px] font-semibold leading-none mb-1">
-                    Chapter {chapter.chapterNumber ?? index + 1}
+                    Chapter {chapter?.chapterNumber ?? index + 1}
                 </span>
                 <span className="text-white text-[16px] font-semibold leading-normal truncate">
-                    {chapter.title}
+                    {chapter?.title}
                 </span>
-                {chapter.transcodeStatus && !["ready", "done"].includes(chapter.transcodeStatus) && (
+                {chapter?.transcodeStatus && !["ready", "done"].includes(chapter.transcodeStatus) && (
                     <span className="text-yellow-warning text-[11px] mt-0.5 capitalize">Status: {chapter.transcodeStatus}</span>
                 )}
             </div>
 
             <span className="text-[#ADAAAA] text-[12px] font-normal shrink-0 self-center">
-                {formatDurationMs(chapter.durationMs)}
+                {formatDurationMs(chapter?.durationMs)}
             </span>
 
             {confirmingDelete ? (

@@ -45,16 +45,16 @@ const AdminDashboardVideosPage = () => {
           </div>
         </div>
 
-        {/* UploadVideoDialog commented out per rule: admin video creation endpoint does not exist in backend */}
-        {/* <UploadVideoDialog> */}
-          <button
-            type="button"
-            onClick={() => toast.info("This feature is currently unavailable.")}
-            className="rounded-full bg-gradient-to-r from-secondary to-[#B1FE4D] text-button-text font-semibold hover:opacity-90 transition-opacity border-0 px-5 py-2 cursor-pointer shadow-md flex items-center gap-1.5"
-          >
-            <Upload className="w-4 h-4" /> Upload Video
-          </button>
-        {/* </UploadVideoDialog> */}
+        {/* No admin video-create endpoint exists in the backend — creation
+            only happens via POST /creator/videos (shared with artists), so
+            this stays an honest disabled stub rather than a dialog. */}
+        <button
+          type="button"
+          onClick={() => toast.info("This feature is currently unavailable.")}
+          className="rounded-full bg-gradient-to-r from-secondary to-[#B1FE4D] text-button-text font-semibold hover:opacity-90 transition-opacity border-0 px-5 py-2 cursor-pointer shadow-md flex items-center gap-1.5"
+        >
+          <Upload className="w-4 h-4" /> Upload Video
+        </button>
       </div>
 
       {/* Videos grid/list container */}

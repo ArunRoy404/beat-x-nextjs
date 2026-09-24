@@ -10,10 +10,11 @@ import DeleteVideoDialog from "@/components/dialogs/admin/videos/DeleteVideoDial
 import { useApproveVideo } from "@/hooks/api/admin/videos/useApproveVideo"
 import { useRejectVideo } from "@/hooks/api/admin/videos/useRejectVideo"
 import { useUpdateVideo } from "@/hooks/api/admin/videos/useUpdateVideo"
+import { VIDEO_STATUS, isVideoAwaitingReview, normalizeVideoStatus } from "@/lib/constants/videoStatus"
 
 const REJECTION_REASONS = [
-    { value: "Identity Music unclear or unreadable", label: "Identity Music unclear or unreadable" },
-    { value: "Potential Copyright Infringement", label: "Potential Copyright Infringement" },
+    { value: "Video content unclear or unreadable", label: "Video content unclear or unreadable" },
+    { value: "Potential copyright infringement", label: "Potential copyright infringement" },
     { value: "Low video quality or resolution", label: "Low video quality or resolution" },
     { value: "Inappropriate or offensive content", label: "Inappropriate or offensive content" },
     { value: "Metadata or cover image incorrect", label: "Metadata or cover image incorrect" },
@@ -28,10 +29,13 @@ const VideoDetailFooter = ({ video }) => {
     const { mutate: rejectVideo, isPending: isRejectPending } = useRejectVideo()
     const { mutate: updateVideo, isPending: isUpdatePending } = useUpdateVideo()
 
-    const statusKey = (video?.status || "").toLowerCase()
-    const isDraft = statusKey === "draft" || statusKey === "pending" || video?.submittedStatus === "pending"
-    const isActive = statusKey === "active" || statusKey === "published"
-    const isArchived = statusKey === "archived"
+    const statusKey = normalizeVideoStatus(video?.status)
+    // Admin-created content publishes with NO approval step — a "draft" is
+    // just the admin's own unpublished upload, not a moderation queue item.
+    // Only a real artist submission (status: "pending_review") needs review.
+    const isAwaitingReview = isVideoAwaitingReview(video)
+    const isActive = statusKey === VIDEO_STATUS.ACTIVE
+    const isArchived = statusKey === VIDEO_STATUS.ARCHIVED
 
     const handleApprove = () => {
         if (!video?._id) return
@@ -115,8 +119,8 @@ const VideoDetailFooter = ({ video }) => {
         <div className="p-4 border-t border-white/5 mt-auto shrink-0 bg-card">
             <div className="flex items-center justify-between w-full flex-wrap gap-2">
                 <div className="flex items-center gap-2.5 flex-wrap">
-                    {/* Approve / Reject buttons strictly for Draft videos */}
-                    {isDraft && (
+                    {/* Approve / Reject buttons only for real artist submissions awaiting review */}
+                    {isAwaitingReview && (
                         <>
                             <Button
                                 onClick={handleApprove}
@@ -140,9 +144,9 @@ const VideoDetailFooter = ({ video }) => {
                     )}
 
                     {/* Take Down button for Active/Published videos */}
-                    {!isDraft && isActive && (
+                    {!isAwaitingReview && isActive && (
                         <Button
-                            onClick={() => handleStatusChange("archived")}
+                            onClick={() => handleStatusChange(VIDEO_STATUS.ARCHIVED)}
                             isLoading={isUpdatePending}
                             variant="outline"
                             className="bg-yellow-warning/10 hover:bg-yellow-warning/20 border border-yellow-warning/20 text-yellow-warning font-medium rounded-[10px] px-4 h-10 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
@@ -153,9 +157,9 @@ const VideoDetailFooter = ({ video }) => {
                     )}
 
                     {/* Restore button for Archived videos */}
-                    {!isDraft && isArchived && (
+                    {!isAwaitingReview && isArchived && (
                         <Button
-                            onClick={() => handleStatusChange("active")}
+                            onClick={() => handleStatusChange(VIDEO_STATUS.ACTIVE)}
                             isLoading={isUpdatePending}
                             variant="outline"
                             className="bg-green-success/10 hover:bg-green-success/20 border border-green-success/20 text-green-success font-medium rounded-[10px] px-4 h-10 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"

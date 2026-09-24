@@ -13,6 +13,17 @@ export async function getPodcastsRequest({ status, category, genre, q, page = 1,
   return res?.data?.data;
 }
 
+/**
+ * Admins share the same create route as artists (POST /creator/podcasts) —
+ * there's no separate /admin/podcasts create route. Admin-created content
+ * publishes immediately per whatever status is sent (no pending_review
+ * queueing, unlike an artist submission through this same route).
+ */
+export async function createPodcastRequest(formData) {
+  const res = await axiosPrivate.post("/creator/podcasts", formData);
+  return res?.data?.data;
+}
+
 export async function getPodcastDetailRequest({ id }) {
   const res = await axiosPrivate.get(`/admin/podcasts/${id}`);
   return res?.data?.data;

@@ -8,12 +8,14 @@ import PodcastDetailsDialog from "@/components/dialogs/admin/podcasts/PodcastDet
 import RejectPodcastDialog from "@/components/dialogs/admin/podcasts/RejectPodcastDialog"
 import { useUpdatePodcastStatus } from "@/hooks/api/admin/podcasts/useUpdatePodcastStatus"
 import { useApprovePodcast } from "@/hooks/api/admin/podcasts/useApprovePodcast"
+import { PODCAST_STATUS, isPodcastAwaitingReview, normalizePodcastStatus } from "@/lib/constants/podcastStatus"
 
 const PodcastsTableActions = ({ status, podcast, className }) => {
     const { mutate: updatePodcastStatus, isPending: isStatusPending } = useUpdatePodcastStatus()
     const { mutate: approvePodcast, isPending: isApprovePending } = useApprovePodcast()
 
-    const isPendingOrDraft = status === "draft" || status === "pending" || podcast?.submittedStatus === "pending" || podcast?.status === "pending"
+    const normalizedStatus = normalizePodcastStatus(status)
+    const isAwaitingReview = isPodcastAwaitingReview(podcast)
 
     const handleApprove = () => {
         approvePodcast({ id: podcast?._id })
@@ -25,7 +27,7 @@ const PodcastsTableActions = ({ status, podcast, className }) => {
 
     return (
         <div className={cn("flex items-center justify-end gap-2 pr-2", className)}>
-            {isPendingOrDraft && (
+            {isAwaitingReview && (
                 <>
                     <Button
                         onClick={handleApprove}
@@ -51,9 +53,9 @@ const PodcastsTableActions = ({ status, podcast, className }) => {
                 </>
             )}
 
-            {!isPendingOrDraft && status === "active" && (
+            {!isAwaitingReview && normalizedStatus === PODCAST_STATUS.ACTIVE && (
                 <Button
-                    onClick={() => handleStatusChange("archived")}
+                    onClick={() => handleStatusChange(PODCAST_STATUS.ARCHIVED)}
                     disabled={isStatusPending}
                     variant="outline"
                     className="text-yellow-warning border border-yellow-warning/20 bg-yellow-warning/10 rounded-full px-3! py-3!"
@@ -62,9 +64,9 @@ const PodcastsTableActions = ({ status, podcast, className }) => {
                 </Button>
             )}
 
-            {!isPendingOrDraft && status === "archived" && (
+            {!isAwaitingReview && normalizedStatus === PODCAST_STATUS.ARCHIVED && (
                 <Button
-                    onClick={() => handleStatusChange("active")}
+                    onClick={() => handleStatusChange(PODCAST_STATUS.ACTIVE)}
                     disabled={isStatusPending}
                     variant="outline"
                     className="text-green-success border border-green-success/20 bg-green-success/10 rounded-full px-3! py-3!"

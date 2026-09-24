@@ -7,7 +7,8 @@ import { queryKeys } from "@/lib/reactQuery/queryKeys"
 /**
  * Fetches a paginated, filterable admin audiobooks list.
  *   const { data, isLoading, isError, error, refetch } = useAudioBooks({ status, genre, q, page, limit })
- *   data => { data: AudioBook[], total, page, limit }
+ *   data => { audio: AudioBook[], total, page, limit } (the real server response —
+ *   the Postman collection's saved example showed `data` instead of `audio`)
  */
 export function useAudioBooks(params) {
   return useQuery({

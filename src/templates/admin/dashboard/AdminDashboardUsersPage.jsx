@@ -20,9 +20,10 @@ const AdminDashboardUsersPage = () => {
   }, [rawStatus, rawSearch, page, limit])
 
   const { data } = useUsers(params)
-  const users = Array.isArray(data) ? data : data?.data || []
+  const users = Array.isArray(data) ? data : data?.admins || data?.data || []
 
   const verifiedCount = users.filter((user) => user?.isVerified).length
+  const restrictedCount = users.filter((user) => user?.status === "suspended" || user?.status === "banned").length
   const now = new Date()
   const newThisMonthCount = users.filter((user) => {
     if (!user?.createdAt) return false
@@ -49,8 +50,8 @@ const AdminDashboardUsersPage = () => {
     },
     {
       id: 3,
-      title: "Unverified Users",
-      value: (users.length - verifiedCount).toLocaleString(),
+      title: "Suspended / Banned",
+      value: restrictedCount.toLocaleString(),
       icon: "UserX",
       iconColor: "#FFAE00",
       iconBg: "rgba(255, 174, 0, 0.15)"

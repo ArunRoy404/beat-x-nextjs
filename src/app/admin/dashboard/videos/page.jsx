@@ -2,7 +2,9 @@ import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 import { getQueryClient } from "@/lib/reactQuery/getQueryClient";
 import { queryKeys } from "@/lib/reactQuery/queryKeys";
 import { getVideosRequest } from "@/services/admin/videosServices";
+import { getGenresRequest } from "@/services/admin/genreServices";
 import { buildVideosParams } from "@/hooks/api/admin/videos/videosParams";
+import { TAXONOMY_OPTIONS_PARAMS } from "@/lib/constants/taxonomyOptions";
 import AdminDashboardVideosPage from "@/templates/admin/dashboard/AdminDashboardVideosPage";
 
 // No `export const revalidate` here on purpose: getVideosRequest reads
@@ -29,6 +31,10 @@ const page = async ({ searchParams }) => {
           queryFn: () => getVideosRequest(defaultParams),
         })
       : Promise.resolve(),
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.genre.list(TAXONOMY_OPTIONS_PARAMS),
+      queryFn: () => getGenresRequest(TAXONOMY_OPTIONS_PARAMS),
+    }),
   ]);
 
   return (

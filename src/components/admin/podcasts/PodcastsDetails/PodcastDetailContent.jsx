@@ -8,6 +8,32 @@ import { formatDurationMs } from "@/lib/format/formatDuration"
 import { useGlobalMediaPlayerStore } from "@/zustandStore/media/useGlobalMediaPlayerStore"
 import { getSongAudioUrl, resolveMediaUrl } from "@/lib/format/resolveMediaUrl"
 import { toast } from "sonner"
+import { useCategories } from "@/hooks/api/admin/categories/useCategories"
+import { TAXONOMY_OPTIONS_PARAMS } from "@/lib/constants/taxonomyOptions"
+import { PODCAST_STATUS_LABELS, normalizePodcastStatus } from "@/lib/constants/podcastStatus"
+
+/**
+ * `ownerId` and `reviewedBy` are Mongo refs: sometimes populated objects,
+ * sometimes bare ObjectIds. Either way they must be reduced to a string —
+ * rendering the object itself throws "Objects are not valid as a React child".
+ */
+const refToText = (ref, ...fields) => {
+    if (!ref) return ""
+    if (typeof ref === "string") return ref
+    if (typeof ref === "object") {
+        for (const field of fields) {
+            if (ref?.[field]) return ref[field]
+        }
+        return ref?._id || ""
+    }
+    return ""
+}
+
+const formatDate = (value) => {
+    if (!value) return ""
+    const date = new Date(value)
+    return isNaN(date.getTime()) ? "" : format(date, "MMM d, yyyy")
+}
 
 const PodcastDetailContent = ({ podcast }) => {
     const {
@@ -34,7 +60,7 @@ const PodcastDetailContent = ({ podcast }) => {
                 id: episodeId || audioSrc,
                 mediaType: "audio",
                 src: audioSrc,
-                title: episode?.title ? `Ep. ${episode.episodeNumber || 1}: ${episode.title}` : "Podcast Episode",
+                title: episode?.title ? `Ep. ${episode?.episodeNumber || 1}: ${episode?.title}` : "Podcast Episode",
                 artist: artistName,
                 coverUrl: episode?.coverUrl || podcast?.coverUrl,
                 durationMs: episode?.durationMs || 0,
@@ -42,19 +68,27 @@ const PodcastDetailContent = ({ podcast }) => {
         }
     }
 
+    const categoriesQuery = useCategories(TAXONOMY_OPTIONS_PARAMS)
+    const categoriesList = categoriesQuery?.data?.data ?? []
+    const categoryName =
+        (typeof podcast?.category === "object" ? podcast?.category?.name : "") ||
+        categoriesList.find((category) => category?._id === podcast?.category)?.name ||
+        "-"
+
     const episodes = podcast?.episodes || []
 
     return (
         /* Scrollable Body Content */
         <div className="p-4 flex flex-col gap-5 overflow-y-auto flex-1 min-h-0 scrollbar-thin">
             <div className="grid grid-cols-2 gap-4">
-                <CommonInfoBox label="Owner" value={podcast?.ownerId?.name} />
-                <CommonInfoBox label="Category / Genre" value={podcast?.category?.name || podcast?.genre?.name} />
-                <CommonInfoBox label="Language" value={podcast?.language} />
+                <CommonInfoBox label="Owner" value={refToText(podcast?.ownerId, "name", "email") || "-"} />
+                <CommonInfoBox label="Category" value={categoryName} />
+                <CommonInfoBox label="Language" value={podcast?.language || "-"} />
                 <CommonInfoBox label="Total Episodes" value={podcast?.totalEpisodes ?? episodes.length} />
-                <CommonInfoBox label="Rating" value={podcast?.ratingCount ? `${podcast.ratingAverage} (${podcast.ratingCount})` : "-"} />
+                <CommonInfoBox label="Rating" value={podcast?.ratingCount ? `${podcast?.ratingAverage} (${podcast.ratingCount})` : "-"} />
                 <CommonInfoBox label="Weekly Plays" value={podcast?.playCountWeek ?? 0} />
-                <CommonInfoBox label="Published" value={podcast?.publishedAt ? format(new Date(podcast.publishedAt), "MMM d, yyyy") : "-"} />
+                <CommonInfoBox label="Published" value={formatDate(podcast?.publishedAt) || "-"} />
+                <CommonInfoBox label="Scheduled For" value={formatDate(podcast?.scheduledAt) || "-"} />
 
                 {/* Description Box (Full Width) */}
                 <div className="col-span-2 border border-white/10 bg-white/5 rounded-[16px] p-3 px-4 flex flex-col gap-1.5 w-full">
@@ -84,7 +118,7 @@ const PodcastDetailContent = ({ podcast }) => {
 
                                 return (
                                     <div
-                                        key={episode._id}
+                                        key={episode?._id}
                                         className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-white/[0.02] border border-white/5 rounded-[14px] hover:border-secondary/30 transition-all group"
                                     >
                                         <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
@@ -106,24 +140,24 @@ const PodcastDetailContent = ({ podcast }) => {
                                             <div className="flex flex-col min-w-0 flex-1 gap-1">
                                                 <div className="flex items-center gap-2 flex-wrap">
                                                     <span className="text-[11px] font-mono font-medium text-secondary bg-secondary/10 px-2 py-0.5 rounded-md shrink-0">
-                                                        {episode.seasonNumber ? `S${episode.seasonNumber} ` : ""}Ep. {episode.episodeNumber || 1}
+                                                        {episode?.seasonNumber ? `S${episode.seasonNumber} ` : ""}Ep. {episode?.episodeNumber || 1}
                                                     </span>
                                                     <span className="text-whitetext font-semibold text-[13.5px] truncate">
-                                                        {episode.title}
+                                                        {episode?.title}
                                                     </span>
                                                 </div>
 
-                                                {episode.description && (
+                                                {episode?.description && (
                                                     <p className="text-light-gray/60 text-[12px] line-clamp-2 leading-relaxed">
                                                         {episode.description}
                                                     </p>
                                                 )}
 
                                                 <div className="flex items-center gap-3 text-[11px] text-light-gray/40 font-mono flex-wrap mt-0.5">
-                                                    <span>{formatDurationMs(episode.durationMs)}</span>
+                                                    <span>{formatDurationMs(episode?.durationMs)}</span>
                                                     <span>•</span>
-                                                    <span>{episode.playCount ?? 0} plays</span>
-                                                    {episode.publishedAt && (
+                                                    <span>{episode?.playCount ?? 0} plays</span>
+                                                    {episode?.publishedAt && (
                                                         <>
                                                             <span>•</span>
                                                             <span>{format(new Date(episode.publishedAt), "MMM d, yyyy")}</span>
@@ -135,7 +169,7 @@ const PodcastDetailContent = ({ podcast }) => {
 
                                         <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
                                             <span className="text-[11px] px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-light-gray font-medium capitalize">
-                                                {episode.status}
+                                                {episode?.status}
                                             </span>
                                         </div>
                                     </div>
@@ -148,6 +182,19 @@ const PodcastDetailContent = ({ podcast }) => {
                         </div>
                     )}
                 </div>
+            </div>
+
+            {/* Moderation / review trail — populated once a podcast goes
+                through the artist submission queue (approve/reject). */}
+            <div className="grid grid-cols-2 gap-4">
+                <CommonInfoBox
+                    label="Submitted Status"
+                    value={PODCAST_STATUS_LABELS[normalizePodcastStatus(podcast?.submittedStatus)] || "-"}
+                />
+                <CommonInfoBox label="Submitted At" value={formatDate(podcast?.submittedAt) || "-"} />
+                <CommonInfoBox label="Reviewed By" value={refToText(podcast?.reviewedBy, "name", "email") || "-"} />
+                <CommonInfoBox label="Reviewed At" value={formatDate(podcast?.reviewedAt) || "-"} />
+                <CommonInfoBox label="Rejection Reason" value={podcast?.rejectionReason || "-"} />
             </div>
         </div>
     )

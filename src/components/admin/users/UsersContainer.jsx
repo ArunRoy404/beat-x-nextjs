@@ -8,6 +8,7 @@ import CommonFilter from "@/components/shared/commonFilter/commonFilter"
 import CommonSearch from "@/components/shared/CommonSearch/CommonSearch"
 import CommonPagination from "@/components/shared/CommonPagination/CommonPagination"
 import CommonTableContainer from "@/components/shared/CommonTable/CommonTableContainer"
+import UserStatusBadge from "@/components/shared/UserStatusBadge/UserStatusBadge"
 import InviteUserDialog from "@/components/dialogs/admin/users/InviteUserDialog"
 import UserDetailsDialog from "@/components/dialogs/admin/users/UserDetailsDialog"
 import DeleteUserDialog from "@/components/dialogs/admin/users/DeleteUserDialog"
@@ -33,21 +34,21 @@ const UsersContainer = () => {
 
   const { data, isLoading, isError, error, refetch } = useUsers(params)
 
-  const usersList = Array.isArray(data) ? data : data?.data || []
+  const usersList = Array.isArray(data) ? data : data?.admins || data?.data || []
   const totalItems = data?.total ?? usersList.length
   const totalPages = (data?.totalPages ?? Math.ceil(totalItems / limit)) || 1
 
   const activeTab = useMemo(() => {
     const s = (rawStatus || "").toLowerCase()
-    if (s === "verified") return "Verified"
-    if (s === "unverified") return "Unverified"
+    if (s === "active") return "Active"
+    if (s === "suspended") return "Suspended"
+    if (s === "banned") return "Banned"
     return "All"
   }, [rawStatus])
 
   const handleTabChange = (tabName) => {
     const name = tabName.toLowerCase()
-    if (name === "verified") setParams({ status: "verified" })
-    else if (name === "unverified") setParams({ status: "unverified" })
+    if (["active", "suspended", "banned"].includes(name)) setParams({ status: name })
     else setParams({ status: "" })
   }
 
@@ -59,7 +60,7 @@ const UsersContainer = () => {
         <>
           {/* Tab pills */}
           <CommonFilter
-            tabs={["All", "Verified", "Unverified"]}
+            tabs={["All", "Active", "Suspended", "Banned"]}
             activeTab={activeTab}
             onChange={handleTabChange}
           />
@@ -110,11 +111,7 @@ const UsersContainer = () => {
                         <span className="text-light-gray/60 text-xs">{user?.email || "-"}</span>
                       </div>
                     </div>
-                    <span className={`text-[12px] font-semibold select-none ${
-                      user?.isVerified ? "text-[#34C759]" : "text-[#FFCC00]"
-                    }`}>
-                      {user?.isVerified ? "Verified" : "Unverified"}
-                    </span>
+                    <UserStatusBadge status={user?.status} />
                   </div>
 
                   <div className="flex flex-wrap gap-2 text-xs">
